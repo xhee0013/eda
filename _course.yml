@@ -10,18 +10,23 @@ schedule:
   - week: 3
     lecturer: Emi
     topic: "Initial data analysis: Model dependent exploration and how it differs from EDA"
+    readings: "[The initial examination of data](https://www.jstor.org/stable/2981969?seq=1#metadata_info_tab_contents)"
   - week: 4
     lecturer: Emi
     assessment: "Assignment 1 **due Fri 28 Aug 11:55 PM**"
+    readings: "Unwin (2015) Graphical Data Analysis Ch 3-4"
     topic: "Working with a single variable, making transformations, detecting outliers, using robust statistics"
   - week: 5
     lecturer: Di
+    readings: "Unwin (2015) Graphical Data Analysis Ch 5"
     topic: "Bivariate dependencies and relationships, transformations to linearise"
   - week: 6
     lecturer: Di
+    readings: "Unwin (2015) Graphical Data Analysis Ch 6"
     topic: "Going beyond two variables, exploring high dimensions"
   - week: 7
     lecturer: Emi
+    readings: "Unwin (2015) Graphical Data Analysis Ch 10"
     topic: Making comparisons between groups and strata
     assessment: "Assignment 2 **due Fri 18 Sep 11:55 PM**"
   - week: 8
@@ -29,6 +34,7 @@ schedule:
     topic: Sculpting data using models, checking assumptions, co-dependency and performing diagnostics
   - week: 9
     lecturer: Di
+    readings: "Unwin (2015) Graphical Data Analysis Ch 11"
     topic: Exploring data having a space and time context
   - week: 10
     lecturer: Emi

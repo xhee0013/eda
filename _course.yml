@@ -3,7 +3,7 @@ schedule:
     lecturer: Di
     topic: "Overview. Why this course? What is EDA?"
     readings: ""
-    assessment: ""
+    assessment: "<ul><li>Reading quizzes *each week*.</li> <li>Engagement *each week* based on lecture attendance, github commits, discussion posts, and among others. Where you cannot attend lectures or tutorials due to clashes, you are expected to engage in other ways.</li></ul>"
   - week: 2
     lecturer: Di
     topic: "Learning from history"
@@ -12,6 +12,7 @@ schedule:
     topic: "Initial data analysis: Model dependent exploration and how it differs from EDA"
   - week: 4
     lecturer: Emi
+    assessment: "Assignment 1 **due Fri 28 Aug 11:55 PM**"
     topic: "Working with a single variable, making transformations, detecting outliers, using robust statistics"
   - week: 5
     lecturer: Di
@@ -22,6 +23,7 @@ schedule:
   - week: 7
     lecturer: Emi
     topic: Making comparisons between groups and strata
+    assessment: "Assignment 2 **due Fri 18 Sep 11:55 PM**"
   - week: 8
     lecturer: Emi
     topic: Sculpting data using models, checking assumptions, co-dependency and performing diagnostics
@@ -37,16 +39,17 @@ schedule:
   - week: 12
     lecturer: Emi/Di
     topic: Your turn to present your project work
+    assessment: "<ul><li>Group presentation **Mon 2 Nov 4:00PM**.</li><li>Assignment 3 **due Fri 6 Nov 11:55 PM**</li></ul>"
 team:
   - name: Prof Di Cook
     role: lecturer
-    consult: Mon 3-4pm (Wk 1-2, 5-6, 9, 11-12)
+    consult: Thu 11.30-12.30pm (Wk 1-2, 5-6, 9, 11-12)
   - name: Dr Emi Tanaka (Chief Examiner)
     role: lecturer
-    consult: Mon 3-4pm (Wk 3-4, 7-8, 10-12)
+    consult: Thu 11.30-12.30pm (Wk 3-4, 7-8, 10-12)
   - name: Sayani Gupta
     role: tutor
-    consult: Mon 3-4pm
+    consult: Tue 1.45-2.30pm (Wk 1-12)
   - name: Sherry Zhang
     role: tutor
-    consult: Mon 3-4pm
+    consult: Fri 2.45-3.30pm (Wk 1-12)

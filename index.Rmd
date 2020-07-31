@@ -65,7 +65,8 @@ All consultations will be in using zoom. Check Moodle for the links.
 
 ```{r consult, results="asis"}
 team_df %>% 
-  mutate(consult_print = glue::glue("{paste0(name, ': ', consult)}")) %>% 
+  mutate(name = gsub(" (Chief Examiner)", "", name, fixed = T)) %>% 
+  mutate(consult_print = glue::glue("**{name}**: {consult}")) %>% 
   pull(consult_print) %>% 
   ui_list()
 ```
@@ -109,7 +110,7 @@ schedule_df <- schedule_df %>%
 midsem_break <- 7 # after which week
 
 schedule_df %>% 
-  kable(escape = FALSE, align = c("c", "c", "c", "c", "l", "l"),
+  kable(escape = FALSE, align = c("c", "c", "c", "c", "l", "l", "l"),
         col.names = c("Week", "Lecturer", "Slides", "Tutorial", 
                       "Topic", "Readings", "Assessments")) %>% 
   kable_styling(bootstrap_options = "striped",

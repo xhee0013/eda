@@ -2,7 +2,7 @@ schedule:
   - week: 1
     lecturer: Di
     topic: "Overview. Why this course? What is EDA?"
-    readings: " [50 Years of Data Science](https://www.tandfonline.com/doi/full/10.1080/10618600.2017.1384734)"
+    readings: "[50 Years of Data Science](https://www.tandfonline.com/doi/full/10.1080/10618600.2017.1384734)"
     assessment: "<ul><li>Reading quizzes *each week*.</li> <li>Engagement *each week* based on lecture attendance, github commits, discussion posts, and among others. Where you cannot attend lectures or tutorials due to clashes, you are expected to engage in other ways.</li></ul>"
   - week: 2
     lecturer: Di

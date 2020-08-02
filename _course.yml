@@ -1,4 +1,9 @@
 schedule:
+  - week: 0
+    lecturer: Di
+    topic: "Course information"
+    readings:
+    assessment:
   - week: 1
     lecturer: Di
     topic: "Overview. Why this course? What is EDA?"

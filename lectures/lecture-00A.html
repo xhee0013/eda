@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Di Cook" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="assets/chroma.min.js"></script>
+    <script src="assets/rgb-color.js"></script>
+    <script src="assets/hcl-color.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles2.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/di.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=lecture-00A.pdf/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/wk1bg1.jpg)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Getting started&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Di Cook*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 1 - Session 0
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+---
+
+&lt;div class="grid" style="grid: 1fr / 1.2fr 2fr;"&gt;
+&lt;div class="item white monash-bg-blue border-right"&gt;
+&lt;br&gt;
+
+&lt;div class="circle-image"&gt;
+&lt;center&gt;
+&lt;img src="http://dicook.org/img/dicook-2019.png" width = "150px"/&gt;
+&lt;/center&gt;
+&lt;/div&gt;
+
+**Di Cook** &lt;br&gt;
+*Professor of Business Analytics*&lt;br&gt;
+Monash University
+
+&lt;br&gt;
+
+&lt;i class="fas fa-globe"&gt;&lt;/i&gt; https://dicook.org/
+
+&lt;i class="fas fa-envelope"&gt;&lt;/i&gt; ETC5521.Clayton-x@monash.edu
+
+&lt;i class="fab fa-twitter"&gt;&lt;/i&gt; @visnut
+
+&lt;/div&gt;
+
+&lt;div class="item"&gt;
+
+&lt;h1&gt;About your instructor&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;I moved to Melbourne in Jul 2015 to start my job at Monash&lt;/li&gt;
+&lt;li&gt;I have a PhD from Rutgers University, NJ, and a Bachelor of Science from University of New England, Armidale <span>&lt;i class="fas  fa-quidditch faa-spin animated-hover "&gt;&lt;/i&gt;</span>&lt;/li&gt;
+&lt;li&gt;I am a Fellow of the American Statistical Association, elected member of the International Statistical Insitute, and an elected member of the R Foundation.  <span>&lt;i class="fas  fa-book faa-tada animated-hover "&gt;&lt;/i&gt;</span>&lt;/li&gt;
+
+&lt;li&gt;My main  research is in data visualisation, statistical graphics and computing, with application to sports, ecology and bioinformatics. I like to develop new methodology and software. <span>&lt;i class="fas  fa-chart-bar faa-burst animated-hover "&gt;&lt;/i&gt;</span>&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+---
+&lt;div class="grid" style="grid: 1fr / 1.2fr 2fr;"&gt;
+&lt;div class="item white monash-bg-blue border-right"&gt;
+&lt;br&gt;
+
+&lt;div class="circle-image"&gt;
+&lt;center&gt;
+&lt;img src="images/avatar.png" width = "150px"/&gt;
+&lt;/center&gt;
+&lt;/div&gt;
+
+**Emi Tanaka** &lt;br&gt;
+*Lecturer in Statistics*&lt;br&gt;
+Monash University
+
+&lt;br&gt;
+
+&lt;i class="fas fa-globe"&gt;&lt;/i&gt; https://emitanaka.org/
+
+&lt;i class="fas fa-envelope"&gt;&lt;/i&gt; ETC5521.Clayton-x@monash.edu
+
+&lt;i class="fab fa-twitter"&gt;&lt;/i&gt; @statsgen
+
+&lt;/div&gt;
+
+&lt;div class="item"&gt;
+
+&lt;h1&gt;About your instructor&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;I moved to Melbourne in Jan 2020 to start my job at Monash&lt;/li&gt;
+&lt;li&gt;I teach R at university courses as well as use it daily for research and hobby <span>&lt;i class="fab  fa-reddit-alien faa-spin animated-hover "&gt;&lt;/i&gt;</span>&lt;/li&gt;
+&lt;li&gt;If you ever wonder who answers those stackoverflow questions, I'm one of those magic fairies <span>&lt;i class="fab  fa-stack-overflow faa-tada animated-hover "&gt;&lt;/i&gt;</span>&lt;/li&gt;
+
+&lt;center&gt;
+&lt;a href="https://stackexchange/users/10113966/emi"&gt;&lt;img src="https://stackoverflow.com/users/flair/10113966.png" width="208" height="58" alt="profile for Emi at Stack Overflow, Q&amp;amp;A for professional and enthusiast programmers" title="profile for Emi at Stack Overflow, Q&amp;amp;A for professional and enthusiast programmers" style="border:solid 2px black;"&gt;&lt;/a&gt;
+&lt;/center&gt;
+&lt;li&gt;My main statistical application is agriculture and bioinformatics; these days I do more software&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+---
+
+
+&lt;div class="grid" style="grid: 1fr / 1.2fr 2fr;"&gt;
+&lt;div class="item white monash-bg-blue border-right"&gt;
+&lt;br&gt;
+
+&lt;div class="circle-image"&gt;
+&lt;center&gt;
+&lt;img src="https://sayani.netlify.app/authors/admin/avatar_hua3aa348ba72a0105ccf6cbcb16ae73b2_67379_250x250_fill_q90_lanczos_center.jpg" width = "150px"/&gt;
+&lt;/center&gt;
+&lt;/div&gt;
+
+**Sayani Gupta** &lt;br&gt;
+*PhD student*&lt;br&gt;
+Monash University
+
+&lt;br&gt;
+
+&lt;i class="fas fa-globe"&gt;&lt;/i&gt; https://sayani.netlify.app
+
+&lt;i class="fab fa-twitter"&gt;&lt;/i&gt; @SayaniGupta07
+
+&lt;/div&gt;
+
+&lt;div class="item"&gt;
+
+&lt;h1&gt;About your tutor&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt; My research focuses on building visualization and statistical tools for analyzing spatially distributed big time series data.
+&lt;li&gt; I'm passionate about putting to use statistics to solve real world problems.
+&lt;li&gt; I spend my time learning Indian classical music, and exploring cafes near me.
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+---
+
+
+&lt;div class="grid" style="grid: 1fr / 1.2fr 2fr;"&gt;
+&lt;div class="item white monash-bg-blue border-right"&gt;
+&lt;br&gt;
+
+&lt;div class="circle-image"&gt;
+&lt;center&gt;
+&lt;img src="https://huizezhangsh.netlify.app/authors/admin/avatar_hu756ae419dca872ecfcac293f58082c63_38882_250x250_fill_q90_lanczos_center.jpeg" width = "150px"/&gt;
+&lt;/center&gt;
+&lt;/div&gt;
+
+**Sherry Zhang** &lt;br&gt;
+*PhD student*&lt;br&gt;
+Monash University
+
+&lt;br&gt;
+
+&lt;i class="fas fa-globe"&gt;&lt;/i&gt; https://huizezhangsh.netlify.app
+
+&lt;i class="fab fa-twitter"&gt;&lt;/i&gt; @huizezhangsh
+
+&lt;/div&gt;
+
+&lt;div class="item"&gt;
+
+&lt;h1&gt;About your tutor&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt; I am a first year PhD student in Monash University
+&lt;li&gt; I'm working on the diagnostics of projection pursuit optimisation
+&lt;li&gt; I like programming using R 
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+---
+background-image: url(images/wk1bg2.jpg)
+background-size: 30%
+background-position: 100% 0%
+class: middle
+
+
+.font_large[Introduce yourself in the chat!]
+
+&lt;br&gt;
+
+* What was your undergraduate degree in?
+* What's your profession?  
+* Where do you live?
+* What's your hobby? 
+* What's one thing you want everyone &lt;br&gt; to know (about you)? 
+
+
+---
+class: center
+
+# Help me!
+
+
+&lt;br&gt;&lt;br&gt;
+
+You can write in the chat.
+
+&lt;br&gt;
+
+You can ask (unmute yourself).
+
+&lt;br&gt;
+
+You can raise hand from zoom under Participants.
+
+&lt;img src="images/zoom-help.png"&gt;
+
+---
+
+# Where to go to find information
+
+- Primary source for notes and contact information: https://eda.numbat.space
+- Moodle for discussion forum, questions and answering questions.
+- Flux for quizzes. **Sign in with your monash email address, to be sure your marks are transferred correctly.**
+
+---
+class: transition middle animated slideInLeft
+
+# Schedule at [.orange[https://eda.numbat.space]](https://eda.numbat.space)
+
+
+---
+# Assessment
+
+- Reading quizzes (weekly) **10%**
+- Engagement **10%** (calculated on lecture attendance, github commits, discussion posts and answers)
+- Assignment 1, 2, 3 (**20%** each): completed on GitHub
+- Final presentation **20%**
+
+---
+
+
+background-image: url(images/wk1bg1.jpg)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Di Cook
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "googlecode",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

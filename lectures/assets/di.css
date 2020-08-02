@@ -1,0 +1,82 @@
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
+li {
+  position: relative;
+  display: list-item;
+  text-align: left;
+  padding-left: 45px!important;
+}
+
+.padtop0 {
+  padding-top: 0;
+}
+
+ul {
+    display: block;
+    list-style: none; /* Remove list bullets */
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 0;
+}
+
+ul li:before {
+  content: "\f135";
+  font-size: 28px;
+  font-family: "FontAwesome";
+  margin-right: 10px;
+  color: #D93F00;
+}
+
+ul li li:before {
+  content: "\f186";
+  font-size: 28px;
+  font-family: "FontAwesome";
+  margin-right: 10px;
+  color: #D93F00;
+}
+
+.grid2, .grid2-col, .grid2-row {
+  display: grid;
+  margin-left: 1em;
+  margin-right: 1em;
+  width: calc(70% + 8em);
+  height: 100%;
+}
+
+.scroll-800 {
+  overflow-y: scroll;
+  height: 600px;
+}
+
+pre {
+  text-align: left!important
+}
+
+.custom-list ul li li li:before {
+  content: "";
+}
+
+blockquote {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 40px;
+  margin-right: 40px;
+  font-style: italic;
+}
+
+.font_large .remark-code { font-size: 30pt;}
+
+.pull-left {
+  float: left;
+  width: 47%;
+  padding-top: 50px;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+  padding-top: 50px;
+}
+

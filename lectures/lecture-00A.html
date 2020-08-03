@@ -292,26 +292,123 @@ You can raise hand from zoom under Participants.
 &lt;img src="images/zoom-help.png"&gt;
 
 ---
+class: middle center
 
-# Where to go to find information
+## 👋 .monash-blue[Welcome to ETC5521 Exploratory data analysis!]
 
-- Primary source for notes and contact information: https://eda.numbat.space
-- Moodle for discussion forum, questions and answering questions.
-- Flux for quizzes. **Sign in with your monash email address, to be sure your marks are transferred correctly.**
+&lt;br&gt;
 
----
-class: transition middle animated slideInLeft
-
-# Schedule at [.orange[https://eda.numbat.space]](https://eda.numbat.space)
-
+.monash-blue[Before modelling and predicting, data should first be explored to uncover the patterns and structures that exist. Exploratory data analysis involves both numerical and visual techniques designed to reveal interesting information that may be hidden in the data. However, an analyst must be cautious not to over-interpret apparent patterns, and to properly assess the results of a data exploration.]
 
 ---
-# Assessment
 
-- Reading quizzes (weekly) **10%**
-- Engagement **10%** (calculated on lecture attendance, github commits, discussion posts and answers)
-- Assignment 1, 2, 3 (**20%** each): completed on GitHub
-- Final presentation **20%**
+# 📅 Unit Structure 
+
+&lt;br&gt;
+
+-  2 hour lectures &lt;i class="fas fa-chalkboard-teacher"&gt;&lt;/i&gt;  <span class=" faa-bounce animated-hover " style=" display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">Mon 4.00-6.00PM</span>
+
+&lt;br&gt;
+
+- 1.5 hour tutorial  &lt;i class="fas fa-wrench"&gt;&lt;/i&gt; <span class=" faa-bounce animated-hover " style=" display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">Mon 6.00-7.30PM</span> 
+
+&lt;br&gt;&lt;br&gt;
+
+&lt;center&gt; *Attendances are recorded.* &lt;/center&gt;
+---
+
+# 🎯 ETC5521 Learning Objectives
+
+&lt;br&gt;
+.info-box.wider-list.width70[
+1. learn to use modern data exploration tools with real data to uncover interesting structure and
+unusual observations 
+2. understand how to map out appropriate analyses, and to define what we would expect to see in the data 
+3. be able to compute null samples in order to test apparent patterns, and to interpret the
+results of visual inference 
+]
+
+---
+# 📚 Resources
+
+&lt;br&gt;
+
+&lt;i class="fa fa-home"&gt;&lt;/i&gt; **Course homepage**: this is where you find the course materials &lt;br&gt;(lecture slides, tutorials and tutorial solutions)
+### https://eda.numbat.space/
+
+&lt;i class="fa fa-archive"&gt;&lt;/i&gt; **Moodle**: this is where you find discussion forum, zoom links, assignments and marks
+### https://lms.monash.edu/course/view.php?id=81234
+
+&lt;i class="fa fa-bell"&gt;&lt;/i&gt; **Flux for quizzes**. Sign in with your monash email address, to be sure your marks are transferred correctly.
+### https://flux.qa/J974UJ
+
+---
+# 💯 Assessment .font_small[Part 1/3]
+
+# Engagement (total 10%)
+
+* Lecture and tutorial participation will contribute to this.
+* If you have some clashes for lecture or tutorial, there are other opportunities to show your engagement, including:
+  * posting in the Moodle discussion forum, 
+  * github commits (more on this later in the course), 
+  * peer reviewing (more on this later in the course), and 
+  * online submissions (see Tutorial Q3 for example). 
+* There should be **at least 3 measurable and meaningful engagement activities each week** (contributing to 1% of your final mark capped to 10% over the whole semester; in other words, you can miss 2 weeks, .font_small[or 4 weeks counting mid-semester break although harder to gain engagement marks over that period], without impacting your mark). 
+
+---
+# 💯 Assessment .font_small[Part 2/3]
+
+# Weekly quizzes **10%** 
+There will be a weekly quiz provided through flux, on reading or exercises conducted during the tutorial. These are a great chance to check your knowledge, and help you keep up with the weekly course material.
+&lt;br&gt;
+
+# Assignment 1, 2, 3 (**20%** each): through GitHub classroom
+Weeks 4, 7, 12 are the due dates for these. We'll be working on a buddy system. For each assignment you will be randomly grouped with another student, and you will work together to provide a solution. Different partner each time. The work needs to be conducted using Github, so that your efforts on the team work will be clear. 
+
+---
+# 💯 Assessment .font_small[Part 3/3]
+
+# Final presentation **20%**
+
+In other classes, e.g. ETC5510 you have had the chance to build your EDA skills. This project is designed to help you critically assess a data analysis. The task will involve examining a given data analysis, and critically and positively examining the parts, and providing strategies for improving on it.
+---
+
+# 🔶 Expectations .font_small[Part 1/2]
+
+* Lectures are recorded but you are expected to have either attended the lecture, or watched the recordings fully, prior to the tutorial for the week.
+* Tutorials may not be recorded, and attendance is expected.
+* Questions related to the course should be raised at moodle discussion forum.
+* For personal or private administrative issues, the email contact is: ETC5521.Clayton-x@monash.edu
+* If you register after the start of the semester or if you miss a lecture/tutorial, it is your responsibility to catch up with missed material, learn about due dates for material to be turned in, and getting assigned to a group for team work, as necessary.
+* All times are given in AEST (Melbourne time).
+
+---
+
+# 🔶 Expectations .font_small[Part 2/2]
+
+* **ETC5513 is prerequisite**. Some of you may have exemption (due to evidence of equivalent knowledge to ETC5513) or gone through the bridging course instead. 
+* It's expected that you know how to use **git**, **github** and basic **R Markdown** (as taught in ETC5513). 
+* The priority of the ETC5521 teaching team is to support you in ETC5521 material.
+* It's essential in this course that you have a [GitHub](https://github.com/) account. It is free to register.
+
+---
+# GitHub Classroom
+
+We are going to use GitHub Classroom to keep track of your repos and distribute templates. 
+
+1. Start with the test assignment by clicking on the link given in [Moodle](https://lms.monash.edu/course/view.php?id=81234) **before Fri 7 Aug 11PM** and make sure you identify yourself by connecting your name to the roster.
+2. Once you have accepted it .font_small[(note: some browsers do not work well with GitHub Classroom so use Chrome or Firefox)], you can find your repo here:
+&lt;center&gt;
+&lt;a href="https://github.com/etc5521-2020"&gt;https://github.com/etc5521-2020&lt;/a&gt;
+&lt;/center&gt;
+3. If you don't recall how to connect this repo locally, check [this guide](https://github.com/jfiksel/github-classroom-for-students).
+4. Make some small changes to your repo and make sure these changed are pushed to GitHub.
+
+---
+
+class: nostripheader middle
+
+# Questions?
 
 ---
 

@@ -477,8 +477,7 @@ ggplot(tips_aug,
     aes(x=size, y=tip_pct)) + #<<
   geom_point() +
   geom_smooth(method="lm") +
-  xlab("observed") +
-  ylab("fitted")
+  ylab("tip %")
 ```
 ]]
 .pull-right[

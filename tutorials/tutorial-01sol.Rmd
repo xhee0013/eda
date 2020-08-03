@@ -1,0 +1,10 @@
+---
+title: "ETC5521 Tutorial 1 Solution"
+subtitle: "Introduction to exploratory data analysis"
+author: "Prof. Di Cook"
+date: "Week 1"
+output:
+  html_document
+---
+
+## No graded exercises this week

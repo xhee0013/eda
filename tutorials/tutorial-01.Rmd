@@ -1,0 +1,37 @@
+---
+title: "ETC5521 Tutorial 1"
+subtitle: "Introduction to exploratory data analysis"
+author: "Prof. Di Cook"
+date: "Week 1"
+output:
+  html_document:
+    toc: true
+---
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+This is the first tutorial meeting of the semester. It is just after the first lecture, which makes it difficult to plan to cover any lecture material here. The goal, then, is to get to know other people in the class with you, and your tutors, and to get started thinking about exploratory data analysis. 
+
+## `r emo::ji("wrench")` Preparation 
+
+The reading for this week is [50 Years of Data Science](https://www.tandfonline.com/doi/full/10.1080/10618600.2017.1384734). This is a very long read, but try to browse the sections and pick the parts that are most interesting for you. This will be the basis of the tutorial discussion today.
+
+## Exercise 1.1: Introduce yourself
+
+In the chat window, say hello, add something fun about yourself, if you feel comfortable.
+
+## Exercise 1.2: Discussion groups
+
+We are going to divide into two groups, with a tutor managing the discussion in each. Think about the sentence or paragraph that was most meaningful from the paper assigned for reading. When it is your turn read this out, and tell us why this stood out. 
+
+## Exercise 1.3: Complete the quizzes
+
+Login to https://flux.qa/J974UJ with your **Monash email address**, making a password of your choice. There will be two quizzes to complete. 
+
+- information: there is no correct answer here
+- reading trivia quiz: this is a check your knowledge from the assigned reading for this week
+

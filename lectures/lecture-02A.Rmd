@@ -151,16 +151,16 @@ This book is based on an important principle.
 Learning first what you can do will  help you to work more easily  and effectively. 
 
 <br>
-This book is about exploratory data analysis, about looking at data to see  what it seems to say. It concentrates on simple  arithmetic and easy-to-draw pictures. It regards whatever appearances  we have recognized as partial descriptions, and tries to look beneather them for  new insights. Its concern is with  appearance, not with confirmation.
+This book is about exploratory data analysis, about looking at data to see  what it seems to say. It concentrates on simple  arithmetic and easy-to-draw pictures. It regards whatever appearances  we have recognized as partial descriptions, and tries to look beneath them for  new insights. Its concern is with  appearance, not with confirmation.
 
 <br>
 **Examples, NOT case histories**
 
 <br>
-The book does not exist to make the case that exploratory data analysis is useful. Rather it exists to expose its readers and users to a considerable variety of techniques for looking more effectively at one's data.  The examples are not intended to be complete case histories. Rather they should isolated techniques in action on real data. The emphasis is on general technqiues, rather than specific problems. 
+The book does not exist to make the case that exploratory data analysis is useful. Rather it exists to expose its readers and users to a considerable variety of techniques for looking more effectively at one's data.  The examples are not intended to be complete case histories. Rather they should isolated techniques in action on real data. The emphasis is on general techniques, rather than specific problems. 
 <br>
 
-A basic problem abou any body of data is to make it more easily and effectively handleable by monds -- our minds, her mind, his mind. To this general end:
+A basic problem about any body of data is to make it more easily and effectively handleable by minds -- our minds, her mind, his mind. To this general end:
 
 - anything that make a simpler description possible makes the description more easily handleable.
 - anything that looks below the previously described surface makes the description more effective.
@@ -170,7 +170,7 @@ A basic problem abou any body of data is to make it more easily and effectively 
 
 So we shall always be glad (a) to simplify description and (b) to describe one layer deeper. In particular, 
 
-- to be able to say that we looked one layer deeper, and found nothing, is a definite step forward -- though not as far as to be abe to say that we looked deeper and found thus-and-such.
+- to be able to say that we looked one layer deeper, and found nothing, is a definite step forward -- though not as far as to be able to say that we looked deeper and found thus-and-such.
 - to be able to say that "if we change our point of view in the following way ... things are simpler" is always a gain--though not quite so much as to be able to say "if we don't bother to change out point of view (some other) things are equally simple."
 
 <br>
@@ -183,15 +183,15 @@ Consistent with this view, we believe, is a clear demand that pictures based on 
 <center> <b>Confirmation</b> </center>
 <br>
 
-The principles and procedures of what we call confirmatory data analysis are both widely used and one of the great intellectual products of our century. In their simplest form, these principles and procedures look at a sample--and at what that sample has told us abou the population from which it came--and assess the precision with which our inference from sample to population is made. We can no longer get along without confirmatory data analysis. <b>But we need not start with it.</b>
+The principles and procedures of what we call confirmatory data analysis are both widely used and one of the great intellectual products of our century. In their simplest form, these principles and procedures look at a sample--and at what that sample has told us about the population from which it came--and assess the precision with which our inference from sample to population is made. We can no longer get along without confirmatory data analysis. <b>But we need not start with it.</b>
 
 <br>
 
-The best way to <b>understand what CAN be done is not longer</b>--if it ever was--<b>to ask what things could</b>, in the current state of our skill techniques, <b>be confirmed</b> (positively or negatively). Even more understanding is <em>lost</em> if we consider each thing we can do to data <em>only</em> in terms of some set of very restrictive assumtpions under which that thing is best possible--assumptions we <em>know we CANNOT check in practice</em>.
+The best way to <b>understand what CAN be done is not longer</b>--if it ever was--<b>to ask what things could</b>, in the current state of our skill techniques, <b>be confirmed</b> (positively or negatively). Even more understanding is <em>lost</em> if we consider each thing we can do to data <em>only</em> in terms of some set of very restrictive assumptions under which that thing is best possible--assumptions we <em>know we CANNOT check in practice</em>.
 
 <center> <b>Exploration AND confirmation</b> </center>
 
-Once upon a time, statisticians only explored. Then they learned to confirm exactly--to confirm a few things exactly, each under very specific circumstances. As they emphasized exact confirmation, their techniques inevitably became less flexible. The connection of the most used techniques with past insights was weakedned. Anything to which confirmatory procedure was not explicitly attached was decried as "mere descriptive statistics", no matter how much we learned from it. 
+Once upon a time, statisticians only explored. Then they learned to confirm exactly--to confirm a few things exactly, each under very specific circumstances. As they emphasized exact confirmation, their techniques inevitably became less flexible. The connection of the most used techniques with past insights was weakened. Anything to which confirmatory procedure was not explicitly attached was decried as "mere descriptive statistics", no matter how much we learned from it. 
 
 <br>
 
@@ -209,18 +209,18 @@ Today, the flexibility of (approximate) confirmation by the jacknife makes it re
 The teacher needs to be careful about assigning problems. Not too many, please. They are likely to take longer than you think. The number supplied is to accommodate diversity of interest, not to keep everybody busy. 
 
 <br>
-Besides the length of our problems, both teacher and student need to realise that many problems do not have a single "right answer". There can be many ways to approach a body of data. Not all are equally good. For some bodies of data this may be clear, but for others we may not be able to tell from a single body of data which approach is preferred. Even several bodies of data about very similar situations may not be enough to show which approach shoud be preferred. Accordingly, it will often be quite reasonable for different analysts to reach somewhat different analyses.
+Besides the length of our problems, both teacher and student need to realise that many problems do not have a single "right answer". There can be many ways to approach a body of data. Not all are equally good. For some bodies of data this may be clear, but for others we may not be able to tell from a single body of data which approach is preferred. Even several bodies of data about very similar situations may not be enough to show which approach should be preferred. Accordingly, it will often be quite reasonable for different analysts to reach somewhat different analyses.
 
 <br>
-Yet more--to unloc the analysis of a body of day, to find the good way to approach it, may require a key, whose finding is a creative act. Not everyone can be expected to create the key to any one situation. And to continue to paraphrase Barnum, no one can be expected to create a key to each situation he or she meets. 
+Yet more--to unlock the analysis of a body of day, to find the good way to approach it, may require a key, whose finding is a creative act. Not everyone can be expected to create the key to any one situation. And to continue to paraphrase Barnum, no one can be expected to create a key to each situation he or she meets. 
 
 <br>
-**To learn about data analysis, it is right that each of us try many things that do not work**--that we tackle more problems than we make expert analyses of. We often learn less from an expertly done analysis than from one where, by not trying something, we missed--at least until we were told about it--an opportunit to learn more. Each teacher needs to recognize this in grading and commenting on problems. 
+**To learn about data analysis, it is right that each of us try many things that do not work**--that we tackle more problems than we make expert analyses of. We often learn less from an expertly done analysis than from one where, by not trying something, we missed--at least until we were told about it--an opportunity to learn more. Each teacher needs to recognize this in grading and commenting on problems. 
 
 <br>
 <center><b> Precision</b></center>
 
-The teacher who heeds these words and admits that there need be *no one correct approach* may, I regret to contemplate, still want whatever is done to be digit perfect. (Under such a requirement, the write should still be able to pass the course, but it is not clear whether she would get an "A".) One does, from time to time, have to produce digit-perfect, carefully checked results, but forgiving techniques that are not too distributed by unusual data are also, usually, *little disturbed by SMALL arithmetic errors*. The techniques we discuss here have been chosen to be forgiving. It is hoped, then, that small arithmetic errors will take little off the problem's grades, leaving severe penatlies for larger errors, either of arithmetic or concept.
+The teacher who heeds these words and admits that there need be *no one correct approach* may, I regret to contemplate, still want whatever is done to be digit perfect. (Under such a requirement, the write should still be able to pass the course, but it is not clear whether she would get an "A".) One does, from time to time, have to produce digit-perfect, carefully checked results, but forgiving techniques that are not too distributed by unusual data are also, usually, *little disturbed by SMALL arithmetic errors*. The techniques we discuss here have been chosen to be forgiving. It is hoped, then, that small arithmetic errors will take little off the problem's grades, leaving severe penalties for larger errors, either of arithmetic or concept.
 ]
 
 ---

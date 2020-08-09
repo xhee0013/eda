@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Di Cook" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="libs/fabric-3.6.3/fabric.min.js"></script>
+    <script src="libs/FileSaver-2.0.2/FileSaver.min.js"></script>
+    <script src="libs/jQuery-3.5.1/jquery-3.5.1.min.js"></script>
+    <script src="assets/chroma.min.js"></script>
+    <script src="assets/rgb-color.js"></script>
+    <script src="assets/hcl-color.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/di.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=lecture-02B.pdf/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/wk2bg1.jpg)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Learning from history&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Di Cook*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 2 - Session 2
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+
+---
+class: transition middle animated slideInLeft
+
+##  &lt;i class="fas fa-pencil-alt"&gt;&lt;/i&gt; &lt;i class="fas fa-sticky-note"&gt;&lt;/i&gt; Easy summaries -- numerical and graphical 
+
+---
+# Hinges and 5-number summaries
+
+.pull-left[
+.font_small[
+
+
+```
+##  [1] -3.2 -1.7 -0.4  0.1
+##  [5]  0.3  1.2  1.5  1.8
+##  [9]  2.4  3.0  4.3  6.4
+## [13]  9.8
+```
+
+]
+
+You know the median is the middle number. What's a hinge?
+
+There are 13 data values here, provided already sorted.  Write them into  a down-up-down-up pattern, evenly. 
+
+.font_small[.monash-blue2[Median will be 7th, hinge will be 4th from each end.]]
+]
+.pull-right[
+
+<input id = erasecanvas3 type = 'checkbox' title='Check it to erase !'>
+
+<input id = canvas3drawing-color type = 'color' value = '#005E7A' style = 'width:30px;'>
+
+<input id = exportcanvas3 type = 'button' style = 'width:55px;' value = 'Export'>
+
+<canvas id="canvas3" width="550" height="500"></canvas>
+<script>
+const canvas3 = new fabric.Canvas('canvas3', {
+    backgroundColor: 'whitesmoke',
+    isDrawingMode: true
+
+    });
+
+
+canvas3.freeDrawingBrush.width  = 3;
+
+
+canvas3drawingColorEl = document.getElementById('canvas3drawing-color');
+
+canvas3.freeDrawingBrush.color = canvas3drawingColorEl.value;
+
+canvas3drawingColorEl.onchange = function() {
+    canvas3.freeDrawingBrush.color = canvas3drawingColorEl.value;
+  };
+
+
+ $('#erasecanvas3').click(function(){
+
+    if (this.checked) {
+
+      canvas3.freeDrawingBrush.color  = 'whitesmoke';
+
+    } else {
+
+      canvas3.freeDrawingBrush.color = canvas3drawingColorEl.value;
+
+    }
+
+
+
+});
+
+
+
+
+
+ $('#erasecanvas3').click(function(){
+
+    if (this.checked) {
+
+      canvas3.freeDrawingBrush.width   = 10;
+
+    } else {
+
+      canvas3.freeDrawingBrush.width  = 3;
+
+    }
+
+
+});
+
+
+$('#exportcanvas3').click(function(){
+
+  $('#canvas3').get(0).toBlob(function(blob){
+
+    saveAs(blob, 'canvas3-IMG.png');
+
+
+  });
+
+
+});
+
+
+
+
+
+
+</script>
+]
+
+---
+# Hinges and 5-number summary
+
+.pull-left[
+&lt;img src="images/week2/canvas3-IMG.png" width="80%"&gt;
+]
+.pull-right[
+&lt;img src="images/week2/hinges.png" width="80%"&gt;
+]
+
+hinges are alternatively known as Q1 and Q3.
+---
+
+# box-and-whisker display
+
+.pull-left[
+&lt;img src="images/week2/canvas3-IMG.png" width="80%"&gt;
+]
+
+.pull-right[
+Starting with a 5-number summary
+
+&lt;img src="images/week2/5-number.png" width="80%"&gt;
+ 
+]
+
+---
+
+# box-and-whisker display
+
+.pull-left[
+Starting with a 5-number summary
+
+&lt;img src="images/week2/5-number.png" width="80%"&gt;
+ 
+]
+
+.pull-right[
+
+<input id = erasecanvas4 type = 'checkbox' title='Check it to erase !'>
+
+<input id = canvas4drawing-color type = 'color' value = '#005E7A' style = 'width:30px;'>
+
+<input id = exportcanvas4 type = 'button' style = 'width:55px;' value = 'Export'>
+
+<canvas id="canvas4" width="550" height="500"></canvas>
+<script>
+const canvas4 = new fabric.Canvas('canvas4', {
+    backgroundColor: 'whitesmoke',
+    isDrawingMode: true
+
+    });
+
+
+canvas4.freeDrawingBrush.width  = 3;
+
+
+canvas4drawingColorEl = document.getElementById('canvas4drawing-color');
+
+canvas4.freeDrawingBrush.color = canvas4drawingColorEl.value;
+
+canvas4drawingColorEl.onchange = function() {
+    canvas4.freeDrawingBrush.color = canvas4drawingColorEl.value;
+  };
+
+
+ $('#erasecanvas4').click(function(){
+
+    if (this.checked) {
+
+      canvas4.freeDrawingBrush.color  = 'whitesmoke';
+
+    } else {
+
+      canvas4.freeDrawingBrush.color = canvas4drawingColorEl.value;
+
+    }
+
+
+
+});
+
+
+
+
+
+ $('#erasecanvas4').click(function(){
+
+    if (this.checked) {
+
+      canvas4.freeDrawingBrush.width   = 10;
+
+    } else {
+
+      canvas4.freeDrawingBrush.width  = 3;
+
+    }
+
+
+});
+
+
+$('#exportcanvas4').click(function(){
+
+  $('#canvas4').get(0).toBlob(function(blob){
+
+    saveAs(blob, 'canvas4-IMG.png');
+
+
+  });
+
+
+});
+
+
+
+
+
+
+</script>
+
+]
+
+---
+# Identified end values
+
+.pull-left[
+&lt;img src="images/week2/box_and_whisker.png" width="50%"&gt;
+
+Why are some individual points singled out? 
+]
+.pull-right[
+&lt;img src="images/week2/schematic.png" width="50%"&gt;
+
+Rules for this one may be clearer?
+]
+---
+class: motivator middle
+
+## 🙀 Isn't this imposing a belief? 
+
+
+---
+class: middle center
+
+.outline-text[There is no excuse for failing to plot and look]
+
+&lt;br&gt;
+&lt;br&gt;
+
+.font_small[Another Tukey wisdom drop]
+
+---
+background-image: \url(images/week2/schematic.png)
+background-size: 20%
+background-position: 99% 50%
+# Fences and outside values
+
+- H-spread: difference between the hinges (we would call this Inter-Quartile Range)
+- step: 1.5 times H-spread
+- inner fences: 1 step outside the hinges
+- outer fences: 2 steps outside the hinges
+- the value at each end closest to, but still inside the inner fence are "adjacent"
+- values between an inner fence and its neighbouring outer fence are "outside"
+- values beyond outer fences are "far out"
+- these rules produce a SCHEMATIC PLOT
+
+---
+# New statistics: trimeans
+
+The number that comes closest to 
+
+`$$\frac{\text{lower hinge} + 2\times \text{median} + \text{upper hinge}}{4}$$`
+is the **trimean**.
+
+&lt;br&gt;
+&lt;br&gt;
+
+Think about trimmed means, where we might drop  the highest and lowest 5% of observations.
+
+---
+# Letter value plots
+
+.pull-left[
+Why break the data into quarters? Why not eighths, sixteenths? k-number summaries?
+
+What does a 7-number summary look like?
+
+&lt;img src="images/week2/7-number.png" width="80%"&gt;
+
+.monash-orange2[How would you make an 11-number summary?]
+]
+.pull-right[
+
+.font_small[
+
+```r
+library(lvplot)
+p &lt;- ggplot(mpg, 
+            aes(class, hwy))
+*p + geom_lv(aes(fill=..LV..)) +
+  scale_fill_brewer() 
+```
+
+&lt;img src="images/week2/lvplot-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+class: informative middle
+
+## Box plots are ubiquitous in use today. 
+
+🐶 🐱 Mostly used to compare distributions, multiple subsets of the data.
+
+Puts the emphasis on the <span class=" faa-spin animated-hover " style=" color:yellow; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">middle 50%</span> of observations, although variations can put emphasis on other aspects.
+
+---
+class: transition middle animated slideInLeft
+
+## Easy re-expression
+
+---
+# Logs, square roots, reciprocals
+
+.pull-left[
+What you need to know about logs?
+- how to find good enough logs fast and easily
+- that equal differences in logs correspond to equal ratios of raw values. .font_small[(This means that wherever you find people using products or ratios-- even in such things as price indexes--using logs--thus converting producers to sums and ratios to differences--is likely to help.)]
+]
+--
+
+.pull-right[
+The most common transformations are logs, sqrt root, reciprocals, reciprocals of square roots
+
+&lt;center&gt; -1, -1/2, +1/2, +1 &lt;/center&gt;
+
+What happened to ZERO?
+--
+
+<span class=" faa-passing animated-hover " style=" display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">It turns out that the role of a zero power, is for the purposes of re-expression, neatly filles by the logarithm.</span>  
+
+]
+---
+## Re-express to symmetrize the distribution
+
+&lt;img src="images/week2/logs.png" width="60%"&gt;
+
+---
+class: center middle
+## Power ladder
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+
+<span>&lt;i class="fas  fa-arrow-right faa-passing animated-hover " style=" color:orangered;"&gt;&lt;/i&gt;</span> <span class=" faa-passing animated-hover " style=" color:orangered; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">fix RIGHT-skewed values</span>
+&lt;br&gt;
+&lt;br&gt;
+
+-2, -1, -1/2, 0 (log), 1/3, 1/2, .font_large[.monash-orange2[1]], 2, 3, 4 
+
+&lt;br&gt;
+<span>&lt;i class="fas  fa-arrow-left faa-passing-reverse animated-hover " style=" color:orangered;"&gt;&lt;/i&gt;</span> <span class=" faa-passing-reverse animated-hover " style=" color:orangered; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">fix LEFT-skewed values</span>
+---
+class: middle center
+
+.outline-text[We now regard re-expression as a tool, something to let us do a better job of grasping. The grasping is done with the eye and the better job is through a more symmetric appearance.]
+
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+.font_small[Another Tukey wisdom drop]
+
+---
+# Linearising bivariate relationships
+
+&lt;img src="images/week2/linearise1.png" width="34%"&gt; 
+&lt;img src="images/week2/linearise2.png" width="34%"&gt; 
+&lt;img src="images/week2/linearise3.png" width="29%"&gt; 
+
+&lt;br&gt;
+
+The small fluctuations in later years are apparently errors or problems with data collection in the Censuses.
+
+---
+# Linearising bivariate relationships
+
+&lt;img src="images/week2/linearise4.png" width="32%"&gt; 
+&lt;img src="images/week2/linearise5.png" width="32%"&gt; 
+&lt;img src="images/week2/linearise6.png" width="32%"&gt; 
+
+&lt;br&gt;
+
+No explanation for these fluctuations. (Log didn't linearise, btw.)
+
+---
+class: center middle
+
+.outline-text[Whatever the data, we can try to gain by straightening or by flattening. When we succeed in doing one or both, we almost always see more clearly what is going on.]
+
+---
+# Rules and advice
+
+.pull-left[
+.font_medium2[
+1.Graphics are friendly.&lt;br&gt;
+2.Arithmetic often exists to make graphs possible.&lt;br&gt;
+3.Graphs force us to note the unexpected; nothing could be more important.&lt;br&gt;
+4.Different graphs show us quite different aspects of the same data.&lt;br&gt;
+5.There is no more reason to expect one graph to "tell all" than to expect one number to do the same.&lt;br&gt;
+6."Plotting `\(y\)` against `\(x\)`" involves significant choices--how we express one or both variables can be crucial.&lt;br&gt;
+]]
+--
+
+.pull-right[
+.font_small[
+7.The first step in penetrating plotting is to straighten out the dependence or point scatter as much as reasonable.&lt;br&gt;
+8.Plotting `\(y^2\)`, `\(\sqrt{y}\)`, `\(log(y)\)`, `\(-1/y\)` or the like instead of `\(y\)` is one plausible step to take in search of straightness.&lt;br&gt;
+9.Plotting `\(x^2\)`, `\(\sqrt{x}\)`, `\(log(x)\)`, `\(-1/x\)` or the like instead of `\(x\)` is another.&lt;br&gt;
+10.Once the plot is straightened, we can usually gain much by flattening it, usually by plotting residuals.&lt;br&gt;
+11.When plotting scatters, we may need to be careful about how we express `\(x\)` and `\(y\)` in order to avoid concealment by crowding.&lt;br&gt;
+]]
+
+
+---
+
+class: transition middle animated slideInLeft
+
+## Making two-way analyses
+
+&lt;br&gt;
+
+## &lt;i class="fas fa-pause-circle"&gt;&lt;/i&gt; Stay tuned for median polish, coming in a later session on spatial data
+
+---
+class: middle
+background-image: \url(https://vignette.wikia.nocookie.net/starwars/images/d/d6/Yoda_SWSB.png/revision/latest?cb=20150206140125)
+background-size: cover
+
+.monash-white[The book is a digest of] ⭐ .monash-white[tricks and treats] ⭐ .monash-white[of massaging numbers and drafting displays.] 
+
+.monash-white[Many of the tools have made it into today's analyses in various ways. Many have not.] 
+
+.monash-white[Notice the word developments too: froots, fences. Tukey brought you the word] .monash-fuchsia2["software"].monash-white[!]
+
+.monash-white[The temperament of the book is an inspiration for the mind-set for this unit. There is such delight in working with numbers!] 
+
+<span class="fa-2x faa-spin animated-hover " style=" color:yellow; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">We love data!</span>
+
+---
+# Resources
+
+- [wikipedia](https://en.wikipedia.org/wiki/Exploratory_data_analysis)
+- John W. Tukey (1977) Exploratory data analysis
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Sketching canvases made using [`fabricerin`](https://ihaddadenfodil.com/post/fabricerin-a-tutorial/)
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+---
+
+
+background-image: url(images/wk2bg1.jpg)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Di Cook
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "googlecode",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

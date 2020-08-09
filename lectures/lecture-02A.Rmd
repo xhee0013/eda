@@ -283,8 +283,24 @@ fabric_drawing(cid = "canvas1",
                cfill = "whitesmoke", 
                drawingWidth = 3, 
                gumSize = 10)
-fabric_curtail(cid = "canvas1", imgsrc = "images/week2/chevy.png", 
-                    type = "background")
+fabric_text_add(cid = "canvas1", textId = "txt1",
+                text = "250, 150, 795, 895, 695,  ",
+                left = 10, top = 10, 
+                fontFamily = "Courier", fontSize = 28)
+fabric_text_add(cid = "canvas1", textId = "txt2",
+                text = "1699, 1499, 1099, 1693,",
+                left = 10, top = 60, 
+                fontFamily = "Courier", fontSize = 28)
+fabric_text_add(cid = "canvas1", textId = "txt3",
+                text = "1166, 688, 1333, 895,",
+                left = 10, top = 110, 
+                fontFamily = "Courier", fontSize = 28)
+fabric_text_add(cid = "canvas1", textId = "txt3",
+                text = "1775, 895, 1895, 795",
+                left = 10, top = 160, 
+                fontFamily = "Courier", fontSize = 28)
+#fabric_curtail(cid = "canvas1", imgsrc = #"images/week2/chevy.png", 
+#                    type = "background")
 ```
 
 

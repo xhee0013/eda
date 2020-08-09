@@ -377,18 +377,112 @@ $('#exportcanvas1').click(function(){
 
 </script><script>
 
+  var txt1 = new fabric.Text("250, 150, 795, 895, 695,  ", {
 
-fabric.Image.fromURL('images/week2/chevy.png', function(img) {
-    img.set({
-        scaleX: canvas1.getWidth() / img.width,
-        scaleY: canvas1.getHeight() / img.height,
-        objectCaching: false,
-        originX: 'left',
-        originY: 'top'
-     });
-     canvas1.setBackgroundImage(img, canvas1.renderAll.bind(canvas1));
- });
+  left: 10,
+  top: 10,
+  fontFamily: 'Courier',
+  fontSize: 28,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
 
+});
+
+  canvas1.add(txt1);
+</script><script>
+
+  var txt2 = new fabric.Text("1699, 1499, 1099, 1693,", {
+
+  left: 10,
+  top: 60,
+  fontFamily: 'Courier',
+  fontSize: 28,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
+
+});
+
+  canvas1.add(txt2);
+</script><script>
+
+  var txt3 = new fabric.Text("1166, 688, 1333, 895,", {
+
+  left: 10,
+  top: 110,
+  fontFamily: 'Courier',
+  fontSize: 28,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
+
+});
+
+  canvas1.add(txt3);
+</script><script>
+
+  var txt3 = new fabric.Text("1775, 895, 1895, 795", {
+
+  left: 10,
+  top: 160,
+  fontFamily: 'Courier',
+  fontSize: 28,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
+
+});
+
+  canvas1.add(txt3);
 </script>
 
 

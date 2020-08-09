@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Di Cook" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="libs/fabric-3.6.3/fabric.min.js"></script>
+    <script src="libs/FileSaver-2.0.2/FileSaver.min.js"></script>
+    <script src="libs/jQuery-3.5.1/jquery-3.5.1.min.js"></script>
+    <script src="assets/chroma.min.js"></script>
+    <script src="assets/rgb-color.js"></script>
+    <script src="assets/hcl-color.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/di.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=lecture-02A.pdf/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/wk2bg1.jpg)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Learning from history&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Di Cook*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 2 - Session 1
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+
+---
+background-image: \url(images/week2/tukey_cover.png)
+background-size: 50%
+background-position: 5% 15%
+# Birth of EDA
+
+.pull-right[
+The field of exploratory data analysis came of age when this book appeared in 1977. 
+
+&lt;br&gt;
+
+.monash-blue[*Tukey held that too much emphasis in statistics was placed on statistical hypothesis testing (confirmatory data analysis); more emphasis needed to be placed on using data to suggest hypotheses to test.*]
+
+]
+
+---
+# John W. Tukey
+
+.pull-left[
+&lt;img src="https://upload.wikimedia.org/wikipedia/en/e/e9/John_Tukey.jpg" style="width: 400px; border-radius: 50%"&gt; 
+]
+
+.pull-right[
+.font_medium[
+- Born in 1915, in New Bedford, Massachusetts.
+- Mum was a private tutor who home-schooled John. Dad was a Latin teacher. 
+- BA and MSc in Chemistry, and PhD in Mathematics
+- Awarded the National Medal of Science in 1973, by President Nixon
+- By some reports, his home-schooling was unorthodox and contributed to his thinking and working differently. 
+]
+]
+
+---
+class: informative 
+# Taking a glimpse back in time 
+
+is possible with the [American Statistical Association video lending library](http://stat-graphics.org/movies/). 
+
+&lt;br&gt;
+We're going to watch John Tukey talking about exploring high-dimensional data with an amazing new computer in 1973, four years before the EDA book.  
+&lt;br&gt;
+
+<span>&lt;i class="fas  fa-lightbulb faa-float animated " style=" color:yellow;"&gt;&lt;/i&gt;</span> .monash-pink2[Look out for these things:]
+
+<span class=" faa-float animated-hover " style=" display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">Tukey's expertise is described as *for trial and error learning* and the computing equipment.</span>
+
+.footnote[First 4.25 minutes of https://www.youtube.com/embed/B7XoW2qiFUA)]
+
+
+---
+&lt;iframe width="840" height="630" src="https://www.youtube.com/embed/B7XoW2qiFUA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+
+---
+
+.pull-left[
+&lt;img src="images/week2/tukey_cover.png" style="width: 400px; border-radius: 30%"&gt; 
+]
+
+.pull-right[
+&lt;img src="images/week2/pencil_and_paper.png" width="80%"&gt;
+
+]
+
+---
+# Setting the frame of mind
+
+.scroll-box-18[
+This book is based on an important principle. 
+
+&lt;br&gt;
+**It is important to understand  what you CAN DO before you learn to  measure how WELL you seem to have DONE it.** 
+
+&lt;br&gt;
+Learning first what you can do will  help you to work more easily  and effectively. 
+
+&lt;br&gt;
+This book is about exploratory data analysis, about looking at data to see  what it seems to say. It concentrates on simple  arithmetic and easy-to-draw pictures. It regards whatever appearances  we have recognized as partial descriptions, and tries to look beneather them for  new insights. Its concern is with  appearance, not with confirmation.
+
+&lt;br&gt;
+**Examples, NOT case histories**
+
+&lt;br&gt;
+The book does not exist to make the case that exploratory data analysis is useful. Rather it exists to expose its readers and users to a considerable variety of techniques for looking more effectively at one's data.  The examples are not intended to be complete case histories. Rather they should isolated techniques in action on real data. The emphasis is on general technqiues, rather than specific problems. 
+&lt;br&gt;
+
+A basic problem abou any body of data is to make it more easily and effectively handleable by monds -- our minds, her mind, his mind. To this general end:
+
+- anything that make a simpler description possible makes the description more easily handleable.
+- anything that looks below the previously described surface makes the description more effective.
+
+
+&lt;br&gt;
+
+So we shall always be glad (a) to simplify description and (b) to describe one layer deeper. In particular, 
+
+- to be able to say that we looked one layer deeper, and found nothing, is a definite step forward -- though not as far as to be abe to say that we looked deeper and found thus-and-such.
+- to be able to say that "if we change our point of view in the following way ... things are simpler" is always a gain--though not quite so much as to be able to say "if we don't bother to change out point of view (some other) things are equally simple."
+
+&lt;br&gt;
+...
+
+&lt;br&gt;
+Consistent with this view, we believe, is a clear demand that pictures based on exploration of data should *force* their messages upon us. Pictures that emphasize what we already know--"security blankets" to reassure us--are frequently not worth the space they take. Pictures that have to be gone over with a reading glass to see the main point are wasteful of time and inadequate of effect. **The greatest value of a picture** is when it *forces* us to notice **what we never expected to see.**
+
+&lt;br&gt;
+&lt;center&gt; &lt;b&gt;Confirmation&lt;/b&gt; &lt;/center&gt;
+&lt;br&gt;
+
+The principles and procedures of what we call confirmatory data analysis are both widely used and one of the great intellectual products of our century. In their simplest form, these principles and procedures look at a sample--and at what that sample has told us abou the population from which it came--and assess the precision with which our inference from sample to population is made. We can no longer get along without confirmatory data analysis. &lt;b&gt;But we need not start with it.&lt;/b&gt;
+
+&lt;br&gt;
+
+The best way to &lt;b&gt;understand what CAN be done is not longer&lt;/b&gt;--if it ever was--&lt;b&gt;to ask what things could&lt;/b&gt;, in the current state of our skill techniques, &lt;b&gt;be confirmed&lt;/b&gt; (positively or negatively). Even more understanding is &lt;em&gt;lost&lt;/em&gt; if we consider each thing we can do to data &lt;em&gt;only&lt;/em&gt; in terms of some set of very restrictive assumtpions under which that thing is best possible--assumptions we &lt;em&gt;know we CANNOT check in practice&lt;/em&gt;.
+
+&lt;center&gt; &lt;b&gt;Exploration AND confirmation&lt;/b&gt; &lt;/center&gt;
+
+Once upon a time, statisticians only explored. Then they learned to confirm exactly--to confirm a few things exactly, each under very specific circumstances. As they emphasized exact confirmation, their techniques inevitably became less flexible. The connection of the most used techniques with past insights was weakedned. Anything to which confirmatory procedure was not explicitly attached was decried as "mere descriptive statistics", no matter how much we learned from it. 
+
+&lt;br&gt;
+
+Today, the flexibility of (approximate) confirmation by the jacknife makes it relatively easy to ask, for almost any clearly specified exploration, "How far is it confirmed?"
+
+&lt;br&gt;
+
+**Today, exploratory and confirmatory can--and should--proceed side by side**. This book, of course, considers only exploratory techniques, leaving confirmatory techniques to other accounts. 
+
+&lt;br&gt;
+
+&lt;center&gt; &lt;b&gt; About the problems &lt;/b&gt; &lt;/center&gt;
+
+&lt;br&gt;
+The teacher needs to be careful about assigning problems. Not too many, please. They are likely to take longer than you think. The number supplied is to accommodate diversity of interest, not to keep everybody busy. 
+
+&lt;br&gt;
+Besides the length of our problems, both teacher and student need to realise that many problems do not have a single "right answer". There can be many ways to approach a body of data. Not all are equally good. For some bodies of data this may be clear, but for others we may not be able to tell from a single body of data which approach is preferred. Even several bodies of data about very similar situations may not be enough to show which approach shoud be preferred. Accordingly, it will often be quite reasonable for different analysts to reach somewhat different analyses.
+
+&lt;br&gt;
+Yet more--to unloc the analysis of a body of day, to find the good way to approach it, may require a key, whose finding is a creative act. Not everyone can be expected to create the key to any one situation. And to continue to paraphrase Barnum, no one can be expected to create a key to each situation he or she meets. 
+
+&lt;br&gt;
+**To learn about data analysis, it is right that each of us try many things that do not work**--that we tackle more problems than we make expert analyses of. We often learn less from an expertly done analysis than from one where, by not trying something, we missed--at least until we were told about it--an opportunit to learn more. Each teacher needs to recognize this in grading and commenting on problems. 
+
+&lt;br&gt;
+&lt;center&gt;&lt;b&gt; Precision&lt;/b&gt;&lt;/center&gt;
+
+The teacher who heeds these words and admits that there need be *no one correct approach* may, I regret to contemplate, still want whatever is done to be digit perfect. (Under such a requirement, the write should still be able to pass the course, but it is not clear whether she would get an "A".) One does, from time to time, have to produce digit-perfect, carefully checked results, but forgiving techniques that are not too distributed by unusual data are also, usually, *little disturbed by SMALL arithmetic errors*. The techniques we discuss here have been chosen to be forgiving. It is hoped, then, that small arithmetic errors will take little off the problem's grades, leaving severe penatlies for larger errors, either of arithmetic or concept.
+]
+
+---
+# Outline
+
+.pull-left[
+.monash-orange2[1.Scratching down numbers]&lt;br&gt;
+.monash-orange2[2.Schematic summary]&lt;br&gt;
+.monash-orange2[3.Easy re-expression]&lt;br&gt;
+4.Effective comparison&lt;br&gt;
+5.Plots of relationship&lt;br&gt;
+ .monash-orange2[6.Straightening out plots (using three points)]
+7.Smoothing sequences&lt;br&gt;
+8.Parallel and wandering schematic plots&lt;br&gt;
+9.Delineations of batches of points&lt;br&gt;
+10.Using two-way analyses&lt;br&gt;
+]
+
+.pull-right[
+.monash-orange2[11.Making two-way analyses]&lt;br&gt;
+12.Advanced fits&lt;br&gt;
+13.Three way fits&lt;br&gt;
+14.Looking in two or more ways at batched of points&lt;br&gt;
+15.Counted fractions&lt;br&gt;
+16.Better smoothing&lt;br&gt;
+.monash-orange2[17.Counts in bin after bin&lt;br&gt;]
+18.Product-ratio plots&lt;br&gt;
+19.Shapes of distributions&lt;br&gt;
+20.Mathematical distributions&lt;br&gt;
+]
+
+---
+class: transition middle animated slideInLeft
+
+## Here we go &lt;i class="fas fa-pencil-alt"&gt;&lt;/i&gt; &lt;i class="fas fa-sticky-note"&gt;&lt;/i&gt;
+
+---
+# Scratching down numbers
+
+Prices of Chevrolet in the local used car newspaper ads of 1968. 
+
+
+
+
+Stem-and-leaf plot: still seen introductory statistics books
+
+
+<input id = erasecanvas1 type = 'checkbox' title='Check it to erase !'>
+
+<input id = canvas1drawing-color type = 'color' value = '#005E7A' style = 'width:30px;'>
+
+<input id = exportcanvas1 type = 'button' style = 'width:55px;' value = 'Export'>
+
+<canvas id="canvas1" width="950" height="450"></canvas>
+<script>
+const canvas1 = new fabric.Canvas('canvas1', {
+    backgroundColor: 'whitesmoke',
+    isDrawingMode: true
+
+    });
+
+
+canvas1.freeDrawingBrush.width  = 3;
+
+
+canvas1drawingColorEl = document.getElementById('canvas1drawing-color');
+
+canvas1.freeDrawingBrush.color = canvas1drawingColorEl.value;
+
+canvas1drawingColorEl.onchange = function() {
+    canvas1.freeDrawingBrush.color = canvas1drawingColorEl.value;
+  };
+
+
+ $('#erasecanvas1').click(function(){
+
+    if (this.checked) {
+
+      canvas1.freeDrawingBrush.color  = 'whitesmoke';
+
+    } else {
+
+      canvas1.freeDrawingBrush.color = canvas1drawingColorEl.value;
+
+    }
+
+
+
+});
+
+
+
+
+
+ $('#erasecanvas1').click(function(){
+
+    if (this.checked) {
+
+      canvas1.freeDrawingBrush.width   = 10;
+
+    } else {
+
+      canvas1.freeDrawingBrush.width  = 3;
+
+    }
+
+
+});
+
+
+$('#exportcanvas1').click(function(){
+
+  $('#canvas1').get(0).toBlob(function(blob){
+
+    saveAs(blob, 'canvas1-IMG.png');
+
+
+  });
+
+
+});
+
+
+
+
+
+
+</script><script>
+
+
+fabric.Image.fromURL('images/week2/chevy.png', function(img) {
+    img.set({
+        scaleX: canvas1.getWidth() / img.width,
+        scaleY: canvas1.getHeight() / img.height,
+        objectCaching: false,
+        originX: 'left',
+        originY: 'top'
+     });
+     canvas1.setBackgroundImage(img, canvas1.renderAll.bind(canvas1));
+ });
+
+</script>
+
+
+
+---
+.pull-left[
+
+First stem-and-leaf, first digit on stem, second digit on leaf
+
+&lt;img src="images/week2/canvas1-IMG (5).png" width="90%"&gt;
+
+]
+--
+
+.pull-right[
+
+Order any leaves which need it, eg stem 6
+
+&lt;img src="images/week2/canvas1-IMG (6).png" width="90%"&gt;
+
+]
+--
+
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+
+.monash-pink2[*A benefit is that the numbers can be read off the plot, but the focus is still on the pattern. Also quantiles like the median, can be computed easily.*]
+
+---
+.pull-left[
+
+Shrink the stem
+
+&lt;img src="images/week2/canvas1-IMG (8).png" width="90%"&gt;
+
+]
+
+.pull-right[
+
+Shrink the stem more
+
+&lt;img src="images/week2/canvas1-IMG (9).png" width="90%"&gt;
+
+]
+---
+
+# And, in R ...
+
+.font_small[
+
+```r
+stem(chevrolets$prices)
+```
+
+```
+## 
+##   The decimal point is 3 digit(s) to the right of the |
+## 
+##   0 | 23
+##   0 | 7788999
+##   1 | 123
+##   1 | 57789
+```
+]
+---
+# &lt;i class="fas fa-bookmark"&gt;&lt;/i&gt; Remember the tips data
+
+.font_smaller2[
+
+```r
+tips &lt;- read_csv("http://ggobi.org/book/data/tips.csv")
+stem(tips$tip, scale=0.5, width=120)
+```
+
+```
+## 
+##   The decimal point is at the |
+## 
+##    1 | 000001233334445555555555556666667777788889
+##    2 | 000000000000000000000000000000000000000001122222223333555555555555556666677788899
+##    3 | 00000000000000000000000011111112222222333344445555555555555666778889
+##    4 | 0000000000001112233335777
+##    5 | 00000000001122226799
+##    6 | 05577
+##    7 | 6
+##    8 | 
+##    9 | 0
+##   10 | 0
+```
+]
+---
+
+
+.scroll-output[.font_smaller3[
+
+```r
+stem(tips$tip, scale=2)
+```
+
+```
+## 
+##   The decimal point is 1 digit(s) to the left of the |
+## 
+##    10 | 0000107
+##    12 | 55526
+##    14 | 44578000000000678
+##    16 | 1346781356
+##    18 | 032678
+##    20 | 00000000000000000000000000000000011233598
+##    22 | 0033440114
+##    24 | 5700000000002456
+##    26 | 01412455
+##    28 | 382
+##    30 | 00000000000000000000000267891245688
+##    32 | 133557159
+##    34 | 0188800000000015
+##    36 | 0181566
+##    38 | 2
+##    40 | 0000000000006889
+##    42 | 09004
+##    44 | 0
+##    46 | 713
+##    48 | 
+##    50 | 000000000074567
+##    52 | 0
+##    54 | 
+##    56 | 05
+##    58 | 52
+##    60 | 0
+##    62 | 
+##    64 | 00
+##    66 | 03
+##    68 | 
+##    70 | 
+##    72 | 
+##    74 | 8
+##    76 | 
+##    78 | 
+##    80 | 
+##    82 | 
+##    84 | 
+##    86 | 
+##    88 | 
+##    90 | 0
+##    92 | 
+##    94 | 
+##    96 | 
+##    98 | 
+##   100 | 0
+```
+]]
+---
+class: informative middle
+
+## 💭 Similar information to the histogram, but we can see the actual numbers too. 
+
+---
+# Refining the size
+
+.pull-left[
+&lt;img src="images/week2/stem_stretched.png" width="90%"&gt;
+]
+
+.pull-right[
+&lt;img src="images/week2/stem_5line.png" width="80%"&gt;
+
+]
+---
+# a different style of scratching
+
+.pull-left[
+We know about
+
+&lt;img src="images/week2/tally.png" width="90%"&gt;
+
+but its too easy to 
+
+&lt;img src="images/week2/tally_error.png" width="90%"&gt;
+
+make a mistake
+]
+.pull-right[
+Try this instead
+
+&lt;img src="images/week2/squares.png" width="90%"&gt;
+
+
+]
+---
+Count this data using the squares approach.
+
+.pull-left[
+.font_smaller4[
+
+
+```
+## # A tibble: 25 x 2
+##    smoker day  
+##    &lt;chr&gt;  &lt;chr&gt;
+##  1 Yes    Sun  
+##  2 Yes    Sun  
+##  3 Yes    Sun  
+##  4 No     Sun  
+##  5 No     Sat  
+##  6 No     Sun  
+##  7 Yes    Sun  
+##  8 No     Sat  
+##  9 No     Sat  
+## 10 Yes    Sun  
+## 11 No     Sun  
+## 12 Yes    Sat  
+## 13 No     Sun  
+## 14 No     Sun  
+## 15 Yes    Sat  
+## 16 Yes    Sat  
+## 17 No     Sun  
+## 18 Yes    Sat  
+## 19 No     Sun  
+## 20 No     Sat  
+## 21 Yes    Sun  
+## 22 No     Sun  
+## 23 No     Sun  
+## 24 No     Sun  
+## 25 Yes    Sat
+```
+
+]
+
+]
+.pull-right[
+
+<input id = erasecanvas2 type = 'checkbox' title='Check it to erase !'>
+
+<input id = canvas2drawing-color type = 'color' value = '#005E7A' style = 'width:30px;'>
+
+<input id = exportcanvas2 type = 'button' style = 'width:55px;' value = 'Export'>
+
+<canvas id="canvas2" width="500" height="450"></canvas>
+<script>
+const canvas2 = new fabric.Canvas('canvas2', {
+    backgroundColor: 'whitesmoke',
+    isDrawingMode: true
+
+    });
+
+
+canvas2.freeDrawingBrush.width  = 3;
+
+
+canvas2drawingColorEl = document.getElementById('canvas2drawing-color');
+
+canvas2.freeDrawingBrush.color = canvas2drawingColorEl.value;
+
+canvas2drawingColorEl.onchange = function() {
+    canvas2.freeDrawingBrush.color = canvas2drawingColorEl.value;
+  };
+
+
+ $('#erasecanvas2').click(function(){
+
+    if (this.checked) {
+
+      canvas2.freeDrawingBrush.color  = 'whitesmoke';
+
+    } else {
+
+      canvas2.freeDrawingBrush.color = canvas2drawingColorEl.value;
+
+    }
+
+
+
+});
+
+
+
+
+
+ $('#erasecanvas2').click(function(){
+
+    if (this.checked) {
+
+      canvas2.freeDrawingBrush.width   = 10;
+
+    } else {
+
+      canvas2.freeDrawingBrush.width  = 3;
+
+    }
+
+
+});
+
+
+$('#exportcanvas2').click(function(){
+
+  $('#canvas2').get(0).toBlob(function(blob){
+
+    saveAs(blob, 'canvas2-IMG.png');
+
+
+  });
+
+
+});
+
+
+
+
+
+
+</script>
+]
+
+---
+class: middle
+
+.info-box[
+## What does it mean to "feel what the data are like?"]
+---
+
+.pull-left[
+&lt;img src="images/week2/stem_alaska.png" width="90%"&gt;
+]
+
+.pull-right[
+This is a stem and leaf of the height of the highest peak in each of the 50 US states. 
+
+&lt;br&gt;
+
+The states roughly fall into three groups.
+
+&lt;br&gt;
+
+.font_small[.monash-blue2[It's not really surprising, but we can imagine this grouping. Alaska is in a group of its own, with a much higher high peak. Then the Rocky Mountain states, California, Washington and Hawaii also have high peaks, and the rest of the states lump together.]]
+
+]
+---
+class: middle
+
+.info-box[
+## Exploratory data analysis is detective work -- in the purest sense -- finding and revealing the clues.]
+---
+# Resources
+
+- [wikipedia](https://en.wikipedia.org/wiki/Exploratory_data_analysis)
+- John W. Tukey (1977) Exploratory data analysis
+
+---
+
+
+background-image: url(images/wk2bg1.jpg)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Di Cook
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "googlecode",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -69,7 +69,6 @@ knitr::opts_chunk$set(
 ```{r}
 library(tidyverse)
 library(fabricerin)
-
 ```
 
 ```{r titleslide, child="components/titleslide.Rmd"}
@@ -286,10 +285,6 @@ fabric_drawing(cid = "canvas1",
                gumSize = 10)
 fabric_curtail(cid = "canvas1", imgsrc = "images/week2/chevy.png", 
                     type = "background")
-#fabric_text_add(cid = "canvas1", "data1", "250, 150, 795, 895, 695, 1699, 1499, 1099, 1693, 1166, 688, 1333, 895, 1775, 895, 1895, 795", fontFamily = "Courier", fontSize=24, left=10, top=10)
-#fabric_text_add(cid = "data1", "data2", "1699, 1499, 1099, 1693, 1166,", fontFamily = "Courier", fontSize=24, left=10, top=30)
-#fabric_text_add(cid = "draw1", "data3", "688, 1333, 895, 1775, 895,", fontFamily = "Courier", fontSize=24, left=10, top=50)
-#fabric_text_add(cid = "draw1", "data4", "1895, 795", fontFamily = "Courier", fontSize=24, left=10, top=70)
 ```
 
 
@@ -468,6 +463,10 @@ class: middle
 
 - [wikipedia](https://en.wikipedia.org/wiki/Exploratory_data_analysis)
 - John W. Tukey (1977) Exploratory data analysis
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Sketching canvases made using [`fabricerin`](https://ihaddadenfodil.com/post/fabricerin-a-tutorial/)
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
 
 ---
 

@@ -1,0 +1,71 @@
+---
+title: "ETC5521 Tutorial 2"
+subtitle: "Deconstructing an exploratory data analysis"
+author: "Prof. Di Cook"
+date: "Week 2"
+output:
+  html_document:
+    toc: true
+---
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+It is really hard to evaluate an exploratory data analysis. This tutorial is an exercise in digesting a really good analysis. Your goal is to understand the analysis, and the choices the analysts made, and why these were would be considered high quality.  
+
+## `r emo::ji("wrench")` Preparation 
+
+Read the article https://vita.had.co.nz/papers/bay-area-blues.pdf, authored by Hadley Wickham, Deborah F. Swayne, and David Poole. It appeared in an editing volume "Beautiful Data" edited by Jeff Hammerbacher and Toby Segaran. Not all the chapters in the book are good examples of data analysis, though.
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/San_Francisco_from_the_Marin_Headlands_in_March_2019.jpg" width="100%">
+
+## Exercise 0: 
+In the chat window, say hello, and if you feel comfortable tell us something fun about yourself, or what you have done this last week.
+
+## Exercise 1: Structure of the analysis
+
+Write down the section structure of the paper
+
+## Exercise 2: Primary question
+
+What was the primary question of interest? Or is there one?
+
+## Exercise 3: Data description
+
+You've all learned about tidy data before coming to this unit. Write down the variables in this data. And add two sentences on how the data was collected.
+
+## Exercise 4: Population
+
+What is the population? Is this data representative of the population or the complete population?
+
+## Exercise 5: Data transformation and cleaning
+
+List the any transformations of data, handling of missing values, error checking.  
+
+## Exercise 6: Analysis
+
+Outline the main components of the analysis. Pick one component, and describe it in detail, and what was learned.
+
+## Exercise 7: Conclusions
+
+List one major conclusion from the analysis, and explain how that particular conclusion follows from the analysis
+
+## Exercise 8: Anything surprising?
+
+Were there any findings that surprised the authors? Or would surprise you?
+
+## Exercise 9: Additional resources
+
+Some of the findings were compared against information gathered from other sources. Can you point to an example of this, and how the other information was used to support or question the finding?
+
+## Exercise 10: Not confirmatory analysis
+
+In a confirmatory analysis, the analyst would start from a hypothesis, or a particular question. Explain how this analysis differs in its approach.
+
+## Exercise 11: Reproducibility
+
+Is the analysis reproducible, 12 years later? Support your answer, either by reproducing one of the plots in the paper, or by arguing against it.
+

@@ -1,0 +1,139 @@
+---
+title: "ETC5521 Tutorial 2 Solution"
+subtitle: "Deconstructing an exploratory data analysis"
+author: "Prof. Di Cook"
+date: "Week 2"
+output:
+  html_document:
+    toc: true
+---
+
+## Exercise 1: Structure of the analysis
+
+These are the sections in the paper:
+
+- Introduction
+- How Did We Get the Data?
+- Geocoding
+- Data Checking
+- Analysis
+- The Influence of Inflation
+- The Rich Get Richer and the Poor Get Poorer
+- Geographic Differences
+- Census Information
+- Exploring San Francisco
+- Conclusion
+
+and they roughly map into these four categories
+
+- Motivation and overview
+- Data collection and processing
+- Analysis and findings
+- Conclusion
+
+## Exercise 2: Primary question
+
+The analysis is motivated by current economic events in the USA, and particularly there is an open-ended driving question:
+
+> *What can we learn about the way prices rose and fell throughout a single region and across a wide range of prices?*
+
+It is also helpful to note that several other questions were addressed in the analysis, and these can be found in the body of the text:
+
+- Has the housing crisis equally affected the rich and the poor?
+- Has the effect of the crisis been to improve or worsen the relative equality of these two groups?
+
+
+## Exercise 3: Data description
+
+county, city, zip, street, price, br, lsqft, bsqft, year, date, datesold <!-- house-sales.csv -->
+
+followed by
+
+street,city,zip,long,lat,quality,match,success,error <!--addresses.csv--> 
+
+## Exercise 4: Population
+
+The population would be "all housing sales in the San Francisco Bay Area from 2003 to 2008". 
+
+This is likely to be a fairly comprehensive collection of the full population. There may be some sales that were not documented publicly. 
+
+## Exercise 5: Data transformation and cleaning
+
+- Prices were inflation adjusted. 
+- Locations were plotted on a map. Where they fell outside of the San Francisco area indicated a geocoding error that needed fixing, or were removed from the analysis.
+
+## Exercise 6: Analysis
+
+ Overview plots of price and sales by weekly average
+2. Prices examined in relation to inflation over the time, and then adjusted because the plots indicated the necessity
+3. Price deciles are computed over time, and used to examine the changes for different price brackets. 
+4. Prices for deciles were indexed to the start of the period, and also to the median price for the decile, in order to examine changes relative to themselves. This enabled assessing the impact in different price brackets.
+5. Prices by different cities (geographic) were examined, to determine the extent of the effect for different regions (cities).
+6. Data for cities was augmented with demographic data taken from the Census Bureau. Change in price was computed in order to make comparisons by demographic variables.
+7. One region, San Franciso, was explored in detail, with sale locations compared with a map. Sale locations pretty much reproduces the map, which shows that the data is quite comprehensive.
+
+Using 4. as an example. 
+
+a. Prices data was subsetted by month
+b. The deciles for each month were computed
+c. Deciles were plotted using a line plot over time, and the pattern is quite similar across each
+d. Decile values were indexed by dividing by the initial value. These indexed price values were plotted using a line plot over time. This revealed that the cheaper houses peaker earlier and dropped earlier than the more expensive houses.
+e. A second way to index this was dividing by the median price for each decile. This showed that the housing bubble mostly affected the lower price houses. The higher price houses were still recording values well above the median in the height of the economic downfall.
+
+
+## Exercise 7: Conclusions
+
+Here is an example: 
+
+*The boom and the bust hit lower-priced homes both earlier and harder; cities with lower average incomes peaked higher and dropped lower.* This observation is based on the analysis of deciles described in the previous section.
+
+## Exercise 8: Anything surprising?
+
+I found it interesting that Mountain View had no decline in housing prices. This city has the headquarters of many of the world's largest technology companies are in the city, including Google, Mozilla Foundation, Symantec, and Intuit.
+
+## Exercise 9: Additional resources
+
+> *All of this is consistent with what we have learned about subprime mortgages since the housing bust hit the headlines.*
+
+Subprime mortgages were offered on little collateral which meant they were quite risky, and they tended to be on the lower end of the housing market. This information was in all the news headlines at the time, and the analysis that these authors have done was checked against the common reporting at the time. The data was consistent with these reports.
+
+## Exercise 10: Not confirmatory analysis
+
+An example of a confirmatory analysis for this data might have been:
+
+Hypothesis (as given in the media or some authoritative source): Housing prices fell more dramatically in regions relying more heavily on sub-prime mortgages, the lower end where new construction. 
+
+This would have been tested by setting up a model, where statistical significance of terms was calculated.
+
+In contrast, although this analysis was driven by questions, with the answers being provided mostly by plotting the data. There was no significance testing, rather the reader is asked to see the same structure in the plots as the authors. The types of plots were decided by the types of variables provided.
+
+## Exercise 11: Reproducibility
+
+Yes, for the most part this analysis can still be conducted. Download a zip file of the code and data from the github repo, referenced in the paper. 
+
+Here is a slightly revised code (from the `explore-deciles.R` file) to do the deciles calculation:
+
+```{r echo=TRUE, eval=FALSE}
+# ---- new
+library(tidyverse)
+library(lubridate)
+deciles <- geo %>%
+  mutate(month = month(date), year = year(date)) %>%
+  group_by(month, year) %>%
+  summarise(price = quantile(price, seq(0.1, 0.9, by=0.1), na.rm=T)) %>%
+  ungroup() %>%
+  mutate(decile = rep(seq(0.1, 0.9, by=0.1), 69)) %>%
+  filter(!is.na(month)) %>%
+  mutate(date = ymd(paste0(year,"-",month,"-01")))
+
+ggplot(deciles, aes(date, price)) +
+  geom_line(aes(group = decile, colour = decile)) +
+  scale_colour_gradient(low="grey70", high = "grey20") +
+  theme(legend.position = "none") +
+  xlab(NULL) +
+  ylab("Price (millions)")
+
+# ---- end new
+```
+
+![](deciles.png)

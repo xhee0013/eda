@@ -156,7 +156,7 @@ class: font_small
 ```{r, echo = TRUE, fig.height = 3.5}
 library(tidyverse)
 glimpse(cars)
-ggplot(cars, aes(speed, dist)) + 
+ggplot(cars, aes(dist, speed)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE)
 ```

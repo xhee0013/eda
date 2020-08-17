@@ -1,31 +1,45 @@
-li {
-  position: relative;
-  display: list-item;
-  text-align: left;
-  padding-left: 45px!important;
+.item50 {
+  width: 605px;
+  overflow: scroll;
 }
+
 
 .padtop0 {
   padding-top: 0;
 }
 
-ul li:before {
-  content: "👾";
-  position: absolute;
-  font-size: 30px;
-  color: #D93F00;
-  left: 0;
+ul li ul {
+  list-style-type: square;
 }
 
+.clock {
+  font-size: 50pt;
+  width: 200px;
+  text-align: center;
+  color: black;
+  background-color: gray!important;
+  background-image: none;
+}
+
+.clock.running {
+  background-color: #8B0000!important;
+  border: 3px solid black;
+  color: white!important;
+}
+
+.scroll-300 {
+  overflow-y: scroll;
+  height: 300px;
+}
 
 .scroll-800 {
   overflow-y: scroll;
-  height: 600px;
+  height: 400px;
 }
 
 .scroll-900 {
   overflow-y: scroll;
-  height: 790px;
+  height: 550px;
 }
 
 pre {
@@ -74,4 +88,39 @@ th {
 
 
 
+.bg-orange {
+  background-color: var(--color-orange)!important;
+}
 
+.bg-blue {
+  background-color: var(--color-blue)!important;
+}
+
+
+.circle {
+    border-radius: 50%;
+    width: 50px;
+    line-height: 50px;
+    padding: 3px;
+    display:inline-block;
+
+    background: white;
+    color: #006DAE;
+    text-align: center;
+    font-weight: bold;
+
+}
+
+.circle-big {
+    border-radius: 50%;
+    width: 100px;
+    line-height: 100px;
+    padding: 3px;
+    display:inline-block;
+
+    background: white;
+    color: #006DAE;
+    text-align: center;
+    font-weight: bold;
+
+}

@@ -20,7 +20,7 @@ schedule:
   - week: 4
     lecturer: Emi
     assessment: "Assignment 1 **due Fri 28 Aug 11:55 PM**"
-    readings: "Unwin (2015) Graphical Data Analysis Ch 3-4"
+    readings: "[Case Study: Behaviours of dairy calves](https://f1000research.com/articles/4-546/v1) & Unwin (2015) Graphical Data Analysis Ch 3-4"
     topic: "Working with a single variable, making transformations, detecting outliers, using robust statistics"
   - week: 5
     lecturer: Di

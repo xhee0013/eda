@@ -1,0 +1,104 @@
+---
+title: "ETC5521 Tutorial 3"
+subtitle: "Deconstructing a predictive (maybe confirmatory) data analysis"
+author: "Prof. Di Cook"
+date: "Week 3"
+output:
+  html_document:
+    toc: true
+---
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+It is useful to distinguish an exploratory data analysis from a predictive or confirmatory data analysis. This tutorial is an exercise in digesting different analyses a rudimentary predictive analysis. Your goal is to understand the analyses, and how they depart (or not) from an exploratory data analysis.  
+
+## Exercise 0: Introduction
+
+In the chat window, say hello, and if you feel comfortable tell us something fun about yourself, or what you have done this last week.
+
+## Exercise 1: Los Angeles housing prices
+
+Take a quick read of Lishuan Yuan's Master thesis research [A Rregression ModelL of Single House Price in LA Constructing a Predicted Model for House Prices](http://dspace.calstate.edu/bitstream/handle/10211.3/213900/YuanLishun_Project2019.pdf?sequence=3). (I don't know Lishuan, but I think the analysis is a fairly typical, yet simple, example of a more confirmatory study. )
+
+### 1A Analysis purpose
+
+What is the main question that the analysis is addressing? 
+
+
+### 1B Motivation
+
+How is the work motivated?
+
+### 1C Data collection
+
+What data was collected? Describe whether this is a population or a sample from a population. If the latter, what would the population likely be.
+
+### 1D Analysis structure
+
+Sketch out the components of the analysis. This mostly should follow the section headings, but not all the sections are relevant.  
+
+### 1E Is predictive modeling confirmatory?
+
+The description of the analysis is that this is *predictive modeling*. In what ways could this be considered to be confirmatory analysis? Or should it not be called confirmatory?  Point to parts of the analysis to support your point of view.
+
+### 1F What's missing?
+
+Could any part of the analysis be called exploratory? Point these out. What is missing from the analysis because the focus was on predictive modeling? What else might have been learned about the data, if some exploratory tools had been used?
+
+### 1G Anything surprising?
+
+Does the report yield anything about the LA housing data that is surprising?
+
+### 1H Reproducibility
+
+Is the work reproducible?
+
+## Exercise 2: Ames housing price prediction
+
+
+Skim through the article https://rpubs.com/DocOfi/342740, authored unknown. This is a short summary of model development for predicting house prices for Ames, Iowa. (It looks like it was a report from an assignment for a modeling class. Its a bit rough, and not a polished data analysis. Nevertheless its got the components that we need in order to tease apart the difference between EDA from last week's tutorial example, and predictive modeling
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Story_County_Iowa_Incorporated_and_Unincorporated_areas_Ames_Highlighted.svg/500px-Story_County_Iowa_Incorporated_and_Unincorporated_areas_Ames_Highlighted.svg.png" width="100%">
+
+Aside: There is a predictive modeling analysis of the San Franciso Housing market [here](https://towardsdatascience.com/house-hunting-in-the-san-francisco-bay-area-deal-hunting-using-machine-learning-3ed6fc8e8991) but the modeling may be more advanced than you have learned about yet. The Ames housing analysis is using a simple regression model, which you have already learned about it ETC5510. 
+
+### 2A Primary question
+
+What was the primary question of interest? Is there a hypothesis?
+
+### 2B Data description
+
+How the data was collected? What variables are used for the analysis? What's the data about?
+
+### 2C Population
+
+What is the population? Is this data representative of the population or the complete population?
+
+### 2D Exploratory data analysis
+
+The report has a section titled "Exploratory Data Analysis". Roughly outline the exploration. What questions are being investigated? 
+
+Would you consider this to be exploratory data analysis, or initial data analysis?
+
+
+### 2E Final regression model
+
+How were the variables selected for the final model?
+List the variables that were in the final regression model. 
+
+### 2F Confirmatory analysis?
+
+In what way would you consider this a confirmatory analysis, or not?
+
+### 2G Model diagnostics
+
+Sketch out the main diagnostics employed by the analysts. Was a re-analysis done on the basis of the model failing a diagnostic?
+
+### 2H Reproducibility
+
+Is the analysis reproducible?
+

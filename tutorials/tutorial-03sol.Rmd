@@ -1,0 +1,136 @@
+---
+title: "ETC5521 Tutorial 3 Solution"
+subtitle: "Deconstructing a predictive (maybe confirmatory) data analysis"
+author: "Prof. Di Cook"
+date: "Week 3"
+output:
+  html_document:
+    toc: true
+---
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+It is useful to distinguish an exploratory data analysis from a predictive or confirmatory data analysis. This tutorial is an exercise in digesting different analyses a rudimentary predictive analysis. Your goal is to understand the analyses, and how they depart (or not) from an exploratory data analysis.  
+
+## Exercise 0: Introduction
+
+In the chat window, say hello, and if you feel comfortable tell us something fun about yourself, or what you have done this last week.
+
+## Exercise 1: Los Angeles housing prices
+
+Take a quick read of Lishuan Yuan's Master thesis research [A Rregression ModelL of Single House Price in LA Constructing a Predicted Model for House Prices](http://dspace.calstate.edu/bitstream/handle/10211.3/213900/YuanLishun_Project2019.pdf?sequence=3). (I don't know Lishuan, but I think the analysis is a fairly typical, yet simple, example of a more confirmatory study. )
+
+### 1A Analysis purpose
+
+Determine the factors influencing the individual house prices.
+
+### 1B Motivation
+
+"Knowing the factors infuencing the real estate market is not only beneficial for realtors to complete the sales, but also helpful for buyers to have a thorough view of the real estate market and evaluate the properties in a better way."
+
+### 1C Data collection
+
+
+"Data is randomly selected from realtor.com" with "20 properties are randomly selected in each" of seven cities. Also some information was collected from the local officials. 
+
+This clearly is a sample, and care was taken to not use all available data. The population would be houses in these cities in LA, for sale around the same time period. 
+
+### 1D Analysis structure
+
+There is one chapter section on methodology, that contains both modeling and results. The previous section describes the data collection and aspects of diagnosing the model. 
+
+The analysis is purely to fit a regression model, with all the variables, followed by computing diagnostics to check collinearity among predictors, and heteroskedasticity. 
+
+Note that, the conclusions chapter is not about the data analysis. Its about regression modeling generally. 
+
+### 1E Is predictive modeling confirmatory?
+
+Because the author was careful to select a sample of houses, the goal is to use the model to predict new data. Confirmatory analysis appears when the analysts utilise significance testing to confirm the importance of the predictors.  
+
+### 1F What's missing?
+
+Nothing in this analysis could be considered exploratory. It would be nice to have 
+
+- a map of the house locations, 
+- plots of the response against predictors, 
+- plots of predictors against each other,
+- side-by-side boxplots of prices by different city
+- residual plots 
+- predicted vs fitted plots
+- predicted vs fitted plots, by city to examine if the model fitted similarly in each city
+- plots of price against time, in case there was some temporal effect (although more than 20 observations per city would help to study this)
+
+### 1G Anything surprising?
+
+There is nothing surprising that I can see.
+
+### 1H Reproducibility
+
+Although the report states that work was done with R, there is no code associated. Its not reproducible.
+
+## Exercise 2: Ames housing price prediction
+
+
+Skim through the article https://rpubs.com/DocOfi/342740, authored unknown. This is a short summary of model development for predicting house prices for Ames, Iowa. (It looks like it was a report from an assignment for a modeling class. Its a bit rough, and not a polished data analysis. Nevertheless its got the components that we need in order to tease apart the difference between EDA from last week's tutorial example, and predictive modeling
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Story_County_Iowa_Incorporated_and_Unincorporated_areas_Ames_Highlighted.svg/500px-Story_County_Iowa_Incorporated_and_Unincorporated_areas_Ames_Highlighted.svg.png" width="100%">
+
+Aside: There is a predictive modeling analysis of the San Franciso Housing market [here](https://towardsdatascience.com/house-hunting-in-the-san-francisco-bay-area-deal-hunting-using-machine-learning-3ed6fc8e8991) but the modeling may be more advanced than you have learned about yet. The Ames housing analysis is using a simple regression model, which you have already learned about it ETC5510. 
+
+### 2A Primary question
+
+"Develop a model to predict the selling price of a given home in Ames, Iowa."
+
+### 2B Data description
+
+It doesn't really say how the data was collected, although this data is widely available. 
+
+Prof Cook knows this data! The graduates students in Statistics at Iowa State University run a free consulting service for the community. The data was provided by the local government, with the purpose for the students to help them understand house prices. Some of these students enrolled in Prof Cook's EDA and Data Mining class used this data for their class project, tying it into their consulting effort. Dean DeCook, who spearheaded the project, was not in the class, but since donated the data to kaggle and other archives. 
+
+There are numerous variables available in the data, all noting house features, and neighbourhood of Ames. There are no economic variables as seen in the LA analysis. 
+
+### 2C Population
+
+This was pretty much the entire data on housing sales in a given time frame. From this perspective it is close to being the population. 
+
+### 2D Exploratory data analysis
+
+Primarily the section titled "Exploratory Data Analysis" contains plots of the response variable against various predictors. It is simply considering how the response variable is associated with the predictors. Accordingly this would be considered initial data analysis. 
+
+
+### 2E Final regression model
+
+Ten variables:
+
+- age_sold 
+- Overall.Qual
+- log(area)
+- neighbourhood
+- log(Total.Bsmt.SF + 1) 
+- log(Garage.Cars + 1)
+- Central.Air
+- Kitchen.Qual
+- MS.SubClass
+- log(Wood.Deck.SF + 1)
+
+
+### 2F Confirmatory analysis?
+
+The authors broke the data into three chunks. One (training) was used to fit the model, another (testing) was used to refine the model and the third set (validation) was used only after the final model was declared to asses its performance. Its this latter part which points to confirmatory data analysis. The analysis hints that it could be used to guide price determination.
+
+If this were an exploratory analysis an enormous number of additional plots of the variables would have been made to investigate relationships between size and neighbourhood and price. Whether some neighbourhoods might be good value. Whether some neighbourhoods are more variable in prices than others. Studying the residuals from the model might have revealed some houses that could be considered to be bargains, or over-priced.
+
+### 2G Model diagnostics
+
+A lot of model diagnostics are done many residual plots, and normal probability plots to check the assumption of normal error, outlier and influence analysis. 
+
+No re-analysis done on the basis of the model failing a diagnostic.
+
+### 2H Reproducibility
+
+Output from R is show (lots of it! and pretty ugly) but no code is shown. The report is not reproducible.
+

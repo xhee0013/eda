@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Emi Tanaka" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="assets/panelset-modified.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/panelset.css" type="text/css" />
+    <link rel="stylesheet" href="assets/emi.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/steve-johnson--auJqHRvM_k-unsplash.jpg)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Working with a single variable, making transformations, detecting outliers, using robust statistics&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Emi Tanaka*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 4 - Session 2
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+---
+
+class: transition middle
+
+# Categorical variables
+
+&lt;br&gt;&lt;br&gt;
+
+
+This lecture is based on Chapter 4  of &lt;br&gt;&lt;br&gt;Unwin (2015) Graphical Data Analysis with R
+
+---
+
+class: nostripheader middle
+
+# There are two types of categorical variables
+
+--
+
+&lt;br&gt;&lt;br&gt;
+
+.monash-blue[**Nominal**] where there is no instrinic ordering to the categories&lt;br&gt;
+**E.g.** blue, grey, black, white.
+
+--
+
+&lt;br&gt;
+
+.monash-blue[**Ordinal**] where there is a clear order to the categories.&lt;Br&gt;
+**E.g.** Strongly disagree, diagree, neutral, agree, strongly agree.
+
+
+---
+
+# Categorical variables in R
+
+.grid[
+.item.border-right[
+* In R, categorical variables may be encoded as **factors**.
+
+```r
+data &lt;- c(2, 2, 1, 1, 3, 3, 3, 1)
+factor(data)
+```
+
+```
+## [1] 2 2 1 1 3 3 3 1
+## Levels: 1 2 3
+```
+* You can easily change the labels of the variables:
+
+```r
+factor(data, labels = c("I", "II", "III"))
+```
+
+```
+## [1] II  II  I   I   III III III I  
+## Levels: I II III
+```
+
+]
+.item[
+
+{{content}}
+
+]
+]
+
+--
+
+* Order of the factors are determined by the input:
+
+
+```r
+*# numerical input are ordered in increasing order
+factor(c(1, 3, 10))
+```
+
+```
+## [1] 1  3  10
+## Levels: 1 3 10
+```
+
+```r
+*# character input are ordered alphabetically
+factor(c("1", "3", "10"))
+```
+
+```
+## [1] 1  3  10
+## Levels: 1 10 3
+```
+
+```r
+*# you can specify order of levels explicitly
+factor(c("1", "3", "10"),  levels = c("1", "3", "10"))
+```
+
+```
+## [1] 1  3  10
+## Levels: 1 3 10
+```
+
+---
+
+# Numerical factors in R
+
+
+```r
+x &lt;- factor(c(10, 20, 30, 10, 20))
+mean(x)
+```
+
+```
+## Warning in mean.default(x): argument is not numeric or logical: returning NA
+```
+
+```
+## [1] NA
+```
+
+--
+
+&lt;i class="fas fa-exclamation-triangle"&gt;&lt;/i&gt; `as.numeric` function returns the internal integer values of the factor
+
+```r
+mean(as.numeric(x))
+```
+
+```
+## [1] 1.8
+```
+
+--
+
+You probably want to use:
+
+&lt;div class="grid" style="padding-left:20%;margin-right:20%"&gt;
+
+.item[
+
+```r
+mean(as.numeric(levels(x)[x]))
+```
+
+```
+## [1] 18
+```
+
+]
+.item[
+
+```r
+mean(as.numeric(as.character(x)))
+```
+
+```
+## [1] 18
+```
+
+].
+
+&lt;/div&gt;
+
+---
+
+# .orange[Revisiting case study] .circle.bg-orange[1] German Bundestag Election 2009
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[
+.item[
+&lt;img src="images/week4B/btw2009-plot1-1.png" width="367.2" style="display: block; margin: auto;" /&gt;
+]
+.item[
+
+&lt;img src="images/week4B/btw2009-plot2-1.png" width="367.2" style="display: block; margin: auto;" /&gt;
+
+
+]
+
+.item[
+
+&lt;img src="images/week4B/btw2009-plot3-1.png" width="367.2" style="display: block; margin: auto;" /&gt;
+
+
+]
+]
+
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+data("btw2009", package = "flexclust")
+east &lt;- c("Brandenburg", "Mecklenburg-Vorpommern", "Sachsen",
+          "Sachsen-Anhalt", "Thueringen")
+df1 &lt;- btw2009 %&gt;%  
+  group_by(state) %&gt;% 
+  summarise(voters = sum(eligible) / 1e6) %&gt;% 
+  mutate(loc = ifelse(state %in% east, "East", "West"))
+skimr::skim(df1)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df1   
+## Number of rows             16    
+## Number of columns          3     
+## _______________________          
+## Column type frequency:           
+##   character                1     
+##   factor                   1     
+##   numeric                  1     
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate   min   max empty n_unique whitespace
+## 1 loc                   0             1     4     4     0        2          0
+## 
+## ── Variable type: factor ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate ordered n_unique top_counts                    
+## 1 state                 0             1 FALSE         16 Bad: 1, Bay: 1, Ber: 1, Bra: 1
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate  mean    sd    p0   p25   p50   p75  p100 hist 
+## 1 voters                0             1  3.89  3.54 0.488  1.79  2.35  4.83  13.3 ▇▂▂▁▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+df1 %&gt;% 
+  ggplot(aes(voters, state)) + 
+  geom_col() + 
+  labs(x = "Voters (millions)", y = "") 
+
+df1 %&gt;% 
+  mutate(state = fct_reorder(state, voters)) %&gt;% 
+  ggplot(aes(voters, state)) + 
+  geom_col() + 
+  labs(x = "Voters (millions)", y = "") 
+
+df1 %&gt;% 
+  mutate(state = fct_reorder(state, voters)) %&gt;% 
+  ggplot(aes(voters, state)) + 
+  geom_col() + 
+  labs(x = "Voters (millions)", y = "") + 
+  facet_grid(loc ~ ., scale = "free_y") 
+```
+]
+]
+
+.footnote[
+Leisch, Friedrich (2006) A Toolbox for K-Centroids Cluster Analysis. *Computational Statistics and Data Analysis* **51** (2) 526-544&lt;br&gt;
+Data source: https://www.bundestag.de/
+]
+
+---
+
+class: nostripheader middle
+
+
+# Order nominal variables meaningfully
+
+&lt;i class="fas fa-code"&gt;&lt;/i&gt; **Coding tip**: use below functions to easily change the order of factor levels
+
+
+```r
+stats::reorder(factor, value, mean)
+forcats::fct_reorder(factor, value, median)
+forcats::fct_reorder2(factor, value1, value2, func)
+```
+
+
+
+
+
+
+---
+
+# .orange[Case study] .circle.bg-orange[8] Aspirin use after heart attack
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[
+.item[
+&lt;img src="images/week4B/meta-plot1-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/week4B/meta-plot2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+
+* Meta-analysis is a statistical analysis that combines the results of multiple scientific studies.
+* This data studies the use of aspirin for death prevention after myocardial infarction, or in plain terms, a heart attack.
+* The ISIS-2 study has more patients than all other studies combined.
+* You could consider lumping the categories with low frequencies together.
+]
+
+
+]
+
+]
+.panel[.panel-name[data]
+.h350.scroll-sign[
+
+```r
+data("Fleiss93", package = "meta")
+df8 &lt;- Fleiss93 %&gt;% 
+  mutate(total = n.e + n.c)
+skimr::skim(df8)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df8   
+## Number of rows             7     
+## Number of columns          7     
+## _______________________          
+## Column type frequency:           
+##   character                1     
+##   numeric                  6     
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate   min   max empty n_unique whitespace
+## 1 study                 0             1     3     6     0        7          0
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate  mean      sd    p0    p25   p50   p75  p100 hist 
+## 1 year                  0             1 1979.    4.39  1974 1978.   1979 1980   1988 ▇▇▇▁▃
+## 2 event.e               0             1  304   563.      32   46.5    85  174   1570 ▇▁▁▁▁
+## 3 n.e                   0             1 2027. 2959.     317  686.    810 1550.  8587 ▇▂▁▁▂
+## 4 event.c               0             1  327.  618.      38   58      67  172.  1720 ▇▁▁▁▁
+## 5 n.c                   0             1 1974. 2993.     309  515     771 1554.  8600 ▇▂▁▁▂
+## 6 total                 0             1 4000. 5950.     626 1228.   1529 3103  17187 ▇▂▁▁▂
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+df8 %&gt;% 
+  mutate(study = fct_reorder(study, desc(total))) %&gt;% 
+  ggplot(aes(study, total)) + 
+  geom_col() + 
+  labs(x = "", y = "Frequency") + 
+  guides(x = guide_axis(n.dodge = 2))
+
+df8 %&gt;% 
+  mutate(study = ifelse(total &lt; 2000, "Other", study),
+         study = fct_reorder(study, desc(total))) %&gt;% 
+  ggplot(aes(study, total)) + 
+  geom_col() + 
+  labs(x = "", y = "Frequency") 
+```
+]
+]
+
+.footnote[
+Fleiss JL (1993): The statistical basis of meta-analysis. *Statistical Methods in Medical Research* **2** 121–145&lt;br&gt;
+Balduzzi S, Rücker G, Schwarzer G (2019), How to perform a meta-analysis with R: a practical tutorial, Evidence-Based Mental Health.
+]
+
+---
+
+class: nostripheader middle
+
+
+# Consider combining factor levels with low frequencies
+
+&lt;i class="fas fa-code"&gt;&lt;/i&gt; **Coding tip**: the following family of functions help to easily lump factor levels together:
+
+
+```r
+forcats::fct_lump()
+forcats::fct_lump_lowfreq()
+forcats::fct_lump_min()
+forcats::fct_lump_n()
+forcats::fct_lump_prop()
+# if conditioned on another variable
+ifelse(cond, "Other", factor)
+dplyr::case_when(cond1 ~ "level1",
+                 cond2 ~ "level2",
+                 TRUE ~ "Other")
+```
+
+
+---
+
+# .orange[Case study] .circle.bg-orange[9] Anorexia
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[
+.item[
+&lt;img src="images/week4B/anorexia-plot1-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+|Treatment | Frequency|
+|:---------|---------:|
+|CBT       |        29|
+|Cont      |        26|
+|FT        |        17|
+
+]
+.item[
+
+**Table or Plot?**
+
+{{content}}
+
+]
+
+
+]
+
+]
+.panel[.panel-name[data]
+.h250.scroll-sign[
+
+```r
+data(anorexia, package = "MASS")
+
+df9tab &lt;- table(anorexia$Treat) %&gt;% 
+  as.data.frame() %&gt;% 
+  rename(Treatment = Var1, Frequency = Freq)
+
+skimr::skim(anorexia)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values  
+## Name                       anorexia
+## Number of rows             72      
+## Number of columns          3       
+## _______________________            
+## Column type frequency:             
+##   factor                   1       
+##   numeric                  2       
+## ________________________           
+## Group variables            None    
+## 
+## ── Variable type: factor ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate ordered n_unique top_counts              
+## 1 Treat                 0             1 FALSE          3 CBT: 29, Con: 26, FT: 17
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate  mean    sd    p0   p25   p50   p75  p100 hist 
+## 1 Prewt                 0             1  82.4  5.18  70    79.6  82.3  86    94.9 ▂▅▇▆▁
+## 2 Postwt                0             1  85.2  8.04  71.3  79.3  84.1  91.6 104.  ▆▇▅▆▂
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(anorexia, aes(Treat)) + 
+  geom_bar() + 
+  labs(x = "", y = "Frequency") 
+```
+
+```r
+ggplot(anorexia, aes(Treat)) + 
+  stat_count(geom = "point", size = 4) +
+  stat_count(geom = "line", group = 1) +
+  labs(y = "Frequency", x = "")
+```
+
+]
+]
+
+.footnote[
+
+Hand, D. J., Daly, F., McConway, K., Lunn, D. and Ostrowski, E. eds (1993) A Handbook of Small Data Sets. Chapman &amp; Hall, Data set 285 (p. 229) &lt;br&gt;
+Venables, W. N. &amp; Ripley, B. D. (2002) Modern Applied Statistics with S. Fourth Edition. Springer, New York. ISBN 0-387-95457-0
+
+]
+
+--
+
+* Table for accuracy, plot for visual communication.
+
+{{content}}
+
+--
+
+**Why not a point or line?**
+
+&lt;img src="images/week4B/anorexia-plot2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+{{content}}
+
+--
+
+* This can be appropriate depending on what you want to communicate. 
+* A barplot occupies more area compared to a point and the area does a better job of communicating size.
+* A line is suggestive of a trend. 
+
+
+---
+
+class: nostripheader middle
+
+
+# `geom_bar` or `geom_col`?
+
+--
+
+
+```r
+df &lt;- data.frame(var = c("F", "F", "M", "M", "F"))
+dftab &lt;- as.data.frame(table(df$var))
+
+df
+```
+
+```
+##   var
+## 1   F
+## 2   F
+## 3   M
+## 4   M
+## 5   F
+```
+
+```r
+dftab
+```
+
+```
+##   Var1 Freq
+## 1    F    3
+## 2    M    2
+```
+
+--
+
+&lt;div style="position:absolute;right:5%;top:34%;"&gt;
+
+&lt;code&gt;ggplot(df, aes(var)) + geom_bar()&lt;/code&gt;
+
+&lt;img src="images/week4B/eg-plot1-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+&lt;br&gt;
+&lt;code&gt;ggplot(dftab, aes(Var1, Freq)) + geom_col()&lt;/code&gt;
+
+&lt;img src="images/week4B/eg-plot2-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+
+&lt;/div&gt;
+
+
+---
+
+# .orange[Case study] .circle.bg-orange[10] Titanic
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[
+.item[
+&lt;img src="images/week4B/titanic-plot1-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/week4B/titanic-plot2-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/week4B/titanic-plot3-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/week4B/titanic-plot4-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+
+**What does the graphs for each categorical variable tell us?**
+
+* There were more crews than 1st to 3rd class passengers
+* There were far more males on ship; possibly because majority of crew members were male. You can further explore this by constructing two-way tables or graphs that consider both variables.
+* Most passengers were adults. 
+* More than two-thirds of passengers died. 
+
+]
+
+
+]
+
+]
+.panel[.panel-name[data]
+.h350.scroll-sign[
+
+```r
+df9 &lt;- as_tibble(Titanic)
+skimr::skim(df9)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df9   
+## Number of rows             32    
+## Number of columns          5     
+## _______________________          
+## Column type frequency:           
+##   character                4     
+##   numeric                  1     
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate   min   max empty n_unique whitespace
+## 1 Class                 0             1     3     4     0        4          0
+## 2 Sex                   0             1     4     6     0        2          0
+## 3 Age                   0             1     5     5     0        2          0
+## 4 Survived              0             1     2     3     0        2          0
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate  mean    sd    p0   p25   p50   p75  p100 hist 
+## 1 n                     0             1  68.8  136.     0  0.75  13.5    77   670 ▇▁▁▁▁
+```
+]]
+.panel[.panel-name[R]
+.scroll-sign[.s500[
+
+```r
+df9 %&gt;% 
+  group_by(Class) %&gt;% 
+  summarise(total = sum(n)) %&gt;% 
+  ggplot(aes(Class, total)) + 
+  geom_col(fill = "#ee64a4") + 
+  labs(x = "", y = "Frequency") 
+
+df9 %&gt;% 
+  group_by(Sex) %&gt;% 
+  summarise(total = sum(n)) %&gt;% 
+  ggplot(aes(Sex, total)) + 
+  geom_col(fill = "#746FB2") + 
+  labs(x = "", y = "Frequency") 
+
+df9 %&gt;% 
+  group_by(Age) %&gt;% 
+  summarise(total = sum(n)) %&gt;% 
+  ggplot(aes(Age, total)) + 
+  geom_col(fill = "#C8008F") + 
+  labs(x = "", y = "Frequency") 
+
+df9 %&gt;% 
+  group_by(Survived) %&gt;% 
+  summarise(total = sum(n)) %&gt;% 
+  ggplot(aes(Survived, total)) + 
+  geom_col(fill = "#795549") + 
+  labs(x = "Survived", y = "Frequency") 
+```
+]]
+]]
+
+.footnote[
+British Board of Trade (1990), Report on the Loss of the ‘Titanic’ (S.S.). British Board of Trade Inquiry Report (reprint). Gloucester, UK: Allan Sutton Publishing
+]
+
+
+---
+
+
+class: nostripheader middle
+
+# Coloring bars
+
+
+&lt;img src="images/week4B/unnamed-chunk-13-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+--
+
+* Colour here doesn't add information as the x-axis already tells us about the categories, but colouring bars can make it more visually appealing. 
+* If you have too many categories colour won't work well to differentiate the categories. 
+
+---
+
+# .orange[Case study] .circle.bg-orange[11] Opinion poll in Ireland Aug 2013
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[
+.item[
+&lt;img src="images/week4B/poll-plot1-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/week4B/poll-plot2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+]
+.item[
+
+* Piechart is popular in mainstream media but are not generally recommended as people are generally poor at comparing angles.
+* 3D piecharts should definitely be avoided!
+* Here you can see that there are many people that are "Undecided" for which political party to support and failing to account for this paints a different picture. 
+
+]
+
+
+]
+
+]
+.panel[.panel-name[data]
+
+```r
+df11 &lt;- tibble(party = c("Fine Gael", "Labour", "Fianna Fail",
+                         "Sinn Fein", "Indeps", "Green", "Undecided"),
+               nos = c(181, 51, 171, 119, 91, 4, 368)) 
+df11v2 &lt;- df11 %&gt;% filter(party != "Undecided")
+df11
+```
+
+```
+## # A tibble: 7 x 2
+##   party         nos
+##   &lt;chr&gt;       &lt;dbl&gt;
+## 1 Fine Gael     181
+## 2 Labour         51
+## 3 Fianna Fail   171
+## 4 Sinn Fein     119
+## 5 Indeps         91
+## 6 Green           4
+## 7 Undecided     368
+```
+]
+.panel[.panel-name[R]
+
+```r
+g11 &lt;- df11 %&gt;% 
+  ggplot(aes("", nos, fill = party)) + 
+  geom_col(color = "black") + 
+  labs(y = "", x = "") + 
+  coord_polar("y") +
+  theme(axis.line = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text = element_blank(),
+        panel.grid.major = element_blank()) +
+  scale_fill_discrete_qualitative(name = "Party")
+g11
+
+g11 %+% df11v2 + 
+  # below is needed to keep the same color scheme as before
+  scale_fill_manual(values = qualitative_hcl(7)[1:6])
+```
+]]
+
+.footnote[
+
+]
+
+
+---
+
+class: nostripheader middle
+
+# Piechart is a stacked barplot just with a transformed coordinate system
+
+--
+
+
+```r
+df &lt;- data.frame(var = c("A", "B", "C"), perc = c(40, 40, 20))
+g &lt;- ggplot(df, aes("", perc, fill = var)) + 
+  geom_col()
+g
+```
+
+&lt;img src="images/week4B/barplot-1.png" width="216" style="display: block; margin: auto;" /&gt;
+--
+
+
+```r
+g + coord_polar("y")
+```
+
+&lt;img src="images/week4B/piechart-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: nostripheader middle
+
+# Roseplot is a barplot just with a transformed coordinate system
+
+--
+
+
+```r
+dummy &lt;- data.frame(var = LETTERS[1:20], 
+                 n = round(rexp(20, 1/100)))
+g &lt;- ggplot(dummy, aes(var, n)) + geom_col(fill = "pink", color = "black")
+g
+```
+
+&lt;img src="images/week4B/nonstacked-barplot-1.png" width="720" style="display: block; margin: auto;" /&gt;
+--
+
+
+```r
+g + coord_polar("x") + theme_void()
+```
+
+&lt;img src="images/week4B/roseplot-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Resources
+
+
+- Unwin (2015) “Graphical Data Analysis with R” 
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+---
+
+
+background-image: url(images/steve-johnson--auJqHRvM_k-unsplash.jpg)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Emi Tanaka
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

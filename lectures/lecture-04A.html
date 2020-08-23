@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Emi Tanaka" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="assets/panelset-modified.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/panelset.css" type="text/css" />
+    <link rel="stylesheet" href="assets/emi.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/steve-johnson--auJqHRvM_k-unsplash.jpg)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Working with a single variable, making transformations, detecting outliers, using robust statistics&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Emi Tanaka*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 4 - Session 1
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+---
+
+class: transition middle
+
+# Continuous variables
+
+&lt;br&gt;&lt;br&gt;
+
+
+This lecture is based on Chapter 3  of &lt;br&gt;&lt;br&gt;Unwin (2015) Graphical Data Analysis with R
+
+
+
+---
+
+# .orange[Case study] .circle.bg-orange[1] German Bundestag Election 2009 .font_small[Part 1/2]
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[
+.item[
+&lt;img src="images/week4A/btw2009-hist-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+.item[
+**About**
+* Bundestag is the first chamber of the German parliament.
+* Germany has 299 constituencies.
+* Die Linke is a party on the left.
+
+**What does this graph tell you?**
+
+{{content}}
+]
+]
+
+]
+.panel[.panel-name[data]
+.h350.scroll-sign[
+
+```r
+data("btw2009", package = "flexclust")
+df1 &lt;- btw2009 %&gt;%  mutate(Linke2 = 100 * LINKE2 / valid2)
+skimr::skim(df1)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df1   
+## Number of rows             299   
+## Number of columns          18    
+## _______________________          
+## Column type frequency:           
+##   factor                   1     
+##   numeric                  17    
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: factor ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate ordered n_unique top_counts                        
+## 1 state                 0             1 FALSE         16 Nor: 64, Bay: 45, Bad: 38, Nie: 30
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##    skim_variable n_missing complete_rate    mean     sd     p0     p25    p50     p75   p100 hist 
+##  1 eligible              0         1     207921. 22936. 154767 190016. 207451 224707  256131 ▂▆▇▆▃
+##  2 votes                 0         1     147176. 18619.  94922 133038  146160 160939  191097 ▁▅▇▆▂
+##  3 invalid1              0         1       2534.   811.   1198   1888    2374   3098.   5598 ▇▇▅▂▁
+##  4 invalid2              0         1       2122.   754.    974   1552.   1971   2564    4959 ▇▇▃▁▁
+##  5 valid1                0         1     144642. 18456.  93398 130464. 143231 158170. 188127 ▁▅▇▆▂
+##  6 valid2                0         1     145054. 18495.  93873 130780  143546 158481  188728 ▁▅▇▆▂
+##  7 SPD1                  0         1      40401. 13450.  14040  28807   40464  50988.  73215 ▅▇▇▆▂
+##  8 SPD2                  0         1      33413. 10040.  13611  25481   32691  40946.  59493 ▅▇▇▅▂
+##  9 UNION1                0         1      57016. 14743.  18394  46464   56503  66090. 101261 ▁▆▇▃▁
+## 10 UNION2                0         1      49025. 11984.  18788  40868.  49267  55608.  86686 ▁▇▇▂▁
+## 11 GRUENE1               3         0.990  13436.  7232.   3725   9008   12190  16142.  73897 ▇▂▁▁▁
+## 12 GRUENE2               0         1      15529.  6789.   4238  10906.  14609  18894.  43347 ▅▇▂▁▁
+## 13 FDP1                  0         1      13634.  4148.   4885  10665   12982  15970   31606 ▃▇▃▁▁
+## 14 FDP2                  0         1      21124.  6065.   7872  16805   20829  25014   38125 ▃▇▇▅▁
+## 15 LINKE1                2         0.993  16132. 12240.   4868   9066   10936  14083   62880 ▇▁▁▁▁
+## 16 LINKE2                0         1      17244. 11341.   5641  10406   12596  16266.  56938 ▇▁▁▁▁
+## 17 Linke2                0         1      17244. 11341.   5641  10406   12596  16266.  56938 ▇▁▁▁▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+df1 %&gt;% 
+  ggplot(aes(Linke2)) + 
+  geom_histogram(binwidth = 1, color = "black", fill = "#027EB6") + 
+  labs(y = "Count", 
+       x = "Percentage of voter support for Die Linke", 
+       title = "2009 Election for German Bundestag")
+```
+]
+]
+
+.footnote[
+Leisch, Friedrich (2006) A Toolbox for K-Centroids Cluster Analysis. *Computational Statistics and Data Analysis* **51** (2) 526-544&lt;br&gt;
+Data source: https://www.bundestag.de/
+]
+
+--
+
+&lt;ul&gt;
+&lt;li&gt;Majority of the country does not support Die Linke.&lt;/li&gt;
+&lt;li&gt;The country appear divided in support of Die Linke with some constituents more supportive than the others.&lt;/li&gt;
+&lt;/ul&gt;
+
+---
+
+# .orange[Case study] .circle.bg-orange[1] German Bundestag Election 2009 .font_small[Part 2/2]
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[
+.item[
+&lt;img src="images/week4A/btw2009-boxplot-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+* The width of the boxplot is proportional to the Bundesland size.
+* The .pink[pink colour] indicates the old-East Germany. 
+* Die-Linke had more support in the old-East.
+]
+
+]
+
+]
+.panel[.panel-name[data]
+.h350.scroll-sign[
+
+```r
+data("btw2009", package = "flexclust")
+df1 &lt;- btw2009 %&gt;%  mutate(Linke2 = 100 * LINKE2 / valid2)
+skimr::skim(df1)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df1   
+## Number of rows             299   
+## Number of columns          18    
+## _______________________          
+## Column type frequency:           
+##   factor                   1     
+##   numeric                  17    
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: factor ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate ordered n_unique top_counts                        
+## 1 state                 0             1 FALSE         16 Nor: 64, Bay: 45, Bad: 38, Nie: 30
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##    skim_variable n_missing complete_rate    mean     sd     p0     p25    p50     p75   p100 hist 
+##  1 eligible              0         1     207921. 22936. 154767 190016. 207451 224707  256131 ▂▆▇▆▃
+##  2 votes                 0         1     147176. 18619.  94922 133038  146160 160939  191097 ▁▅▇▆▂
+##  3 invalid1              0         1       2534.   811.   1198   1888    2374   3098.   5598 ▇▇▅▂▁
+##  4 invalid2              0         1       2122.   754.    974   1552.   1971   2564    4959 ▇▇▃▁▁
+##  5 valid1                0         1     144642. 18456.  93398 130464. 143231 158170. 188127 ▁▅▇▆▂
+##  6 valid2                0         1     145054. 18495.  93873 130780  143546 158481  188728 ▁▅▇▆▂
+##  7 SPD1                  0         1      40401. 13450.  14040  28807   40464  50988.  73215 ▅▇▇▆▂
+##  8 SPD2                  0         1      33413. 10040.  13611  25481   32691  40946.  59493 ▅▇▇▅▂
+##  9 UNION1                0         1      57016. 14743.  18394  46464   56503  66090. 101261 ▁▆▇▃▁
+## 10 UNION2                0         1      49025. 11984.  18788  40868.  49267  55608.  86686 ▁▇▇▂▁
+## 11 GRUENE1               3         0.990  13436.  7232.   3725   9008   12190  16142.  73897 ▇▂▁▁▁
+## 12 GRUENE2               0         1      15529.  6789.   4238  10906.  14609  18894.  43347 ▅▇▂▁▁
+## 13 FDP1                  0         1      13634.  4148.   4885  10665   12982  15970   31606 ▃▇▃▁▁
+## 14 FDP2                  0         1      21124.  6065.   7872  16805   20829  25014   38125 ▃▇▇▅▁
+## 15 LINKE1                2         0.993  16132. 12240.   4868   9066   10936  14083   62880 ▇▁▁▁▁
+## 16 LINKE2                0         1      17244. 11341.   5641  10406   12596  16266.  56938 ▇▁▁▁▁
+## 17 Linke2                0         1      17244. 11341.   5641  10406   12596  16266.  56938 ▇▁▁▁▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+east &lt;- c("Brandenburg", "Mecklenburg-Vorpommern", "Sachsen",
+          "Sachsen-Anhalt", "Thueringen")
+df1 %&gt;% 
+  mutate(color = case_when(state %in% east ~ "#E16A86",
+                           TRUE ~ "black"),
+         state = glue::glue("&lt;span style='color:{color}'&gt;{state}&lt;/span&gt;"),
+         state = fct_reorder(state, Linke2)) %&gt;% 
+  ggplot(aes(Linke2, state)) + 
+  geom_boxplot(varwidth = TRUE) + 
+  labs(y = "", 
+       x = "Percentage of voter support for Die Linke") + 
+  theme(axis.text.y = ggtext::element_markdown())
+```
+]
+]
+
+
+
+
+---
+
+# Possible features of continuous variables
+
+
+
+
+Feature | Example | Description
+--- | --- | ---
+Asymmetry | &lt;img src="images/week4A/plots-1.png" height ="58px"&gt;| The distribution is not symmetrical.
+Outliers |&lt;img src="images/week4A/plots-2.png" height ="58px"&gt; | Some observations are that are far from the rest.
+Multimodality | &lt;img src="images/week4A/plots-3.png" height ="58px"&gt;  | There are more than one "peak" in the observations. 
+Gaps |  &lt;img src="images/week4A/plots-4.png" height ="58px"&gt; | Some continuous interval that are contained within the range but no observations exists. 
+Heaping |  &lt;img src="images/week4A/plots-5.png" height ="58px"&gt; |  Some values occur unexpectedly often.
+Discretized |  &lt;img src="images/week4A/plots-6.png" height ="58px"&gt; | Only certain values are found, e.g. due to rounding.
+Implausible |  &lt;img src="images/week4A/plots-7.png" height ="58px"&gt; | Values outside of plausible or likely range.
+
+
+---
+
+# Numerical features of a single contiuous variables
+
+&lt;img src="images/week4A/example-plot-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+* A measure of **_central tendency_**, e.g. mean, median and mode.
+* A measure of **_dispersion_** (also called variability or spread), e.g. variance, standard deviation and interquartile range.
+* There are other measures, e.g. **_skewness_** and **_kurtosis_** that measures "tailedness", but these are not as common as the measures of first two. 
+* The mean is also the _first moment_ and variance, skewness and kurtosis are _second, third, and fourth central moments_. 
+* **Signifiance tests** or **hypothesis tests**: When testing for `\(H_0: \mu = \mu_0\)` vs. `\(H_1: \mu \neq \mu_0\)` (often `\(\mu_0 = 0\)`), the `\(t\)`-test is commonly used if the underlying data are believed to be normally distributed.
+---
+
+
+# Outliers
+
+.info-box[
+**Outliers** are *observations* that are significantly different from the majority.
+]
+
+&lt;br&gt;
+
+* Outliers can occur by chance in almost all distributions, but could be indicative of a measurement error, a different population, or an issue with the sampling process.
+* Outlying values of independent variables are referred to as **high-leverage points**, although this distinction is not particularly important when analysing a single continuous variable.
+
+
+---
+
+
+# Closer look at the _boxplot_
+
+
+&lt;img src="images/week4A/annotated-boxplot-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+* Observations that are outside the range of lower to upper thresholds are referred at times as .monash-blue[outliers].
+* Plotting boxplots for data from a skewed distribution will almost always show these "outliers" but these are not necessary outliers.
+* Some definitions of outliers assume a symmetrical population distribution (e.g. in boxplots or observations a certain standard deviations away from the mean) and these definitions are ill-suited for asymmetrical distributions.
+
+
+---
+
+# Robust statistics: measure of central tendency
+
+&lt;img src="images/week4A/robust-mean-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+* **Mean** is a non-robust measure of location. 
+* Some robust measures of locations are:
+  * **Median** is the 50% quantile of the observations
+  * **Trimmed mean** is the sample mean after discarding observations at the tails. 
+  * **Winsorized mean** is the sample mean after replacing observations at the tails with the minimum or maximum of the observations that remain.
+
+---
+
+# Robust statistics: measure of dispersion
+
+* **Standard deviation** or its square, **variance*, is a popular choice of measure of dispersion but is not robust to outliers. 
+* Standard deviation for sample `\(x_1, ..., x_n\)` is calculated as 
+`$$\sqrt{\sum_{i=1}^n \frac{(x_i - \bar{x})^2}{n - 1}}$$`
+* Interquartile range is the difference between 1st and 3rd quartile and is more robust measure of spread than above.
+* Median absolute deviance (MAD) is also more robust and defined as 
+`$$\text{median}(|x_i - \bar{x}|).$$`
+
+
+---
+
+# Transformations
+
+* Transformations to data are used as an attempt to stabilize the variance or make the data symmetrical.
+* Log and square root transformations are popular.
+* A range of `\(\lambda\)` values for (one-parameter) Box-Cox transformation is sometimes used to test for optimal transformation:
+`$$y(\lambda) = \begin{cases}\dfrac{(y^\lambda - 1)}{\lambda}\\ \log(y)\end{cases}$$`
+
+.footnote[
+Box, G. E. P. and Cox, D. R. (1964). An analysis of transformations, Journal of the Royal Statistical Society, Series B, 26, 211-252. 
+]
+
+---
+
+# .orange[Case study] .bg-orange.circle[2] Children and midparents heights .font_small[Part 1/3]
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/galton-plot1-1.png" width="460.8" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/galton-plot2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+
+* Midparent's height is an average of the father's height and 1.08 times the mother's height. 
+* The data contains 205 parents and 928 children.
+
+```
+## # A tibble: 928 x 2
+##   child parent
+##   &lt;dbl&gt;  &lt;dbl&gt;
+## 1  61.7     64
+## 2  63.2     64
+## 3  63.2     64
+## # … with 925 more rows
+```
+* The data included families of 1 to 15 children, so in the extreme case, one midparent data point is repeated 15 times in the data.
+* The frequency of midparents heights therefore are over-represented with parents with large family size.
+
+]
+]
+]
+.panel[.panel-name[data]
+.h300.scroll-sign[
+
+```r
+data(galton, package = "UsingR")
+df2 &lt;- galton %&gt;% 
+  pivot_longer(everything(), 
+               names_to = "person", 
+               values_to = "height") 
+skimr::skim(df2)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df2   
+## Number of rows             1856  
+## Number of columns          2     
+## _______________________          
+## Column type frequency:           
+##   character                1     
+##   numeric                  1     
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate   min   max empty n_unique whitespace
+## 1 person                0             1     5     6     0        2          0
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate  mean    sd    p0   p25   p50   p75  p100 hist 
+## 1 height                0             1  68.2  2.19  61.7  67.2  68.5  69.5  73.7 ▁▅▇▇▂
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(df2, aes(height)) + 
+  geom_histogram(binwidth = 1) + 
+  facet_wrap(~ person, scale = "free") + 
+  labs(x = "Height (inches)", y = "Frequency")
+
+ggplot(df2, aes(height)) + 
+  geom_histogram(binwidth = 1) + 
+  facet_grid(. ~ person) + 
+  labs(x = "Height (inches)", y = "Frequency")
+```
+]
+]
+
+.footnote[
+Verzani, John (2018). UsingR: Data Sets, Etc. for the Text "Using R for Introductory Statistics", Second Edition. R package version 2.0-6.&lt;br&gt;
+Galton, Franics (1886). Regression Towards Mediocrity in Hereditary Stature. *Journal of the Anthropological Institute* **15** 246-263
+]
+
+
+
+---
+
+# .orange[Case study] .bg-orange.circle[2] Children and midparents heights .font_small[Part 2/3]
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/galton-plot3-1.png" width="460.8" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/galton-plot4-1.png" width="460.8" style="display: block; margin: auto;" /&gt;
+
+]
+.item50[
+
+* Changing the bin width of histogram from 1 to 0.1, we can see the data have been rounded and hence some precision is lost in the data.
+* The data confirms this with most children's height recorded with ".2" at the end and most midparents heights recorded with ".5" at the end.
+
+&lt;br&gt;
+
+`child`
+
+```
+##  [1] 61.7 62.2 63.2 64.2 65.2 66.2 67.2 68.2 69.2
+## [10] 70.2 71.2 72.2 73.2 73.7
+```
+
+`parent`
+
+```
+##  [1] 70.5 68.5 65.5 64.5 64.0 67.5 66.5 69.5 71.5
+## [10] 72.5 73.0
+```
+
+
+
+]
+]
+]
+.panel[.panel-name[data]
+.h300.scroll-sign[
+
+```r
+data(galton, package = "UsingR")
+df2 &lt;- galton %&gt;% 
+  pivot_longer(everything(), 
+               names_to = "person", 
+               values_to = "height") 
+skimr::skim(df2)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df2   
+## Number of rows             1856  
+## Number of columns          2     
+## _______________________          
+## Column type frequency:           
+##   character                1     
+##   numeric                  1     
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ──────────────────────
+##   skim_variable n_missing complete_rate   min
+## 1 person                0             1     5
+##     max empty n_unique whitespace
+## 1     6     0        2          0
+## 
+## ── Variable type: numeric ────────────────────────
+##   skim_variable n_missing complete_rate  mean
+## 1 height                0             1  68.2
+##      sd    p0   p25   p50   p75  p100 hist 
+## 1  2.19  61.7  67.2  68.5  69.5  73.7 ▁▅▇▇▂
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(df2, aes(height)) + 
+  geom_histogram(binwidth = 1, aes(y = stat(density))) + 
+  facet_wrap(~ person) + 
+  labs(x = "Height (inches)", y = "Density")
+
+ggplot(df2, aes(height)) + 
+  geom_histogram(binwidth = 0.1, aes(y = stat(density))) + 
+  facet_wrap(~ person) + 
+  labs(x = "Height (inches)", y = "Density")
+```
+]
+]
+
+---
+
+# .orange[Case study] .bg-orange.circle[2] Children and midparents heights .font_small[Part 3/3]
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/galton-plot5-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/week4A/galton-plot6-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+
+]
+.item50[
+
+* Aligning the histogram vertically makes it easier to compare the heights of children and midparents. 
+* The side-by-side boxplots makes it easy to see the variability of the heights of the midparents are smaller than the children. 
+* The smaller variability is expected because the midparents heights are average of two values.
+* We can also see that the median height is larger for the midparents than children.
+{{content}}
+
+]
+]
+]
+.panel[.panel-name[data]
+.h300.scroll-sign[
+
+```r
+data(galton, package = "UsingR")
+df2 &lt;- galton %&gt;% 
+  pivot_longer(everything(), 
+               names_to = "person", 
+               values_to = "height") 
+skimr::skim(df2)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df2   
+## Number of rows             1856  
+## Number of columns          2     
+## _______________________          
+## Column type frequency:           
+##   character                1     
+##   numeric                  1     
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ──────────────────────
+##   skim_variable n_missing complete_rate   min
+## 1 person                0             1     5
+##     max empty n_unique whitespace
+## 1     6     0        2          0
+## 
+## ── Variable type: numeric ────────────────────────
+##   skim_variable n_missing complete_rate  mean
+## 1 height                0             1  68.2
+##      sd    p0   p25   p50   p75  p100 hist 
+## 1  2.19  61.7  67.2  68.5  69.5  73.7 ▁▅▇▇▂
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+df2sum &lt;- df2 %&gt;% 
+  group_by(person) %&gt;% 
+  summarise(med = median(height))
+
+ggplot(df2, aes(height)) + 
+  geom_histogram(binwidth = 1) + 
+  facet_grid(person ~ ., as.table = FALSE) + 
+  geom_vline(data = df2sum, 
+             aes(xintercept = med), 
+             color = "red", size = 2) + 
+  labs(x = "Height (inches)", y = "Frequency")
+
+ggplot(df2, aes(height, person)) + 
+  geom_boxplot() + 
+  labs(x = "Height (inches)", y = "")
+```
+]
+]
+
+--
+
+
+* You may think that the heights of children should be **_bimodal_**, _one peak for **male**_ and the _other peak for **female**_. 
+{{content}}
+--
+But that is not necessary the case as we'll see next.
+
+
+
+---
+
+# .orange[Case study] .bg-orange.circle[3] Self-reported heights 
+
+
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/dslabs-heights-1-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/week4A/dslabs-heights-2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+
+]
+.item50[
+
+* You can see that drawing separate density plots for each sexes shows that the women are on average shorter than men.
+* The bimodality is however not visible when the data are combined.
+
+]
+]
+]
+.panel[.panel-name[data]
+.h400.scroll-sign[
+
+```r
+data("heights", package = "dslabs")
+skimr::skim(heights)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values 
+## Name                       heights
+## Number of rows             1050   
+## Number of columns          2      
+## _______________________           
+## Column type frequency:            
+##   factor                   1      
+##   numeric                  1      
+## ________________________          
+## Group variables            None   
+## 
+## ── Variable type: factor ─────────────────────────
+##   skim_variable n_missing complete_rate ordered
+## 1 sex                   0             1 FALSE  
+##   n_unique top_counts        
+## 1        2 Mal: 812, Fem: 238
+## 
+## ── Variable type: numeric ────────────────────────
+##   skim_variable n_missing complete_rate  mean
+## 1 height                0             1  68.3
+##      sd    p0   p25   p50   p75  p100 hist 
+## 1  4.08    50    66  68.5    71  82.7 ▁▂▇▆▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(heights, aes(height)) + 
+  geom_density(aes(fill = sex), size = 2) +
+  scale_fill_discrete_qualitative() + 
+  labs(x = "Height (inches)", y = "Density") + 
+  theme(legend.position = c(0.2, 0.8)) 
+
+ggplot(heights, aes(height)) + 
+  geom_density(fill = "#027EB6", size = 2) +
+  labs(x = "Height (inches)", y = "Density")
+```
+]
+]
+
+.footnote[
+Irizarry, Rafael A. and Gill, Amy (2019). dslabs: Data Science Labs. R package version 0.7.3.
+]
+
+---
+
+# .orange[Case study] .circle.bg-orange[4] Men's heights 
+
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/pearson-height-plot1-1.png" width="460.8" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/pearson-height-plot2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+
+&lt;img src="images/week4A/pearson-height-plot3-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+* The height distribution of the son appears more normal than of the father looking at the density plot.
+* Looking at the Q-Q plots, this however looks the other way around.
+* The heights are recorded to five decimal places (e.g. `65.04851`). 
+* It's unlikely that the heights were measured to such high precision and rather that someone must have "jittered" the data (i.e. added some small random perturbation to the observation). 
+
+
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+data(father.son, package = "UsingR")
+df4 &lt;- father.son %&gt;% 
+  pivot_longer(everything(), 
+               names_to = "status", 
+               values_to = "height") %&gt;% 
+  mutate(status = recode(status, 
+                         fheight = "father",
+                         sheight = "son"))
+skimr::skim(df4)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df4   
+## Number of rows             2156  
+## Number of columns          2     
+## _______________________          
+## Column type frequency:           
+##   character                1     
+##   numeric                  1     
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ──────────────────────
+##   skim_variable n_missing complete_rate   min
+## 1 status                0             1     3
+##     max empty n_unique whitespace
+## 1     6     0        2          0
+## 
+## ── Variable type: numeric ────────────────────────
+##   skim_variable n_missing complete_rate  mean
+## 1 height                0             1  68.2
+##      sd    p0   p25   p50   p75  p100 hist 
+## 1  2.82  58.5  66.3  68.2  70.0  78.4 ▁▃▇▃▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(df4, aes(height)) + 
+  geom_histogram(binwidth = 1, aes(y = stat(density))) + 
+  facet_grid(status ~ .) +
+  geom_density(color = "red", size = 2) + 
+  labs(x = "Height (inches)", y = "Density")
+
+ggplot(df4, aes(sample = height)) +
+  geom_qq_line(color = "red", size = 2) + 
+  geom_qq() +
+  facet_grid(. ~ status) + 
+  labs(x = "Theoretical quantiles", y = "Sample quantiles")
+
+ggplot(df4, aes(height, status)) + 
+  geom_boxplot() + 
+  labs(x = "Height (inches)", y = "")
+```
+
+]
+]
+
+.footnote[
+Verzani, John (2018). UsingR: Data Sets, Etc. for the Text "Using R for Introductory Statistics", Second Edition. R package version 2.0-6.&lt;br&gt;
+Pearson, Karl and Lee, Alison (1903) On the laws of inheritance in man: I. Inheritance of physical characters. *Biometrika* **2** (4) 357-462
+]
+
+---
+
+
+# .orange[Case study] .circle.bg-orange[5] Boston housing data .font_small[Part 1/4]
+
+
+
+
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/boston-plot1-1.png" width="460.8" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+
+{{content}}
+
+
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+data(bostonc, package = "DAAG")
+df5 &lt;- read_tsv(bostonc[10:length(bostonc)]) 
+skimr::skim(df5)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df5   
+## Number of rows             506   
+## Number of columns          21    
+## _______________________          
+## Column type frequency:           
+##   character                2     
+##   numeric                  19    
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ──────────────────────
+##   skim_variable n_missing complete_rate   min
+## 1 TOWN                  0             1     4
+## 2 TRACT                 0             1     4
+##     max empty n_unique whitespace
+## 1    23     0       92          0
+## 2     4     0      506          0
+## 
+## ── Variable type: numeric ────────────────────────
+##    skim_variable n_missing complete_rate     mean
+##  1 OBS.                  0             1 254.    
+##  2 TOWN#                 0             1  47.5   
+##  3 LON                   0             1 -71.1   
+##  4 LAT                   0             1  42.2   
+##  5 MEDV                  0             1  22.5   
+##  6 CMEDV                 0             1  22.5   
+##  7 CRIM                  0             1   3.61  
+##  8 ZN                    0             1  11.4   
+##  9 INDUS                 0             1  11.1   
+## 10 CHAS                  0             1   0.0692
+## 11 NOX                   0             1   0.555 
+## 12 RM                    0             1   6.28  
+## 13 AGE                   0             1  68.6   
+## 14 DIS                   0             1   3.80  
+## 15 RAD                   0             1   9.55  
+## 16 TAX                   0             1 408.    
+## 17 PTRATIO               0             1  18.5   
+## 18 B                     0             1 357.    
+## 19 LSTAT                 0             1  12.7   
+##          sd        p0      p25     p50     p75
+##  1 146.       1       127.     254.    380.   
+##  2  27.6      0        26.2     42      78    
+##  3   0.0754 -71.3     -71.1    -71.1   -71.0  
+##  4   0.0618  42.0      42.2     42.2    42.3  
+##  5   9.20     5        17.0     21.2    25    
+##  6   9.18     5        17.0     21.2    25    
+##  7   8.60     0.00632   0.0820   0.257   3.68 
+##  8  23.3      0         0        0      12.5  
+##  9   6.86     0.46      5.19     9.69   18.1  
+## 10   0.254    0         0        0       0    
+## 11   0.116    0.385     0.449    0.538   0.624
+## 12   0.703    3.56      5.89     6.21    6.62 
+## 13  28.1      2.9      45.0     77.5    94.1  
+## 14   2.11     1.13      2.10     3.21    5.19 
+## 15   8.71     1         4        5      24    
+## 16 169.     187       279      330     666    
+## 17   2.16    12.6      17.4     19.0    20.2  
+## 18  91.3      0.32    375.     391.    396.   
+## 19   7.14     1.73      6.95    11.4    17.0  
+##       p100 hist 
+##  1 506     ▇▇▇▇▇
+##  2  91     ▅▆▅▃▇
+##  3 -70.8   ▁▂▇▂▁
+##  4  42.4   ▁▃▇▃▁
+##  5  50     ▂▇▅▁▁
+##  6  50     ▂▇▅▁▁
+##  7  89.0   ▇▁▁▁▁
+##  8 100     ▇▁▁▁▁
+##  9  27.7   ▇▆▁▇▁
+## 10   1     ▇▁▁▁▁
+## 11   0.871 ▇▇▆▅▁
+## 12   8.78  ▁▂▇▂▁
+## 13 100     ▂▂▂▃▇
+## 14  12.1   ▇▅▂▁▁
+## 15  24     ▇▂▁▁▃
+## 16 711     ▇▇▃▁▇
+## 17  22     ▁▃▅▅▇
+## 18 397.    ▁▁▁▁▇
+## 19  38.0   ▇▇▅▂▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(df5, aes(MEDV)) + 
+  geom_histogram(binwidth = 1, color = "black", fill = "#008A25") + 
+  labs(x = "Median housing value (US$1000)", y = "Frequency")
+```
+
+]
+]
+
+.footnote[
+Harrison, David, and Daniel L. Rubinfeld (1978) Hedonic Housing Prices and the Demand for Clean Air, *Journal of Environmental Economics and Management* **5** 81-102. Original data.&lt;br&gt;
+Gilley, O.W. and R. Kelley Pace (1996) On the Harrison and Rubinfeld Data. *Journal of Environmental Economics and Management* **31** 403-405. Provided corrections and examined censoring.&lt;br&gt;
+Maindonald, John H. and Braun, W. John (2020). DAAG: Data Analysis and Graphics Data and Functions. R package version 1.24
+]
+
+--
+
+* Thre is a large frequency in the final bin.
+* There is a decline in observations in the $40-49K range as well as dip in observations around $26K and $34K.
+* The histogram is using a bin width of 1 unit and is **left-open** (or **right-closed**): (4.5, 5.5], (5.5, 6.5] ... (49.5, 50.5].
+* Occasionally, whether it is left- or right-open can make a difference.
+
+
+---
+
+# .orange[Case study] .circle.bg-orange[5] Boston housing data .font_small[Part 2/4]
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/boston-plot2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/boston-plot3-1.png" width="432" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/boston-plot4-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+.item[
+
+* Density plots depend on the bandwidth chosen and more than often do not estimate well at boundary cases.
+* There are various way to present features of the data using a plot and what works for one person, may not be as straightforward for another. 
+* Be prepared to do multiple plots. 
+
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+data(bostonc, package = "DAAG")
+df5 &lt;- read_tsv(bostonc[10:length(bostonc)]) 
+skimr::skim(df5)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df5   
+## Number of rows             506   
+## Number of columns          21    
+## _______________________          
+## Column type frequency:           
+##   character                2     
+##   numeric                  19    
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ──────────────────────
+##   skim_variable n_missing complete_rate   min
+## 1 TOWN                  0             1     4
+## 2 TRACT                 0             1     4
+##     max empty n_unique whitespace
+## 1    23     0       92          0
+## 2     4     0      506          0
+## 
+## ── Variable type: numeric ────────────────────────
+##    skim_variable n_missing complete_rate     mean
+##  1 OBS.                  0             1 254.    
+##  2 TOWN#                 0             1  47.5   
+##  3 LON                   0             1 -71.1   
+##  4 LAT                   0             1  42.2   
+##  5 MEDV                  0             1  22.5   
+##  6 CMEDV                 0             1  22.5   
+##  7 CRIM                  0             1   3.61  
+##  8 ZN                    0             1  11.4   
+##  9 INDUS                 0             1  11.1   
+## 10 CHAS                  0             1   0.0692
+## 11 NOX                   0             1   0.555 
+## 12 RM                    0             1   6.28  
+## 13 AGE                   0             1  68.6   
+## 14 DIS                   0             1   3.80  
+## 15 RAD                   0             1   9.55  
+## 16 TAX                   0             1 408.    
+## 17 PTRATIO               0             1  18.5   
+## 18 B                     0             1 357.    
+## 19 LSTAT                 0             1  12.7   
+##          sd        p0      p25     p50     p75
+##  1 146.       1       127.     254.    380.   
+##  2  27.6      0        26.2     42      78    
+##  3   0.0754 -71.3     -71.1    -71.1   -71.0  
+##  4   0.0618  42.0      42.2     42.2    42.3  
+##  5   9.20     5        17.0     21.2    25    
+##  6   9.18     5        17.0     21.2    25    
+##  7   8.60     0.00632   0.0820   0.257   3.68 
+##  8  23.3      0         0        0      12.5  
+##  9   6.86     0.46      5.19     9.69   18.1  
+## 10   0.254    0         0        0       0    
+## 11   0.116    0.385     0.449    0.538   0.624
+## 12   0.703    3.56      5.89     6.21    6.62 
+## 13  28.1      2.9      45.0     77.5    94.1  
+## 14   2.11     1.13      2.10     3.21    5.19 
+## 15   8.71     1         4        5      24    
+## 16 169.     187       279      330     666    
+## 17   2.16    12.6      17.4     19.0    20.2  
+## 18  91.3      0.32    375.     391.    396.   
+## 19   7.14     1.73      6.95    11.4    17.0  
+##       p100 hist 
+##  1 506     ▇▇▇▇▇
+##  2  91     ▅▆▅▃▇
+##  3 -70.8   ▁▂▇▂▁
+##  4  42.4   ▁▃▇▃▁
+##  5  50     ▂▇▅▁▁
+##  6  50     ▂▇▅▁▁
+##  7  89.0   ▇▁▁▁▁
+##  8 100     ▇▁▁▁▁
+##  9  27.7   ▇▆▁▇▁
+## 10   1     ▇▁▁▁▁
+## 11   0.871 ▇▇▆▅▁
+## 12   8.78  ▁▂▇▂▁
+## 13 100     ▂▂▂▃▇
+## 14  12.1   ▇▅▂▁▁
+## 15  24     ▇▂▁▁▃
+## 16 711     ▇▇▃▁▇
+## 17  22     ▁▃▅▅▇
+## 18 397.    ▁▁▁▁▇
+## 19  38.0   ▇▇▅▂▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(df5, aes(MEDV, y = "")) + 
+  geom_boxplot(fill = "#008A25") + 
+  labs(x = "Median housing value (US$1000)", y = "") + 
+  theme(axis.line.y = element_blank())
+
+ggplot(df5, aes(MEDV, y = "")) + 
+  geom_jitter() + 
+  labs(x = "Median housing value (US$1000)", y = "") + 
+  theme(axis.line.y = element_blank())
+
+ggplot(df5, aes(MEDV)) + 
+  geom_density() + 
+  geom_rug() + 
+  labs(x = "Median housing value (US$1000)", y = "") + 
+  theme(axis.line.y = element_blank())
+```
+
+]
+]
+
+---
+
+# .orange[Case study] .circle.bg-orange[5] Boston housing data .font_small[Part 3/4]
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/boston-plot5-1.png" width="432" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/boston-plot6-1.png" width="432" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/boston-plot7-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+]
+.item[
+
+&lt;img src="images/week4A/boston-plot8-1.png" width="432" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/boston-plot9-1.png" width="432" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/boston-plot10-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+
+]
+]
+]
+.panel[.panel-name[data]
+.h400.scroll-sign[
+
+```r
+data(bostonc, package = "DAAG")
+df5 &lt;- read_tsv(bostonc[10:length(bostonc)]) 
+skimr::skim(df5)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       df5   
+## Number of rows             506   
+## Number of columns          21    
+## _______________________          
+## Column type frequency:           
+##   character                2     
+##   numeric                  19    
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ──────────────────────
+##   skim_variable n_missing complete_rate   min
+## 1 TOWN                  0             1     4
+## 2 TRACT                 0             1     4
+##     max empty n_unique whitespace
+## 1    23     0       92          0
+## 2     4     0      506          0
+## 
+## ── Variable type: numeric ────────────────────────
+##    skim_variable n_missing complete_rate     mean
+##  1 OBS.                  0             1 254.    
+##  2 TOWN#                 0             1  47.5   
+##  3 LON                   0             1 -71.1   
+##  4 LAT                   0             1  42.2   
+##  5 MEDV                  0             1  22.5   
+##  6 CMEDV                 0             1  22.5   
+##  7 CRIM                  0             1   3.61  
+##  8 ZN                    0             1  11.4   
+##  9 INDUS                 0             1  11.1   
+## 10 CHAS                  0             1   0.0692
+## 11 NOX                   0             1   0.555 
+## 12 RM                    0             1   6.28  
+## 13 AGE                   0             1  68.6   
+## 14 DIS                   0             1   3.80  
+## 15 RAD                   0             1   9.55  
+## 16 TAX                   0             1 408.    
+## 17 PTRATIO               0             1  18.5   
+## 18 B                     0             1 357.    
+## 19 LSTAT                 0             1  12.7   
+##          sd        p0      p25     p50     p75
+##  1 146.       1       127.     254.    380.   
+##  2  27.6      0        26.2     42      78    
+##  3   0.0754 -71.3     -71.1    -71.1   -71.0  
+##  4   0.0618  42.0      42.2     42.2    42.3  
+##  5   9.20     5        17.0     21.2    25    
+##  6   9.18     5        17.0     21.2    25    
+##  7   8.60     0.00632   0.0820   0.257   3.68 
+##  8  23.3      0         0        0      12.5  
+##  9   6.86     0.46      5.19     9.69   18.1  
+## 10   0.254    0         0        0       0    
+## 11   0.116    0.385     0.449    0.538   0.624
+## 12   0.703    3.56      5.89     6.21    6.62 
+## 13  28.1      2.9      45.0     77.5    94.1  
+## 14   2.11     1.13      2.10     3.21    5.19 
+## 15   8.71     1         4        5      24    
+## 16 169.     187       279      330     666    
+## 17   2.16    12.6      17.4     19.0    20.2  
+## 18  91.3      0.32    375.     391.    396.   
+## 19   7.14     1.73      6.95    11.4    17.0  
+##       p100 hist 
+##  1 506     ▇▇▇▇▇
+##  2  91     ▅▆▅▃▇
+##  3 -70.8   ▁▂▇▂▁
+##  4  42.4   ▁▃▇▃▁
+##  5  50     ▂▇▅▁▁
+##  6  50     ▂▇▅▁▁
+##  7  89.0   ▇▁▁▁▁
+##  8 100     ▇▁▁▁▁
+##  9  27.7   ▇▆▁▇▁
+## 10   1     ▇▁▁▁▁
+## 11   0.871 ▇▇▆▅▁
+## 12   8.78  ▁▂▇▂▁
+## 13 100     ▂▂▂▃▇
+## 14  12.1   ▇▅▂▁▁
+## 15  24     ▇▂▁▁▃
+## 16 711     ▇▇▃▁▇
+## 17  22     ▁▃▅▅▇
+## 18 397.    ▁▁▁▁▇
+## 19  38.0   ▇▇▅▂▁
+```
+]]
+.panel[.panel-name[R]
+.scroll-sign[.s500[
+
+```r
+ggplot(df5, aes(PTRATIO)) + 
+  geom_histogram(fill = "#9651A0",  color = "black", binwidth = 0.2) + 
+  labs(x = "Pupil-teacher ratio by town", y = "",
+       title = "Bin width = 0.2, Left-open") 
+
+ggplot(df5, aes(PTRATIO)) + 
+  geom_histogram(fill = "#9651A0",  color = "black", binwidth = 0.5) + 
+  labs(x = "Pupil-teacher ratio by town", y = "",
+       title = "Bin width = 0.5, Left-open") 
+
+ggplot(df5, aes(PTRATIO)) + 
+  geom_histogram(fill = "#9651A0",  color = "black", bin = 30) + 
+  labs(x = "Pupil-teacher ratio by town", y = "",
+       title = "Bin number = 30, Left-open") 
+
+ggplot(df5, aes(PTRATIO)) + 
+  geom_histogram(fill = "#9651A0", color = "black", binwidth = 0.2, closed = "left") + 
+  labs(x = "Pupil-teacher ratio by town", y = "",
+       title = "Bin width = 0.2, Right-open") 
+
+ggplot(df5, aes(PTRATIO)) + 
+  geom_histogram(fill = "#9651A0", color = "black", binwidth = 0.5, closed = "left") + 
+  labs(x = "Pupil-teacher ratio by town", y = "",
+       title = "Bin width = 0.5, Right-open") 
+
+ggplot(df5, aes(PTRATIO)) + 
+  geom_histogram(fill = "#9651A0", color = "black",
+                 bin = 30, closed = "left") + 
+  labs(x = "Pupil-teacher ratio by town", y = "",
+       title = "Bin number = 30, Right-open") 
+```
+]]]
+]
+
+---
+
+# .orange[Case study] .circle.bg-orange[5] Boston housing data .font_small[Part 4/4]
+
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/boston-plotx-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+
+* CRIM: per capita crime rate by town 
+* INDUS: proportion of non-retail business acres per town
+* NOX: nitrogen oxides concentration (parts per 10 million)
+* RM: average number of room per dwelling
+* AGE: proportion of owner-occupied units built prior to 1940
+* DIS: weighted mean of distances to 5 Boston employment centres
+* RAD: index of accessibility to radial highways
+* TAX: full-value property tax rate per $10K
+* PTRATIO: pupil-teacher ratio by town 
+* LSTAT: lower status of the population (%)
+* MEDV: median value of owner-occupied homes in $1000s
+
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+df5long &lt;- df5 %&gt;% pivot_longer(MEDV:LSTAT,
+                             names_to = "var",
+                             values_to = "value") %&gt;% 
+  filter(!var %in% c("CHAS", "B", "ZN"))
+skimr::skim(df5long)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values 
+## Name                       df5long
+## Number of rows             6072   
+## Number of columns          8      
+## _______________________           
+## Column type frequency:            
+##   character                3      
+##   numeric                  5      
+## ________________________          
+## Group variables            None   
+## 
+## ── Variable type: character ──────────────────────
+##   skim_variable n_missing complete_rate   min
+## 1 TOWN                  0             1     4
+## 2 TRACT                 0             1     4
+## 3 var                   0             1     2
+##     max empty n_unique whitespace
+## 1    23     0       92          0
+## 2     4     0      506          0
+## 3     7     0       12          0
+## 
+## ── Variable type: numeric ────────────────────────
+##   skim_variable n_missing complete_rate  mean
+## 1 OBS.                  0             1 254. 
+## 2 TOWN#                 0             1  47.5
+## 3 LON                   0             1 -71.1
+## 4 LAT                   0             1  42.2
+## 5 value                 0             1  49.0
+##         sd        p0   p25   p50   p75  p100 hist 
+## 1 146.       1       127   254.  380   506   ▇▇▇▇▇
+## 2  27.5      0        26    42    78    91   ▅▆▅▃▇
+## 3   0.0753 -71.3     -71.1 -71.1 -71.0 -70.8 ▁▂▇▂▁
+## 4   0.0617  42.0      42.2  42.2  42.3  42.4 ▁▃▇▃▁
+## 5 120.       0.00632   4    12.3  23.4 711   ▇▁▁▁▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(df5long, aes(value)) +
+  geom_histogram() +
+  facet_wrap( ~var, scale = "free") + 
+  labs(x = "", y = "") + 
+  theme(axis.text = element_text(size = 12))
+```
+
+]
+]
+
+
+---
+
+
+# .orange[Case study] .circle.bg-orange[6] Hidalgo stamps thickness 
+
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+&lt;img src="images/week4A/hidalgo-plot-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+* A stamp collector, Walton von Winkle, bought several collections of Mexican stamps from 1872-1874 and measured the thickness of all of them.
+* The different bandwidth for the density plot suggest either that there are two or seven modes.
+
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+load(here::here("data/Hidalgo1872.rda"))
+skimr::skim(Hidalgo1872)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values     
+## Name                       Hidalgo1872
+## Number of rows             485        
+## Number of columns          3          
+## _______________________               
+## Column type frequency:                
+##   numeric                  3          
+## ________________________              
+## Group variables            None       
+## 
+## ── Variable type: numeric ────────────────────────
+##   skim_variable n_missing complete_rate   mean
+## 1 thickness             0         1     0.0860
+## 2 thicknessA          195         0.598 0.0922
+## 3 thicknessB          289         0.404 0.0768
+##        sd    p0    p25   p50   p75  p100 hist 
+## 1 0.0150  0.06  0.075  0.08  0.098 0.131 ▅▇▃▂▁
+## 2 0.0162  0.068 0.0772 0.092 0.105 0.131 ▇▃▆▃▂
+## 3 0.00508 0.06  0.072  0.078 0.08  0.097 ▁▃▇▁▁
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(Hidalgo1872, aes(thickness)) +
+  geom_histogram(binwidth = 0.001, aes(y = stat(density))) + 
+  labs(x = "Thickness (0.001 mm)", y = "Density") + 
+  geom_density(color = "#E16A86", size = 2) + 
+  geom_density(color = "#00AD9A", size = 2, bw = "SJ")
+```
+
+]
+]
+
+
+---
+
+# .orange[Case study] .circle.bg-orange[7] Movie length
+
+
+
+
+.panelset[
+.panel[.panel-name[📊]
+.grid[
+.item[
+&lt;img src="images/week4A/movies-plot1-1.png" width="432" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/week4A/movies-plot2-1.png" width="381.6" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+
+* Upon further exploration, you can find the two movies that are well over 16 hours long are: 
+
+```
+## Cure for Insomnia, The
+## Four Stars
+## Longest Most Meaningless Movie in the World, The
+```
+
+* We can restrict our attention to films under 3 hours:
+
+&lt;img src="images/week4A/movies-plot3-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+]
+]
+
+
+]
+.panel[.panel-name[data]
+.h400.scroll-sign[
+
+```r
+data(movies, package = "ggplot2movies")
+skimr::skim(movies)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       movies
+## Number of rows             58788 
+## Number of columns          24    
+## _______________________          
+## Column type frequency:           
+##   character                2     
+##   numeric                  22    
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: character ──────────────────────
+##   skim_variable n_missing complete_rate   min
+## 1 title                 0             1     1
+## 2 mpaa                  0             1     0
+##     max empty n_unique whitespace
+## 1   121     0    56007          0
+## 2     5 53864        5          0
+## 
+## ── Variable type: numeric ────────────────────────
+##    skim_variable n_missing complete_rate
+##  1 year                  0        1     
+##  2 length                0        1     
+##  3 budget            53573        0.0887
+##  4 rating                0        1     
+##  5 votes                 0        1     
+##  6 r1                    0        1     
+##  7 r2                    0        1     
+##  8 r3                    0        1     
+##  9 r4                    0        1     
+## 10 r5                    0        1     
+## 11 r6                    0        1     
+## 12 r7                    0        1     
+## 13 r8                    0        1     
+## 14 r9                    0        1     
+## 15 r10                   0        1     
+## 16 Action                0        1     
+## 17 Animation             0        1     
+## 18 Comedy                0        1     
+## 19 Drama                 0        1     
+## 20 Documentary           0        1     
+## 21 Romance               0        1     
+## 22 Short                 0        1     
+##             mean           sd    p0      p25
+##  1     1976.           23.7    1893   1958  
+##  2       82.3          44.3       1     74  
+##  3 13412513.     23350085.        0 250000  
+##  4        5.93          1.55      1      5  
+##  5      632.         3830.        5     11  
+##  6        7.01         10.9       0      0  
+##  7        4.02          5.96      0      0  
+##  8        4.72          6.45      0      0  
+##  9        6.37          7.59      0      0  
+## 10        9.80          9.73      0      4.5
+## 11       13.0          11.0       0      4.5
+## 12       15.5          11.6       0      4.5
+## 13       13.9          11.3       0      4.5
+## 14        8.95          9.44      0      4.5
+## 15       16.9          15.7       0      4.5
+## 16        0.0797        0.271     0      0  
+## 17        0.0628        0.243     0      0  
+## 18        0.294         0.455     0      0  
+## 19        0.371         0.483     0      0  
+## 20        0.0591        0.236     0      0  
+## 21        0.0807        0.272     0      0  
+## 22        0.161         0.367     0      0  
+##          p50        p75        p100 hist 
+##  1    1983       1997        2005   ▁▁▃▃▇
+##  2      90        100        5220   ▇▁▁▁▁
+##  3 3000000   15000000   200000000   ▇▁▁▁▁
+##  4       6.1        7          10   ▁▃▇▆▁
+##  5      30        112      157608   ▇▁▁▁▁
+##  6       4.5        4.5       100   ▇▁▁▁▁
+##  7       4.5        4.5        84.5 ▇▁▁▁▁
+##  8       4.5        4.5        84.5 ▇▁▁▁▁
+##  9       4.5        4.5       100   ▇▁▁▁▁
+## 10       4.5       14.5       100   ▇▁▁▁▁
+## 11      14.5       14.5        84.5 ▇▂▁▁▁
+## 12      14.5       24.5       100   ▇▃▁▁▁
+## 13      14.5       24.5       100   ▇▃▁▁▁
+## 14       4.5       14.5       100   ▇▁▁▁▁
+## 15      14.5       24.5       100   ▇▃▁▁▁
+## 16       0          0           1   ▇▁▁▁▁
+## 17       0          0           1   ▇▁▁▁▁
+## 18       0          1           1   ▇▁▁▁▃
+## 19       0          1           1   ▇▁▁▁▅
+## 20       0          0           1   ▇▁▁▁▁
+## 21       0          0           1   ▇▁▁▁▁
+## 22       0          0           1   ▇▁▁▁▂
+```
+]]
+.panel[.panel-name[R]
+
+
+```r
+ggplot(movies, aes(length)) +
+  geom_histogram() + 
+  labs(x = "Length of movie (minutes)", y = "Frequency")
+
+ggplot(movies, aes(length, y = "")) +
+  geom_boxplot() + 
+  labs(x = "Length of movie (minutes)", y = "") + 
+  theme(axis.line.y = element_blank())
+
+movies %&gt;% 
+  filter(length &lt; 180) %&gt;% 
+  ggplot(aes(length)) +
+  geom_histogram(binwidth = 1, fill = "#795549", color = "black") + 
+  labs(x = "Length of movie (minutes)", y = "Frequency") 
+```
+
+]
+]
+
+
+
+
+---
+
+# Resources
+
+
+- Unwin (2015) “Graphical Data Analysis with R” 
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+---
+
+
+background-image: url(images/steve-johnson--auJqHRvM_k-unsplash.jpg)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Emi Tanaka
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

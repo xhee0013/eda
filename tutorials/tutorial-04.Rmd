@@ -1,0 +1,64 @@
+---
+title: "ETC5521 Tutorial 4"
+subtitle: "Initial data analysis"
+author: "Dr Emi Tanaka"
+date: "Week 4"
+output:
+  html_document:
+    toc: true
+---
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+Deconstruct the data anlysis of a research paper and perform your own IDA and EDA.
+
+## `r emo::ji("wrench")` Preparation 
+
+Have a read of the [original article](https://f1000research.com/articles/4-546/v1). Get the data associated with this research [here](https://zenodo.org/record/18854).
+
+> *This article, "Pain and sickness behaviour associated with corneal lesions in dairy calves" by Woods, Millman, da Silva, Dewell, Parsons, Wang, O'Connor follows in a long history of IDA development as part of agricultural studies. Chatfield makes reference to Rothamstead. Where is this, and what is it? Also, another morsel of information, is that the last author, Professor Annette O'Connor is an Australian, and this paper comes from her lab at Iowa State University.* 
+
+## Exercise 0: Introduction
+
+In the chat window, say hello, and if you feel comfortable tell us something fun about yourself, or what you have done this last week.
+
+## Exercise 1: Structure of the paper
+
+Write down the structure of the paper.
+
+## Exercise 2: Primary objective
+
+What was the primary objective of this paper?
+
+## Exercise 3A: Data description
+
+What are the variables in the data? Are the data the authors' supply in a tidy format as described by [Wickham (2014) Tidy Data](https://vita.had.co.nz/papers/tidy-data.pdf)? If not, wrangle and clean the data into a tidy format. Are there some variables that have issues? You may like to remove variables or observations that are not necessary for the main analysis. Produce some numerical and graphical summaries for this data. 
+
+## Exercise 3B: Experimental design
+
+How is the experiment designed? Does it match with what you see in the data?
+
+## Exercise 4: Population
+
+What is the population? Is this data representative of the population or the complete population?
+
+## Exercise 5: Data transformation and cleaning
+
+List any transformations of data, handling of missing values, and error checking.  
+
+## Exercise 6: Analysis
+
+Outline the main components of the analysis. Pick one component, and describe it in detail, and what was learned.
+
+## Exercise 7: Anything surprising?
+
+Were there any findings that surprised the authors? Or would surprise you?
+
+
+## Exercise 8: Reproducibility
+
+How does this paper rate to you in terms of reproducibility? What is done well? And what can be improved?

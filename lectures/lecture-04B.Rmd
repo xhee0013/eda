@@ -105,7 +105,7 @@ class: nostripheader middle
 
 <br><br>
 
-.monash-blue[**Nominal**] where there is no instrinic ordering to the categories<br>
+.monash-blue[**Nominal**] where there is no intrinsic ordering to the categories<br>
 **E.g.** blue, grey, black, white.
 
 --
@@ -113,7 +113,7 @@ class: nostripheader middle
 <br>
 
 .monash-blue[**Ordinal**] where there is a clear order to the categories.<Br>
-**E.g.** Strongly disagree, diagree, neutral, agree, strongly agree.
+**E.g.** Strongly disagree, disagree, neutral, agree, strongly agree.
 
 
 ---
@@ -677,8 +677,8 @@ g11 %+% df11v2 +
 ]
 .item[
 
-* Piechart is popular in mainstream media but are not generally recommended as people are generally poor at comparing angles.
-* 3D piecharts should definitely be avoided!
+* Pie chart is popular in mainstream media but are not generally recommended as people are generally poor at comparing angles.
+* 3D pie charts should definitely be avoided!
 * Here you can see that there are many people that are "Undecided" for which political party to support and failing to account for this paints a different picture. 
 
 ]

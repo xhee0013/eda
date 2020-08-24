@@ -104,7 +104,7 @@ This lecture is based on Chapter 3  of <br><br>Unwin (2015) Graphical Data Analy
 
 ```{r btw2009-data, include = FALSE}
 data("btw2009", package = "flexclust")
-df1 <- btw2009 %>%  mutate(Linke2 = 100 * LINKE2 / valid2)
+df1 <- btw2009 %>%  mutate(perc = 100 * LINKE2 / valid2)
 skimr::skim(df1)
 ```
 
@@ -115,7 +115,7 @@ skimr::skim(df1)
 .item[
 ```{r btw2009-hist}
 df1 %>% 
-  ggplot(aes(Linke2)) + 
+  ggplot(aes(perc)) + 
   geom_histogram(binwidth = 1, color = "black", fill = "#027EB6") + 
   labs(y = "Count", 
        x = "Percentage of voter support for Die Linke", 
@@ -176,8 +176,8 @@ df1 %>%
   mutate(color = case_when(state %in% east ~ "#E16A86",
                            TRUE ~ "black"),
          state = glue::glue("<span style='color:{color}'>{state}</span>"),
-         state = fct_reorder(state, Linke2)) %>% 
-  ggplot(aes(Linke2, state)) + 
+         state = fct_reorder(state, perc)) %>% 
+  ggplot(aes(perc, state)) + 
   geom_boxplot(varwidth = TRUE) + 
   labs(y = "", 
        x = "Percentage of voter support for Die Linke") + 

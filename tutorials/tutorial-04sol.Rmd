@@ -1,0 +1,270 @@
+---
+title: "ETC5521 Tutorial 4 Solution"
+subtitle: "Initial data analysis"
+author: "Dr Emi Tanaka"
+date: "Week 4"
+output:
+  bookdown::html_document2:
+    toc: true
+    number_sections: false
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(ggridges)
+library(colorspace)
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  message = FALSE, 
+  warning = FALSE, 
+  cache = TRUE,
+  cache.path = "tutorial04-cache/",
+  fig.path = "images/tutorial04/",
+  fig.align = "center"
+)
+```
+
+
+# Exercise 1: Structure of the analysis
+
+The paper has a standard research paper format: an **abstract**, **introduction**, **materials and methods**, **results**, **discussion** and **conclusion**. In addition, it has a section on **data and software availability** and there are many subsections under the "Materials and methods" and "Results" section listed below. 
+
+**Materials and methods**
+
+- Study location and study population
+- Enrollment of animals
+- Sample size
+- Treatment description and allocation
+- Behavioral recording
+- Data collection
+- Descriptive analysis
+- A priori hypotheses
+- Data transformations and manipulations
+- Hypothesis testing for analysis for pain behaviours.  
+
+**Results**
+
+- Study population
+- Hypothesis testing differences in head-directed pain behaviours
+- Hypothesis testing differences in sickness behaviours
+
+# Exercise 2: Primary question
+
+The primary objective of this study was to characterise the magnitude and variation of pain and sickness behaviours of calves from using a past experiment. 
+
+# Exercise 3A: Data description 
+
+The original data had the treatment information separated in order to make sure the experiment was blinded. The following shows a skim of the original, combined data. Check the Rmd file for the code associated with the data wrangling.
+
+```{r data}
+# notice here we have to use `\\t` instead of `\t` 
+orig_df <- read_csv(here::here("data/calve-behaviours/recording-data.csv"),
+               col_types = cols(
+                    .default = col_double(),
+                    tn.Date.of.Observation = col_date(format = "%y%m%d"),
+                    subject = col_factor(),
+                    Trial = col_factor(),
+                    Trial.Day = col_factor(),
+                    result = col_character(),
+                    Time = col_factor(),
+                    id.rec = col_factor(),
+                    Ear.Tag = col_factor(),
+                    Treatment = col_factor(),
+                    td.Calf.ID = col_factor(),
+                    `td.\\tObserver` = col_character(),
+                    `td.\\tStart.time` = col_character(),
+                    `tn.\\tStop.time` = col_character()
+                  )) 
+
+trt_df <- read_csv(here::here("data/calve-behaviours/treatment-id-assignation.csv"),
+                   col_types = cols(
+                     `Run 3` = col_factor(),
+                     Ear.Tag = col_factor(),
+                     eye = col_factor(),
+                     Treatment.2 = col_factor()
+                   ))
+
+nontidy_df <- left_join(orig_df, trt_df, by = "Ear.Tag")
+```
+
+```{r numerical-summaries}
+skimr::skim(nontidy_df)
+```
+
+```{r missing-values, fig.cap = "Check for missing values"}
+visdat::vis_miss(nontidy_df)
+```
+
+**Tidy data**
+
+Some notes about the above data:
+
+* We can see that the `Treatment` vector contains no information and there are a lot of missing values for certain observational units. 
+* Variables that offer no information or all the same information are removed.
+* Any observations that do not have `Trial` information are removed.
+* The names of the variables are modified so it is cleaner.
+* You may have noticed that there are issues with some data that capture the time. It appears that when there were some issues in exporting the data and the time information has not been stored correctly. You can see this issue with the names of the variables, e.g. `td.\tObserver` where likely `\t` was not meant to be there.
+* We tidy the data from the original one so that there is a variable that captures the behaviour and its observed duration and frequency. This means that the tidied data will have a longer format than the original data. 
+
+```{r wrangle}
+df <- nontidy_df %>% 
+  # rename funny ones 
+  rename(td.observer = "td.\\tObserver",
+         td.start.time = "td.\\tStart.time",
+         tn.stop.time = "tn.\\tStop.time") %>% 
+  janitor::clean_names() %>% 
+  select(# these hold 0 or 1 unique value 
+         -treatment, -result, -td_observer,
+         # not sure how to read below
+         -tn_stop_time, -td_start_time,
+         # below holds the same information as `trial` 
+         # except with some missing
+         -run_3
+         ) %>% 
+  select(!contains(c("duration", "interval"))) %>% 
+  rename(treatment = treatment_2,
+         calf_id = td_calf_id,
+         rec_id = id_rec,
+         date = tn_date_of_observation)  %>% 
+  # subject should be nested in trial
+  # calf 1 in trial 1 would not be the same calf 1 in trial 2
+  mutate(unit_id = interaction(trial, subject), 
+         subject = factor(subject, levels = 1:12)) %>% 
+  filter(!is.na(trial)) %>% 
+  pivot_longer(starts_with(c("td", "tn")), 
+               names_to = c(".value", "behaviour"),
+               names_pattern = "(td|tn)_(.*)") %>% 
+  rename(duration = td, freq = tn) %>% 
+  mutate(behaviour = factor(behaviour), 
+         # unblinding the treatment below
+         treatment = recode_factor(treatment,
+           yellow = "M. bovis",
+           red = "M. bovoculi",
+           blue = "Control"),
+         trial_day = recode_factor(trial_day,
+           `-1` = "Baseline",
+           `0` = "Scarification"
+         )) %>% 
+  filter(!is.na(eye)) 
+
+skimr::skim(df)
+```
+
+
+
+**Graphical summaries**
+
+Below are some graphical summaries that you could have potentially pursued. Check the Rmd file for the code to produce these graphcs.
+
+
+```{r freq-vs-duration, fig.cap = "Scatter plot of duration vs. frequency by categorised behaviours. The points are colored by their treatment."}
+df %>% 
+  mutate(behaviour = fct_reorder(behaviour, duration, mean)) %>% 
+  ggplot(aes(freq, duration, color = treatment)) + 
+  geom_point() + 
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~behaviour) + 
+  scale_color_discrete_qualitative() + 
+  labs(y = "Duration", x= "Frequency", color = "Treatment")
+```
+
+```{r freq-ridge-plot, fig.cap = "The density plot of frequency of each behaviour."}
+ggplot(df, aes(freq, behaviour)) +  
+  geom_density_ridges() + 
+  geom_point() + 
+  labs(y = "Behaviour", x= "Frequency")
+```
+
+
+# Exercise 3B: Experimental design
+
+According to the paper, there are 36 calves enrolled into the original study but 5 become ineligible due to pre-existing corneal abnormalities. Furthermore, behavior data from two calves enrolled in trial 3 were missing due to camera malfunctions.
+
+**Checking for treatment randomisation and experimental structure**
+
+There should be a total observations on 29 calves; two at least missing from trial 3 and five ineligible. There should be 11 controls, 9 *M. bovoculi* and 9 *M. bovis*. The treatments are randomised to left or right eye of the experimental units (i.e. calves). Although not mentioned explicitly, the three treatments seems to be randomised within each trial and the number of replicates of eye and treatment are roughly equal for each trial.
+
+```{r exp-layout, fig.width = 15, fig.height = 8, fig.cap = "Experimental layout. Each cell represents an experimental unit for each categorised behaviour. The number written in the cell shows the number of observations recorded and the color of the cell shows the treatment applied to the calve."}
+df %>% 
+  group_by(subject, trial, trial_day, behaviour) %>% 
+  summarise(n = n(), treatment = unique(treatment)) %>% 
+  complete(subject, trial, trial_day, behaviour) %>% 
+  ggplot(aes(trial, subject)) + 
+  geom_tile(color = "black", aes(fill = treatment)) + 
+  geom_text(aes(label = n, color = factor(n))) + 
+  facet_grid(trial_day ~ behaviour) + 
+  scale_fill_discrete_qualitative() + 
+  scale_color_manual(values = c("black", "brown")) +
+  coord_equal() + 
+  theme_classic(base_size = 12) + 
+  guides(color = FALSE) + 
+  labs(fill = "Treatment", y = "Pen", x = "Trial")
+```
+
+
+```{r eye-layout, fig.width = 15, fig.height = 8, fig.cap = "Experimental layout. Each cell represents an experimental unit for each categorised behaviour. The number written in the cell shows the average frequency of the behaviour and the color indicates which eye the treatment was applied to."}
+df %>% 
+  group_by(subject, trial, trial_day, behaviour) %>% 
+  summarise(freq = mean(freq), eye = unique(eye)) %>% 
+  complete(subject, trial, trial_day, behaviour) %>% 
+  ggplot(aes(trial, subject)) + 
+  geom_tile(color = "black", aes(fill = eye)) + 
+  geom_text(aes(label = round(freq))) + 
+  facet_grid(trial_day ~ behaviour) + 
+  scale_fill_discrete_qualitative() + 
+  scale_color_manual(values = c("black", "brown")) +
+  coord_equal() + 
+  theme_classic(base_size = 12) + 
+  guides(color = FALSE) + 
+  labs(fill = "Eye", y = "Pen", x = "Trial")
+```
+
+
+
+# Exercise 4: Population
+
+The population is the dairy calves with ocular injury and infection. The study acknowledges that this is for _experimentally induced_ ocular injury and infection.  It also acknowledges the sample is predominantly Holstein genetics with some Jersey influence (this refers to the breed of the dairy calves).
+
+# Exercise 5: Data transformation and cleaning
+
+Missing values are removed and data transformation is described under "Data transformations and manipulations".
+
+# Exercise 6: Analysis
+
+One of their main analysis is testing the differences in head-directed pain behaviours. As authors state "the  frequencies  of  the  three  separate  head-directed  behaviors  were too  rare  to  enable  modeling.  Consequently,  we  combined  the  three separate  head-directed  behaviors  into  one  measure... the effect of time period was significant... whereas the effect of treatment was not significant". 
+
+The three head-directed behaviours are head scratching, head rubbing and head shaking. Some are included in the data but we (at least I) cannot infer which one is head rubbing. 
+
+
+# Exercise 7: Anything surprising?
+
+
+**Trials 1-2 looks better managed**
+
+From Figure \@ref(fig:exp-layout), you can find that the ineligible calves were in Trial 2 and 3. Trial 1 and 2 are from the  Iowa  State  University Dairy  Farm  while Trial 3 was  a  private  Iowa-based  owner. The larger missing value in Trial 3 possibly indicate that the university dairy farm is better managed.
+
+**Duration not recorded for 3 behaviours**
+
+From Figure \@ref(fig:freq-vs-duration), it appears that the duration is not measured for three of the behaviours. For other behaviours, when frequency is zero, is the duration also always zero?
+
+```{r, results="asis"}
+df %>% 
+  filter(!behaviour %in% c("drinking", "head_s", "scratching")) %>% 
+  filter(duration==0 | freq==0) %>% 
+  mutate(check = duration==0 & freq==0) %>% 
+  pull(check) %>% 
+  all() %>% 
+  ifelse("Yes!", "No") %>% 
+  cat()
+```
+
+(The answer above is from using R; see the Rmd document.)
+
+**Frequency data has large gaps**
+
+As seen in Figure \@ref(fig:freq-ridge-plot), we see there are outliers and large gaps in the observed frequencies for some behaviours, particularly "standing" behaviours.
+
+# Exercise 8: Reproducibility
+
+The paper does a fairly good job at reproducibility by providing code and data. However, not all data are provided for full reproducibility. There are other aspects that can be improved such as providing a data dictionary and ensuring that the exported data is correctly formatted. There are some data cleaning and wrangling steps clearly done, however, these are not available.

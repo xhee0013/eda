@@ -1,0 +1,757 @@
+---
+title: "ETC5521: Exploratory Data Analysis"
+subtitle: "Exploring bivariate dependencies, linearising"
+author: "Di Cook"
+email: "ETC5521.Clayton-x@monash.edu"
+date: "Week 5 - Session 1"
+length: "10 minutes"
+color_theme: "yellow"
+pdflink: "lecture-05A.pdf"
+bgimg: "images/wk5bg1.jpg"
+output:
+  xaringan::moon_reader:
+    css:
+      - ninjutsu 
+      - "assets/animate.css"
+      - "assets/fira-code.css"
+      - "assets/boxes.css"
+      - "assets/styles.css"
+      - "assets/custom.css"
+      - "assets/monash-logo.css"
+      - "assets/monash-brand.css"
+      - "assets/monash-fonts.css"
+      - "assets/table.css"
+      - "assets/panelset.css"
+      - "assets/di2.css"
+    self_contained: false 
+    seal: false 
+    chakra: 'libs/remark-latest.min.js'
+    lib_dir: libs
+    includes:
+      in_header: "assets/custom.html"
+    mathjax: "assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    nature:
+      highlightStyle: googlecode
+      highlightLanguage: r 
+      highlightLines: true
+      highlightSpans: false 
+      countIncrementalSlides: false
+      slideNumberFormat: '%current%/%total%'
+      navigation:
+        scroll: false 
+        touch: true
+        click: false
+      ratio: '16:9'
+---
+
+```{r, include = FALSE}
+current_file <- knitr::current_input()
+```
+```{r, include = FALSE, eval = F}
+input <- fs::path_ext_set(current_file, "html")
+pagedown::chrome_print(input = input, format = "pdf", wait = 20)
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  fig.path = "images/week5/",
+  fig.width = 6,
+  fig.height = 4,
+  fig.align = "center",
+  out.width = "100%",
+  fig.retina = 3,
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  cache = FALSE
+)
+```
+
+```{r}
+library(tidyverse)
+library(gt)
+library(forcats)
+library(gridExtra)
+```
+
+```{r titleslide, child="components/titleslide.Rmd"}
+```
+
+---
+
+class: transition middle
+
+# Dependency Relationships and Associations
+
+<br><br>
+
+
+This lecture is based on Chapter 5  of <br><br>Unwin (2015) Graphical Data Analysis with R
+
+---
+class: transition middle
+
+> "The world is full of obvious things which nobody by any chance observes." Sherlock Holmes 
+
+---
+# The story of the galloping horse
+
+<table> 
+<tr> <td> Baronet, 1794 </td><td> Derby D'Epsom 1821</td></tr>
+<tr> <td>
+<img src="https://ejmuybridge.files.wordpress.com/2010/07/baronet.jpg" width="100%"> 
+</td> <td>
+<img src="https://ejmuybridge.files.wordpress.com/2010/07/derbyepsom1.jpg" width="100%">
+</td></tr>
+</table>
+
+<br>
+Galloping horses throughout history were drawn with all four legs out.
+
+.footnote[[Lankester: The Problem of the Galloping Horse](https://ejmuybridge.wordpress.com/2010/07/20/lankester-the-problem-of-the-galloping-horse/)s]
+
+---
+# The story of the galloping horse
+
+<br>
+<br>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/07/The_Horse_in_Motion-anim.gif" width="40%"> 
+--
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/The_Horse_in_Motion_high_res.jpg/440px-The_Horse_in_Motion_high_res.jpg"  width="50%">
+--
+
+<br><br>*With the birth of photography, and particular motion photography, Muybridge illustrated that this leg position was impossible.*
+
+---
+# My painting story(s) 
+
+- "Take another look at the hills" 
+--
+
+- Reflection from lemons
+--
+
+- Green trees
+--
+
+- Tendency to 
+--
+
+    - paint what other people have drawn, not what we see.
+    - Or what we impose, like trees are green.
+--
+
+<br>
+<br>
+> .monash-blue[Try to see with fresh eyes]
+
+---
+# The scatterplot
+
+.box[Scatterplots are the natural plot to make to explore association between two **continuous** (quantitative) variables.]
+
+They are not just for linear relationships but are useful for examining nonlinear patterns, clustering and outliers 
+
+We also can think about scatterplots in terms of statistical distributions: if a histogram shows a marginal distribution, a scatterplot allows us to examine the bivariate distribution of a sample.
+
+---
+# Famous scatterplot examples
+
+.pull-left[
+### Anscomb's quartet
+
+```{r anscombe, out.width="100%"}
+anscombe %>% 
+  pivot_longer(cols=x1:y4, names_to = "var", values_to = "value") %>%
+  mutate(group = substr(var, 2, 2), 
+         var = substr(var, 1, 1), 
+         id = rep(1:11, rep(8, 11))) %>%
+  pivot_wider(id_cols = c(id, group), names_from = var, 
+              values_from = value) %>%
+  ggplot(aes(x=x, y=y)) + 
+    geom_point(colour="orange", size=3) +
+    facet_wrap(~group, ncol=2, scales="free")
+```
+
+> All data has same means, standard deviations and correlation
+]
+--
+.pull-right[
+### Datasaurus dozen
+```{r dinosaur, out.width="40%", fig.width=3, fig.height=2.8}
+library(datasauRus)
+datasaurus_dozen %>% filter(dataset == "dino") %>% ggplot(aes(x=x, y=y)) + 
+  geom_point() 
+```
+
+```{r datasaurus, out.width="100%"}
+datasaurus_dozen %>% filter(dataset != "dino") %>% ggplot(aes(x=x, y=y)) + 
+  geom_point() +
+  facet_wrap(~dataset, ncol=4) +
+  theme(aspect.ratio=1)
+```
+]
+---
+# .orange[Case study] .bg-orange.circle[1] Olympics
+
+```{r 2012-olympics, include = FALSE}
+data(oly12, package = "VGAMdata")
+skimr::skim(oly12)
+```
+
+
+.panelset[
+.panel[.panel-name[🖼️]
+.grid[
+.item[
+```{r 2012-olympics-plot1, fig.width = 6.4}
+ggplot(oly12, aes(x=Height, y=Weight, label=Sport)) + 
+  geom_point() 
+```
+
+]
+.item[
+
+* `Warning message: Removed 1346 rows containing missing values (geom_point)`
+* The expected linear relationship between height and weight is visible, although obscured by outliers.
+* Some discretization of heights, and higher weight values. 
+* Likely to be substantial overplotting (57 athletes 1.7m, 60kg can't tell this from this plot). 
+* Note the unusual height-weight combinations. What sport(s) would you expect some of these athletes might be participating in?
+
+
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+```{r 2012-olympics, echo = TRUE, render = knitr::normal_print}
+```
+]]
+.panel[.panel-name[R]
+
+```{r, ref.label = "2012-olympics-plot1", echo = TRUE, eval = FALSE}
+```
+
+]
+]
+
+---
+class: center
+
+`r anicon::faa("wrench", size=3, animate="wrench", speed="slow", colour="#D93F00", anitype="hover")` Your turn, .monash-blue[cut and paste the code] into your R console, and `r anicon::nia("mouse over", size=2, animate="ring", speed="slow", colour="#D93F00", anitype="hover")` the resulting plot to examine the sport of the athlete. 
+
+<br>
+<br>
+
+.font_medium[
+```{r fig.width = 12, fig.height=8, out.width="100%", eval=FALSE, echo=TRUE}
+library(tidyverse) #<<
+library(plotly) #<<
+data(oly12, package = "VGAMdata") #<<
+p <- ggplot(oly12, aes(x=Height, y=Weight, label=Sport)) + #<<
+  geom_point() #<<
+ggplotly(p) #<<
+```
+]
+
+`r countdown::countdown(5, class="clock")`
+---
+# Sports summary
+
+.scroll-box-16[
+```{r oly_smry}
+oly12 %>% 
+  count(Sport, sort=TRUE) %>%
+  gt() 
+```
+]
+
+---
+
+## Consolidate some factor levels
+
+
+```{r oly_cat, echo=TRUE}
+oly12 <- oly12 %>% 
+  mutate(Sport = as.character(Sport)) %>%
+  mutate(Sport = ifelse(grepl("Cycling", Sport), #<<
+                        "Cycling", Sport)) %>%  #<<
+  mutate(Sport = ifelse(grepl("Gymnastics", Sport),
+                        "Gymnastics", Sport)) %>% 
+  mutate(Sport = ifelse(grepl("Athletics", Sport),
+                        "Athletics", Sport)) %>% 
+  mutate(Sport = as.factor(Sport))
+```
+
+---
+# Split the scatterplots by sport
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+```{r oly_facet, out.width="90%", fig.width=12, fig.height=7}
+ggplot(oly12, aes(x=Height, y=Weight)) + 
+  geom_point(alpha=0.5) + #<<
+  facet_wrap(~Sport, ncol=8) +
+  theme(aspect.ratio = 1) #<<
+```
+
+
+
+]
+.panel[.panel-name[learn]
+
+.grid[
+.item[
+### What do we learn?
+
+- Missing values for some sports
+- The positive association between height and weight is visible across sports
+- Maybe nonlinear in wrestling
+- An outlier in judo, and football, and archery
+- Maybe flatter among swimmers
+- Taller athletes in basketball, volleyball and handball
+- Shorter athletes in athletics, weightlifting and wrestling
+- Little variance in tennis players
+- .monash-blue[*Its still messy, and hard to digest*]
+
+]
+
+.item[
+
+### What would you do to make comparisons easier? 
+
+- Remove sports with missings
+- Make regression lines for remaining sports on one plot
+- Separately examine male/female athletes
+- Compare just one group against the rest
+]]]
+.panel[.panel-name[R]
+
+```{r, ref.label = "oly_facet", echo = TRUE, eval = FALSE}
+```
+
+<br>
+<br>
+Note: alpha transparency, and aspect ratio
+
+]
+]
+
+---
+# Remove missings, add colour for sex 
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+```{r oly_women, out.width="100%", fig.width=12, fig.height=7}
+oly12 %>%
+  filter(!(Sport %in% c("Boxing", "Gymnastics", "Synchronised Swimming", "Taekwondo", "Trampoline"))) %>%
+  mutate(Sport = fct_drop(Sport)) %>%
+  ggplot(aes(x=Height, y=Weight, colour=Sex)) + 
+  geom_point(alpha=0.5) + 
+  facet_wrap(~Sport, ncol=7) +
+  scale_colour_brewer("", palette="Dark2") +
+  theme(aspect.ratio = 1, legend.position="bottom") 
+```
+
+
+
+]
+.panel[.panel-name[learn]
+
+.grid[
+.item[
+- Wish the atletics category had been broken into several more categories like track, field, 
+- Generally, clustering of male/female athletes
+- Outliers: a tall skinny male archer, a medium height very light female athletics athlete, tall light female weightlifter, tall light male volleyballer
+- Canoe slalom athletes, divers, cyclists are tiny
+
+
+]]]
+.panel[.panel-name[R]
+
+```{r, ref.label = "oly_women", echo = TRUE, eval = FALSE}
+```
+
+]
+]
+
+---
+# Comparing association
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+```{r oly_model, out.width="100%", fig.width=12, fig.height=7}
+oly12 %>%
+  filter(Sport %in% c("Swimming", "Archery", "Basketball",
+                      "Handball", "Hockey", "Tennis",
+                      "Weightlifting", "Wrestling")) %>%
+  filter(Sex == "F") %>%
+  mutate(Sport = fct_drop(Sport), Sex=fct_drop(Sex)) %>%
+  ggplot(aes(x=Height, y=Weight, colour=Sport)) + 
+  geom_smooth(method="lm", se=FALSE) + #<<
+  scale_colour_brewer("", palette="Dark2") 
+```
+
+
+
+]
+.panel[.panel-name[learn]
+
+.grid[
+.item[
+- Weightlifters are much heavier relative to height
+- Swimmers are leaner relative to height
+- Tennis players are a bit mixed, shorter tend to be heavier, taller tend to be lighter
+
+]]]
+.panel[.panel-name[R]
+
+```{r, ref.label = "oly_model", echo = TRUE, eval = FALSE}
+```
+
+]
+]
+
+---
+# Comparing variability
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+```{r oly_density, out.width="100%", fig.width=12, fig.height=7}
+oly12 %>%
+  filter(Sport %in% c("Shooting", "Modern Pentathlon", "Basketball")) %>% #<<
+  filter(Sex == "F") %>%
+  mutate(Sport = fct_drop(Sport), Sex=fct_drop(Sex)) %>%
+  ggplot(aes(x=Height, y=Weight, colour=Sport)) + 
+  geom_density2d() + #<<
+  scale_colour_brewer("", palette="Dark2") 
+```
+
+
+
+]
+.panel[.panel-name[learn]
+
+.grid[
+.item[
+- Modern pentathlon athletes are uniformly height and weight related
+- Shooters are quite varied in body type
+
+]]]
+.panel[.panel-name[R]
+
+```{r, ref.label = "oly_density", echo = TRUE, eval = FALSE}
+```
+
+]
+]
+---
+# What does it mean to say associated?
+
+.pull-left[
+A traditional summary of a scatterplot would include these elements:
+
+- **trend**: positive or negative? 
+- **strength**: what is the variation around the trend, are points close or scattered
+- **form**: linear or nonlinear/curvilinear/clustered
+]
+.pull-right[
+
+```{r sc_descriptions, out.width="100%", fig.width=6, fig.height=6}
+set.seed(55555)
+d <- tibble(x = runif(100) -0.5) %>%
+  mutate(positive=4*x+rnorm(100)*0.5, none=rnorm(100)*0.5, negative=-4*x+rnorm(100)*0.5) %>%
+  pivot_longer(cols=positive:negative, names_to="trend", values_to="y") %>%
+  mutate(trend = factor(trend, levels=c("postive", "none", "negative")))
+p1 <- ggplot(d, aes(x=x, y=y)) + 
+  geom_point() + 
+  facet_wrap(~trend, ncol=3) +
+  theme(axis.title = element_blank(), axis.text = element_blank())
+d <- tibble(x = runif(100) -0.5) %>%
+  mutate(strong=4*x+rnorm(100)*0.5, moderate=4*x+rnorm(100), weak=-4*x+rnorm(100)*3) %>%
+  pivot_longer(cols=strong:weak, names_to="strength", values_to="y") %>%
+  mutate(strength = factor(strength, levels=c("strong", "moderate", "weak")))
+p2 <- ggplot(d, aes(x=x, y=y)) + 
+  geom_point() + 
+  facet_wrap(~strength, ncol=3, scales="free") +
+  theme(axis.title = element_blank(), axis.text = element_blank())
+d <- tibble(x = runif(100) -0.5) %>%
+  mutate(linear=4*x+rnorm(100)*0.5, nonlinear1=12*x^2+rnorm(100)*0.5,
+         nonlinear2=2*x - 5*x^2 +rnorm(100)*0.1) %>%
+  pivot_longer(cols=linear:nonlinear2, names_to="form", values_to="y")
+p3 <- ggplot(d, aes(x=x, y=y)) + 
+  geom_point() + 
+  facet_wrap(~form, ncol=3, scales="free") +
+  theme(axis.title = element_blank(), axis.text = element_blank())
+grid.arrange(p1, p2, p3, ncol=1)
+```
+
+]
+---
+# What features might be visible in scatterplots?
+
+I rather prefer Unwin's taxonomy of features that might be visible in a scatterplot:
+
+- **causation**: one variable has a direct influence on the other variable, in some way. For example, people who are taller tend to weigh more. The dependent variable is conventionally on the y axis. *Its not generally possible to tell from the plot that the relationship is causal, which typically needs to be argued from other sources of information.*
+- **association**: variables may be related to one another, but through a different variable. 
+- **outliers or groups of outliers**: observations can be outliers in two dimensions without being an outlier in either of the single variables, particularly if there is a strong association between the variables. 
+---
+# What features might be visible in scatterplots?
+
+I rather prefer Unwin's taxonomy of features that might be visible in a scatterplot:
+
+- **clusters**: some observations separate from others
+- **gaps**: sometimes a particular combination of values does not occuer together.
+- **barriers**: some combinations are impossible, for example, being younger than the years of experience in the workforce
+- **conditional relationships**: the relationship between variables is conditionally dependent on another, such as income against age likely has a different relationship depending on retired or not.
+
+---
+# .orange[Case study] .bg-orange.circle[1] Olympics
+
+We have seen that the association between height and weight is "contaminated" by different variables, sport, gender, and possibly country and age, too. 
+
+Some of the categories also are "contaminated", for example, "Athletics" is masking many different types of events. This **lurking** variable probably contributes to different relationships depending on the event. There is another variable in the data set called `Event`. Athletics cuold be further divided based on key words in this variable. 
+> If you were just given the Height and Weight in this data could you have detected the presence of conditional relationships?
+
+---
+# Can you see conditional dependencies?
+
+.panelset[
+.panel[.panel-name[🖼️]
+.grid[
+.item[
+```{r oly_canyousee, fig.width=8, fig.height=8, out.width="100%"}
+p1 <- ggplot(oly12, aes(x=Height, y=Weight)) + 
+  geom_point(alpha=0.2, size=4) +
+  theme_minimal() + theme(aspect.ratio=1)
+p2 <- ggplot(oly12, aes(x=Height, y=Weight)) + 
+  geom_density2d_filled() +
+  theme_minimal() + 
+  theme(legend.position="none", aspect.ratio=1) 
+p3 <- ggplot(oly12, aes(x=Height, y=Weight)) + 
+  geom_density2d(binwidth=0.01) +
+  theme_minimal() + theme(aspect.ratio=1)
+p4 <- ggplot(oly12, aes(x=Height, y=Weight)) + 
+  geom_density2d(binwidth=0.001, color = "white", size=0.2) +
+  geom_density2d_filled(binwidth=0.001) +
+  theme_minimal() + 
+  theme(legend.position="none", aspect.ratio=1) 
+grid.arrange(p1, p3, p2, p4, ncol=2)
+```
+]
+.item[
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+There is a hint of multimodality, just a hint.
+
+<br>
+<br>
+<br>
+<br>
+
+> Its not easy!
+
+]
+]
+]
+.panel[.panel-name[R]
+
+```{r, ref.label = "oly_canyousee", echo = TRUE, eval = FALSE}
+```
+
+]
+]
+---
+# Focus on just women's tennis
+
+.panelset[
+.panel[.panel-name[🖼️]
+```{r oly_tennis, fig.width=6, fig.height=6, out.width="50%"}
+oly12 %>% filter(Sport == "Tennis", Sex == "F") %>%
+  ggplot(aes(x=Height, y=Weight)) + 
+  geom_point(alpha=0.9, size=3) 
+```
+]
+.panel[.panel-name[learn]
+
+.grid[
+.item[
+- positive
+- linear
+- moderate
+]
+.item[
+- causation
+- outliers: one outlier, maybe two: one really short and light, and one tall but skinny
+]
+]
+]
+.panel[.panel-name[R]
+
+```{r, ref.label = "oly_tennis", echo = TRUE, eval = FALSE}
+```
+
+]
+]
+
+---
+# Focus on just women's wrestling
+
+.panelset[
+.panel[.panel-name[🖼️]
+```{r oly_wrestling, fig.width=6, fig.height=6, out.width="50%"}
+oly12 %>% filter(Sport == "Wrestling", Sex == "F") %>%
+  ggplot(aes(x=Height, y=Weight)) + 
+  geom_point(alpha=0.9, size=3) 
+```
+]
+.panel[.panel-name[learn]
+
+.grid[
+.item[
+- positive
+- non-linear
+- moderate
+
+]
+.item[
+- causation
+- gaps: discreteness
+]
+]
+]
+.panel[.panel-name[R]
+
+```{r, ref.label = "oly_wrestling", echo = TRUE, eval = FALSE}
+```
+
+]
+]
+---
+class: transition middle
+# Thinking about the Olympics 2012 data
+
+- What can this data be used for?
+- What's the population?
+- What could be informed by what is learned from this sample?
+
+---
+class: transition middle
+
+# Re-cap on scatterplots and modifications and purpose
+
+---
+class: informative
+
+```{r generate_data}
+set.seed(2222)
+df <- tibble(x=c(rnorm(500)*0.2, runif(300)+1)) %>%
+  mutate(y1=c(-2*x[1:500]+rnorm(500), 
+              3*x[501:800] + rexp(300)), 
+         y2=c(rep("A", 500), rep("B", 300)))
+```
+
+.grid4x2[
+.item[
+.font_small[Scatterplot: raw information]
+
+```{r scat, fig.width=2, fig.height=2, out.width="100%"}
+ggplot(df, aes(x=x, y=y1)) +
+  geom_point() + xlab("") + ylab("") +
+  theme_void()
+```
+
+]
+.item[
+.font_small[Alpha-blending: overplotting]
+
+```{r scatalpha, fig.width=2, fig.height=2, out.width="100%"}
+ggplot(df, aes(x=x, y=y1)) + 
+  geom_point(alpha=0.2) + xlab("") + ylab("") +
+  theme_void()
+```
+]
+.item[
+.font_small[Model overlay: check the trend]
+
+```{r scatmod, fig.width=2, fig.height=2, out.width="100%"}
+ggplot(df, aes(x=x, y=y1)) +
+  geom_smooth(colour="black", se=F) + xlab("") + ylab("") +
+  theme_void()
+```
+]
+.item[
+.font_small[Model+data: trend/var]
+
+```{r scatmod2, fig.width=2, fig.height=2, out.width="100%"}
+ggplot(df, aes(x=x, y=y1)) +
+  geom_point(alpha=0.2) +
+  geom_smooth(colour="purple", se=F, span=0.2) + xlab("") + ylab("") +
+  theme_void()
+```
+]
+.item[
+.font_small[Density contours: variance, clusters]
+
+```{r scatdens, fig.width=2, fig.height=2, out.width="100%"}
+ggplot(df, aes(x=x, y=y1)) +
+  geom_density_2d(colour="black") + xlab("") + ylab("") +
+  theme_void()
+```
+
+]
+.item[
+.font_small[Density fill: variance, clusters]
+
+```{r scatdensfil, fig.width=2, fig.height=2, out.width="100%"}
+ggplot(df, aes(x=x, y=y1)) +
+  geom_density_2d_filled() + xlab("") + ylab("") +
+  theme_void() + theme(legend.position="none")
+```
+
+]
+.item[
+.font_small[Colour: conditioning vars]
+
+```{r scatcol, fig.width=2, fig.height=2, out.width="100%"}
+ggplot(df, aes(x=x, y=y1, colour=y2)) +
+  geom_point(alpha=0.2) + xlab("") + ylab("") +
+  scale_colour_brewer("", palette="Dark2") +
+  theme_void() + theme(legend.position="none")
+```
+]
+.item[
+.font_small[Colour/density: lurking vars] 
+
+```{r scatdenscol, fig.width=2, fig.height=2, out.width="100%"}
+ggplot(df, aes(x=x, y=y1, colour=y2)) +
+  geom_density2d() + xlab("") + ylab("") +
+  scale_colour_brewer("", palette="Dark2") +
+  theme_void() + theme(legend.position="none")
+```
+]
+]
+
+---
+# Resources
+
+- Unwin (2015) [Graphical Data Analysis with R](http://www.gradaanwr.net)
+- Graphics using [ggplot2](https://ggplot2.tidyverse.org)
+
+---
+
+```{r endslide, child="components/endslide.Rmd"}
+```

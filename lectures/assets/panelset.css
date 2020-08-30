@@ -98,3 +98,8 @@
 .panelset .panel-active {
   display: block;
 }
+
+li.panel-tab::before {
+  content: "";
+  margin-right: 0;
+}

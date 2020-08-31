@@ -14,7 +14,7 @@ This tutorial, including the chat, will be recorded, so that you can re-visit th
 
 ## `r emo::ji("target")` Objectives
 
-Deconstruct the data anlysis of a research paper and perform your own IDA and EDA.
+These are exercises in making plots of one variable and what can be learned about the distributions and the data patterns and problems.
 
 ## `r emo::ji("wrench")` Preparation 
 

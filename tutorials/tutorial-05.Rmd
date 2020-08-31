@@ -1,0 +1,114 @@
+---
+title: "ETC5521 Tutorial 5"
+subtitle: "Working with a single variable, making transformations, detecting outliers, using robust statistics"
+author: "Dr Emi Tanaka"
+date: "Week 5"
+output:
+  html_document:
+    toc: true
+---
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+Deconstruct the data anlysis of a research paper and perform your own IDA and EDA.
+
+## `r emo::ji("wrench")` Preparation 
+
+Install the following R-packages if you do not have it already:
+
+```{r pkgs, eval = FALSE}
+install.packages(c("ggplot2movies", "lawstat", "mi", "HSAUR2", "coin", "DAAG", "vcd", "vcdExtra", "bayesm", "AER", "flexmix", "psych"))
+```
+
+```{r setup, include = FALSE}
+library(tidyverse)
+```
+
+## Exercise 0: Introduction
+
+In the chat window, say hello, and if you feel comfortable tell us something fun about yourself, or what you have done this last week.
+
+The following are questions based from Unwin (2015) Graphical Data Analysis with R Chapter 3-4. For every data you should perform an IDA to understand the data structure, e.g. find the number of observations, the variables in the data, and if there are any missing values.
+
+## Exercise 1: Galaxies
+
+Load the `galaxies` data in the `MASS` package and answer the following questions based on this dataset.
+
+```{r}
+data(galaxies, package = "MASS")
+```
+You can access documentation of the data (if available) using the `help` function specifying the package name in the argument. 
+```{r, eval = FALSE}
+help(galaxies, package = "MASS")
+```
+
+(a) What does the data contain? And what is the data source?
+(b) How many observations are there?
+(c) Draw a histogram, a boxplot and a density plot for this data. 
+(d) Experiment with different bindwidths for the histogram and different bandwiths for the density plot. Which choices do you think are best for the conveying the information in the data?
+
+
+## Exercise 2: Student survey
+
+The `survey` data contains the responses of 237 Statistics I students at the University of Adelaide to a number of questions. Load the data `survey` in the `MASS` package and answer the following questions. 
+
+(a) What variables are in the data?
+(b) Perform some initial data analysis. Are there anything you notice? 
+(c) Draw a histogram of student heights and overlay a density plot of the data. Is there evidence of bimodality?
+(d) Experiment with different binwidths for the histogram and different bandwidths for the density plot. Which choices do you think are best for conveying the information in the data?
+(e) Compare heights of male and female students using separate density plots that are common scaled and aligned with one another.
+
+## Exercise 3: Movie lengths
+
+Load the `movies` dataset in the `ggplot2movies` package and answer the following questions based on it.
+
+(a) How many observations are in the data?
+(b) Draw a histogram with an appropriate binwidth that shows the peaks at 7 minutes and 90 minutes. Draw another set of histograms to show whether these peaks existed both before and after 1980.
+(c) The variable `Short` indicates whether the film was classified as a short film (`1`) or not (`0`). Draw plots to investigate what rules was used to define a film as "short" and whether the films have been consistently classified. 
+
+## Exercise 4: Zuni educational funding 
+
+The `zuni` dataset in the `lawstat` package contains information on 89 school districts in New Mexico, U.S.A., for three variables: the district name, the average revenue per student in dollars, and the number of students. This data is from a court case that raised concern whether the expenditures per student was approximately equal in the state. 
+
+(a) Choose a graphic that help answer the question: are the lower and highest 5% of the revenue values extreme?
+(b) Calculate the sample mean, trimmed mean and Winsorized mean of average revenue per student. For trimmed mean and Winsorized mean, trim the 5% of lowest and highest values. Are your results expectedd? Hint check the help for the `mean` function and also check out `winsor.mean` in the `psych` package.
+(c) Draw a density plot after removing the lowest and highest 5% of the values. Does the distribution of the remaining values look symmetric? What do you conclude after looking at the Q-Q plot?
+
+
+
+## Exercise 5: Multiple sclerosis
+
+Load the dataset `MSPatients` in `vcd` package and produce graphics that will be best to answer the following questions: 
+
+(a) How do the distributions of the ratings of the neurologists compare?
+(b) How would you describe their rating patterns?
+
+
+## Exercise 6: Occupational mobility 
+
+Load the dataset `Yamaguchi87` in `vcdExtra` package and produce graphical or numerical summaries to answer the following questions.
+
+(a) How do the distributions of occupations of the sons in the three countries compare?
+(b) How do the distributions of the sons' and fathers' occupations in the UK compare?
+(c) Are you surprised by the results or are they what you would have expected?
+
+## Exercise 7: Whisky
+
+Load the data `Scotch` in `bayesm` package and consider the following questions. 
+
+(a) Produce a barplot of the number of respondents per brand. What ordering of the brands do you think is the best?
+(b) There are 20 named brands and one category that is labelled as `Other.brands`. Produce a barplot that you think best reduces the number of categories by selecting a criteria to lump certain brands to the `Other` category. 
+(c) The data `whiskey_brands` in the `flexmix` package has the information on whether the whiskey is a single malt or blend. This data is loaded when you load the `whiskey` data in the same package:
+
+```{r}
+data(whiskey, package = "flexmix")
+```
+
+
+How would you incorporate this information on your graphics? 
+
+

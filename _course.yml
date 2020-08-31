@@ -28,7 +28,7 @@ schedule:
     topic: "Bivariate dependencies and relationships, transformations to linearise"
   - week: 6
     lecturer: Di
-    readings: "Unwin (2015) Graphical Data Analysis Ch 6"
+    readings: "Wilke (2019) [Ch 9 Visualising distributions](https://clauswilke.com/dataviz/histograms-density-plots.html) & Unwin (2015) Graphical Data Analysis Ch 6"
     topic: "Going beyond two variables, exploring high dimensions"
   - week: 7
     lecturer: Emi

@@ -1,0 +1,358 @@
+---
+title: "ETC5521 Tutorial 5"
+subtitle: "Working with a single variable, making transformations, detecting outliers, using robust statistics"
+author: "Dr Emi Tanaka"
+date: "Week 5"
+output:
+  html_document:
+    toc: true
+---
+
+```{r setup, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(patchwork)
+library(colorspace)
+library(ggbeeswarm)
+library(lawstat)
+library(scales)
+filter <- dplyr::filter
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE, 
+  fig.path = "images/tutorial05/",
+  cache.path = "cache/",
+  cache = FALSE
+)
+```
+
+
+## Exercise 1: Galaxies
+
+```{r q1data}
+data(galaxies, package = "MASS")
+glimpse(galaxies)
+```
+
+(a) What does the data contain? And what is the data source?
+
+The data contains velocities in km/sec of `r length(galaxies)` galaxies from 6 well-separated conic sections of an unfilled survey of the Corona Borealis region. The original data is from Postman et al. (1986) and this data is from Roeder with 83rd observation removed from the original data as well as typo for the 78th observation.
+
+* Postman, M., Huchra, J. P. and Geller, M. J. (1986) Probes of large-scale structures in the Corona Borealis region. Astronomical Journal 92, 1238–1247
+* Roeder, K. (1990) Density estimation with confidence sets exemplified by superclusters and voids in galaxies. Journal of the American Statistical Association 85, 617–624.
+
+(b) How many observations are there?
+
+There are `r length(galaxies)` observations.
+
+(c) Draw a histogram, a boxplot and a density plot for this data. 
+(d) Experiment with different bindwidths for the histogram and different bandwiths for the density plot. Which choices do you think are best for the conveying the information in the data?
+
+```{r q1plot}
+g <- ggplot(tibble(galaxies), aes(galaxies))
+g1 <- g + geom_histogram(binwidth = 1000) + 
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+g2 <- g + geom_boxplot()  + 
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+g3 <- g + geom_density()
+g1 + g2 + g3 + plot_layout(ncol = 1) 
+```
+
+
+## Exercise 2: Student survey
+
+The `survey` data contains the responses of 237 Statistics I students at the University of Adelaide to a number of questions. Load the data `survey` in the `MASS` package and answer the following questions. 
+
+(a) What variables are in the data?
+
+```{r q2data}
+data(survey, package = "MASS")
+glimpse(survey)
+```
+
+(b) Perform some initial data analysis. Are there anything you notice? 
+
+```{r q2sum}
+visdat::vis_miss(survey)
+```
+
+There are noticeable missing data structure where there are fair bit of pulse and height data missing. The `M.I` variable is an indicator of whether the height was recorded using metric or imperial units so naturally missing when height is missing.
+
+
+(c) Draw a histogram of student heights and overlay a density plot of the data. Is there evidence of bimodality?
+(d) Experiment with different binwidths for the histogram and different bandwidths for the density plot. Which choices do you think are best for conveying the information in the data?
+
+```{r q2plot}
+ggplot(survey, aes(Height)) + 
+  geom_histogram(aes(y = stat(density)), binwidth = 2) + 
+  geom_density(color = "red", size = 1.3,
+               bw = 1.5)
+```
+
+
+
+(e) Compare heights of male and female students using separate density plots that are common scaled and aligned with one another.
+
+```{r q2plot2}
+ggplot(na.omit(survey), aes(Height))  + 
+  geom_density(aes(fill = Sex)) + 
+  facet_grid(Sex ~ . ) + 
+  scale_fill_discrete_qualitative()
+```
+
+
+## Exercise 3: Movie lengths
+
+
+```{r q3data}
+data(movies, package = "ggplot2movies")
+glimpse(movies)
+```
+
+
+(a) How many observations are in the data?
+
+There are `r comma(nrow(movies))` observations.
+
+(b) Draw a histogram with an appropriate binwidth that shows the peaks at 7 minutes and 90 minutes. Draw another set of histograms to show whether these peaks existed both before and after 1980.
+
+```{r q3plot}
+movies %>% 
+  mutate(after1980 = ifelse(year > 1980, 
+                            "After 1980", 
+                            "1980 or before"), 
+         copy = FALSE) %>%
+  bind_rows(mutate(movies, copy = TRUE, after1980 = "All")) %>% 
+  ggplot(aes(length)) + 
+  geom_histogram(binwidth = 1, fill = "yellow", color = "black") +
+  scale_x_continuous(breaks = c(0, 7, 30, 60, 90, 120, 150, 180), 
+                     limits = c(0, 180)) + 
+  facet_grid(after1980 ~ .) 
+
+```
+
+
+(c) The variable `Short` indicates whether the film was classified as a short film (`1`) or not (`0`). Draw plots to investigate what rules was used to define a film as "short" and whether the films have been consistently classified. 
+
+```{r q3sum}
+movies %>% 
+  group_by(Short) %>% 
+  summarise(x = list(summary(length))) %>% 
+  unnest_wider(x)
+```
+
+The maximum length for a film classified as short is `r filter(movies, Short == 1) %>% pull(length) %>% max` minutes. 
+
+```{r q3plot2}
+movies %>% 
+  mutate(short = factor(Short, labels = c("Long", "Short"))) %>% 
+  ggplot(aes(length, short)) + 
+  geom_violin() +
+  geom_boxplot(width = 0.05) + 
+  scale_x_log10(limits = c(1, 240),
+                breaks = c(1, 7, 10, 15, 20, 30, 45, 50, 70, 90, 110, 240)) +
+  labs(y = "")
+```
+
+From the graph, majority of films classified as short are under 50 minutes while those classified as long tend to be longer than 50 minutes. There are clear cases of mislabelling, e.g. a one-minute long film classified as "not short".
+
+On further detective work, the original source of the data says ["Any theatrical film or made-for-video title with a running time of less than 45 minutes, i.e., 44 minutes or less, or any TV series or TV movie with a running time of less than 22 minutes, i.e. 21 minutes or less. (A "half-hour" television program should not be listed as a Short.)"](https://help.imdb.com/article/contribution/titles/genres/GZDRMS6R742JRGAG#short) Given this is an objective measure based on the length of the film, we can see that that any films that are 45 minutes or longer should be classified as long and less than that as short. 
+
+
+## Exercise 4: Zuni educational funding 
+
+```{r q4data}
+data(zuni, package = "lawstat")
+glimpse(zuni)
+```
+
+
+(a) Choose a graphic that help answer the question: are the lower and highest 5% of the revenue values extreme?
+
+```{r q4plot}
+zuni %>% 
+  mutate(extreme = case_when(
+    Revenue <= quantile(Revenue, 0.05) ~ "lower 5%",
+    Revenue >= quantile(Revenue, 0.95) ~ "upper 5%",
+    TRUE ~ "Majority")) %>% 
+  ggplot(aes("", Revenue)) + 
+  geom_beeswarm(aes(color = extreme)) + 
+  coord_flip() +
+  scale_color_discrete_qualitative() 
+```
+
+Looking at the above graph, the upper 5% certainly looks extreme compared to others.
+
+
+(b) Calculate the sample mean, trimmed mean and Winsorized mean of average revenue per student. For trimmed mean and Winsorized mean, trim the 5% of lowest and highest values. Are your results expectedd? 
+
+The sample mean is `r dollar(mean(zuni$Revenue))`, trimmed mean is `r dollar(mean(zuni$Revenue, trim = 0.05))` and the 
+Winsorized mean is `r dollar(psych::winsor.mean(zuni$Revenue, trim = 0.05))` The lower estimate of the location using trimmed and Winsorised mean compared to the sample mean is expected due to the extreme values on the upper tail. 
+
+(c) Draw a density plot after removing the lowest and highest 5% of the values. Does the distribution of the remaining values look symmetric? What do you conclude after looking at the Q-Q plot?
+
+```{r q4plot2}
+df4 <- zuni %>% 
+  filter(between(Revenue, 
+                 quantile(Revenue, 0.05),
+                 quantile(Revenue, 0.95))) 
+
+ggplot(df4, aes(Revenue)) + 
+  geom_density()
+
+ggplot(df4, aes(sample = Revenue)) + 
+  geom_qq() + geom_qq_line(color = "red")
+```
+
+The density plot does not support that the remaining data has a symmetric distribution. The Q-Q plot does not support the data are normally distributed as the data deviates away from the expected theoretical quantile. 
+
+
+## Exercise 5: Multiple sclerosis
+
+
+```{r df10data}
+data(MSPatients, package = "vcd")
+df10 <- as.data.frame(MSPatients) %>% 
+  pivot_longer(everything(), 
+               names_to = c("rating", "neurologist"),
+               names_pattern = "(.*)\\.(.*)",
+               values_to = "count") %>% 
+  mutate(rating = fct_relevel(rating, 
+                         "Certain", "Probable", "Possible", "Doubtful"))
+glimpse(df10)
+```
+
+(a) How do the distributions of the ratings of the neurologists compare?
+
+```{r df10plot}
+ggplot(df10, aes(neurologist, count, fill = rating)) + 
+  geom_col(position = "fill") + 
+  scale_fill_discrete_qualitative() + 
+  labs(y = "Proportion")
+```
+
+Note that the data contains far more patients in Winnipeg than New Orleans so comparing between neurologists, it's not appropriate compare the raw counts. 
+
+```{r q10sum}
+df10 %>% 
+  group_by(neurologist) %>% 
+  summarise(total = sum(count))
+```
+
+
+(b) How would you describe their rating patterns?
+
+Either the Winnipeg neurologist is much more likely to rate their patient as certain for the diagnosis of multiple sclerosis OR Winnipeg neurologist has more patients that display clear symptoms of multiple sclerosis. 
+
+## Exercise 6: Occupational mobility 
+
+
+```{r q11data}
+data(Yamaguchi87, package = "vcdExtra")
+glimpse(Yamaguchi87)
+```
+
+(a) How do the distributions of occupations of the sons in the three countries compare?
+
+```{r q11plot}
+ggplot(Yamaguchi87, aes(Country, Freq, fill = Son)) + 
+  geom_col(position = "fill") + 
+  scale_fill_discrete_qualitative()
+```
+
+From the data documentation: "Upper nonmanuals are professionals, managers, and officials; lower nonmanuals are proprietors, sales workers, and clerical workers; upper manuals are skilled workers; lower manuals are semi-skilled and unskilled nonfarm workers; and farm workers are farmers and farm laborers." 
+
+The graph above shows that Japan has a higher proportions of sons who are farm workers compared to US and UK. 
+
+
+
+
+(b) How do the distributions of the sons' and fathers' occupations in the UK compare?
+
+```{r q11plot2}
+g1 <-  Yamaguchi87 %>% 
+  filter(Country == "UK") %>% 
+  ggplot(aes(Son, Freq)) + 
+  geom_col()
+g2 <-  Yamaguchi87 %>% 
+  filter(Country == "UK") %>% 
+  ggplot(aes(Father, Freq)) + 
+  geom_col()
+g1 + g2 + plot_layout(ncol = 1)
+```
+
+
+(c) Are you surprised by the results or are they what you would have expected?
+
+There are more farmer workers in the older generation and more upper non-manual workers in the new generation. This is perhaps somewhat expected as the technology improves, more farm work may be replaced with machines and there may be more opportunities in non-manual work.
+
+
+## Exercise 7: Whisky
+
+```{r q12data}
+data(Scotch, package = "bayesm")
+data(whiskey, package = "flexmix")
+df12 <- Scotch %>% 
+  pivot_longer(everything(), 
+               names_to = "brand",
+               values_to = "consumed") %>% 
+  filter(consumed==1) %>% 
+  select(brand) %>% 
+  group_by(brand) %>% 
+  summarise(count = n()) %>% 
+  # clean names to match with whiskey.brand
+  mutate(
+    brand = gsub(".", " ", brand, fixed = TRUE),
+    brand = case_when(
+    brand == "the Singleton" ~ "Singleton",
+    brand == "Grants" ~ "Grant's",
+    brand == "Black   White" ~ "Black & White",
+    brand == "Pinch  Haig " ~ "Pinch (Haig)",
+    brand == "J   B" ~ "J&B",
+    brand == "Dewar s White Label" ~ "Dewar's White Label",
+    brand == "Other Brands" ~ "Other brands",
+    TRUE ~ brand
+  ))
+
+glimpse(df12)
+```
+
+(a) Produce a barplot of the number of respondents per brand. What ordering of the brands do you think is the best?
+
+```{r q12plot}
+df12 %>% 
+  mutate(brand = fct_reorder(brand, count),
+         brand = fct_relevel(brand, "Other brands")) %>% 
+  ggplot(aes(count, brand)) + 
+  geom_col()
+```
+
+The ordering of the levels are based on the frequency of the brands consumed except the "Other Brands".
+
+
+(b) There are 20 named brands and one category that is labelled as `Other.brands`. Produce a barplot that you think best reduces the number of categories by selecting a criteria to lump certain brands to the `Other` category. 
+
+```{r q12plot2}
+df12 %>% 
+  mutate(brand = ifelse(count > 200, brand, "Other brands"),
+         brand = fct_reorder(brand, count),
+         brand = fct_relevel(brand, "Other brands")) %>% 
+  ggplot(aes(count, brand)) + geom_col()
+```
+
+I've chosen the cut-off to be 200 as there was a gap in frequency between brands that sold more than 200 and less than 200 and this reduced the comparison to 8 named brands, which is more managable for comparison.
+
+
+(c) The data `whiskey_brands` in the `flexmix` package has the information on whether the whiskey is a single malt or blend. How would you incorporate this information on your graphics? 
+
+```{r q12plot3}
+left_join(df12, whiskey_brands, by = c("brand" = "Brand")) %>%
+  filter(brand != "Other brands") %>% 
+  mutate(brand = fct_reorder(brand, count)) %>% 
+  ggplot(aes(count, brand, fill = Type)) + 
+  geom_col() + 
+  scale_fill_discrete_qualitative()
+```

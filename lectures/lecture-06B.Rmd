@@ -171,11 +171,28 @@ base %>%
   add_lines(x = ~date, y = ~median)
 ```
 
+You can think about parallel coordinate plots like time series plots. Each variable is treated as a parallel axis. Observations are drawn as a line across the axes. 
+
 ---
 
+.grid[
+.item[
 ```{r ref.label="housepcp", echo=TRUE, eval=FALSE}
 ```
+]
+.item[
+.font_small[
+What can you learn?
 
+- lines that are parallel indicate positive linear association, possibly across many variables
+- lines that cross indicate negative linear association
+- lines that go up and down differently from any other lines indicate multivariate outliers
+- lines that go up and down together, but differently from other lines indicate multivariate clustering
+
+> You need to have an .monash-blue2[interactive] parallel coordinate plot for them to be effective for exploring data
+]
+]
+]
 ---
 
 class: center

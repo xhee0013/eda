@@ -1,0 +1,396 @@
+---
+title: "ETC5521 Tutorial 6"
+subtitle: "Bivariate dependencies and relationships, transformations to linearise"
+author: "Dr Di Cook"
+date: "Week 6"
+output:
+  html_document:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  message = FALSE, 
+  warning = FALSE, 
+  cache = TRUE,
+  cache.path = "tutorial06-cache/",
+  fig.path = "images/tutorial06/",
+  fig.align = "center"
+)
+```
+
+```{r libraries}
+library(tidyverse)
+library(ggExtra)
+library(gridExtra)
+```
+
+## Exercise 1: Olympics
+
+We have seen from the lecture that the Athletics category has too many different types of athletics in it for it to be a useful group for studying height and weight. There is another variable called `Event` which contains more specific information.
+
+a. Tabulate `Event` for just the Sport category `Athletics`, and decide which new categories to create.
+
+*World Athletics, the sport's governing body, defines athletics in six disciplines: track and field, road running, race walking, cross country running, mountain running, and trail running [wikipedia](https://en.wikipedia.org/wiki/Sport_of_athletics).*
+
+*That's not so helpful! Track and field should be two different groups. I suggest running (two groups, not long and long), throwing, jumping, walking, and maybe other.*
+
+b. Create the new categories, in steps, creating a new binary variable for each. The function `str_detect` is useful for searching for text patterns in a string. It also helps to know about regular expressions to work with strings like this. And there are two sites, which are great for learning: [Regex puzzles](https://regexcrossword.com/challenges/beginner/puzzles/1), [Information and testing board](https://regex101.com)
+c. Make a plot that explores the association between height and weight for the different athletic categories.
+
+*It is important to separate the sexes. Faceting by sport and sex and examining the scatterplots of height and weight in each is appropriate. Making a plot of just the regression models, faceted by sex can be useful also. A density plot is not so useful here because there isn't a lot of difference in variance between the groups.*
+
+d. Write a paragraph explaining what is learned about body types across the different athletics types. 
+
+*from the scatterplots, we learn that there are some heavy runners! (Maybe I need to check my coding for classifying these four athletes as runners, there might have been a mistake. The throwers are generally taller and much heavier. Female walkers tend to be pretty small. Long distance runners are light!*
+
+*The comparisons between groups is easier from the models. Throwers are heavy! Long-distance runners and walkers are relatively light. Runners and jumpers are similar in weight and height.*
+
+```{r fig.width=10, fig.height=6}
+data(oly12, package = "VGAMdata")
+#oly12 %>% 
+#  filter(Sport == "Athletics") %>%
+#  count(Event, sort = TRUE)
+oly12_ath <- oly12 %>% 
+  filter(Sport == "Athletics") %>%
+  mutate(run = str_detect(Event, "[1248]00m|Hurd"),
+         run_long = str_detect(Event, "Mara|000m|Steep"),
+         jump = str_detect(Event, "Jump|Pole"),
+         throw = str_detect(Event, "Throw|Put"),
+         walk = str_detect(Event, "alk")) %>%
+  mutate(Ath_type = case_when(run ~ "Running",
+                              run_long ~ "Long distance",
+                              jump ~ "Jumping",
+                              throw ~ "Throwing",
+                              walk ~ "Walking",
+                              TRUE ~ "Other")
+         )
+```
+
+```{r fig.width=10, fig.height=4}
+ggplot(oly12_ath, aes(x=Height, y=Weight, colour=Ath_type)) +
+  geom_point() +
+  facet_grid(Sex~Ath_type)
+ggplot(oly12_ath, aes(x=Height, y=Weight, colour=Ath_type)) +
+  geom_smooth(method="lm", se=F) +
+  facet_grid(~Sex)
+```
+
+
+## Exercise 2: Fisherman's Reach crabs
+
+Mud crabs are delicious to eat! Prof Cook's father started a crab farm at Fisherman's Reach, NSW, when he retired. He caught small crabs (with a special license) and nurtured and fed the crabs until they were marketable size. They were then sent to market, like Queen Victoria Market in Melbourne, for people to buy to eat. Mud crabs have a strong and nutty flavour, and a good to eat simply after steaming or boiling.
+
+Early in the farming setup, he collected the measurements of 62 crabs of different sizes, because he wanted to learn when was the best time to send the crab to market. Crabs re-shell from time to time. They grow too big for their shell, and need to discard it. Ideally, the crabs should be sent to market just before they re-shell, because the will be crab will be fuller in the shell, less air, less juice and more crab meat. 
+
+a. Where is Fisherman's Reach? What would you expect the relationship between Length and Weight of a crab to be?
+
+*North coast of NSW, north-east of Kempsey, on the back-water of the Macleay River. We would expect it to be positive, and maybe nonlinear, because weight is more related to volume of the crab than length, which would be length$^p$.*
+
+b. Make a scatterplot of Weight by NSW Length. Describe the relationship. It might be even better if you can add marginal density plots to the sides of the scatterplot. (Aside: Should one variable be considered a dependent variable? If so, make sure this is on the $y$ axis.)
+
+```{r}
+fr_crabs <- read_csv("https://eda.numbat.space/data/fr-crab.csv") %>%
+  mutate(Sex=factor(Sex))
+ggplot(fr_crabs, aes(x=Length.NSW, y=Wgt)) +
+         geom_point()
+```
+
+*It is a little nonlinear, positive and strong relationship. Weight should be considered dependent.*
+
+*If you are unsure about a nonlinear relationship, fit a linear model and look at the residuals. In the plots below you can see the residuals have a U-shape, and also have major heteroskedasticity.*
+
+```{r fig.width=10, fig.height=4, out.width="100%"}
+library(broom)
+cr_lm <- lm(Wgt~Length.NSW, data=fr_crabs)
+fr_crabs <- augment(cr_lm, fr_crabs)
+p1 <- ggplot(fr_crabs, aes(x=Length.NSW, y=Wgt)) +
+         geom_point() + 
+         geom_smooth(method="lm", se=FALSE)
+p2 <- ggplot(fr_crabs, aes(x=Length.NSW, y=.resid)) +
+         geom_point()
+grid.arrange(p1, p2, ncol=2)
+```
+
+c. Examine transformations to linearise the relationship. (Think about why the relationship between Length and Weight is nonlinear.)
+
+```{r fig.width=10, fig.height=4}
+p1 <- ggplot(fr_crabs, aes(x=Length.NSW, y=Wgt)) +
+         geom_point() +
+  scale_y_sqrt() + ggtitle("Square root")
+p2 <- ggplot(fr_crabs, aes(x=Length.NSW, y=Wgt)) +
+         geom_point() +
+  scale_y_log10() + ggtitle("Log10")
+grid.arrange(p1, p2, ncol=2)
+```
+
+d. Is there a lurking variable? Examine the variables in the data, and use colour in the plot to check for another variable explaining some of the relationship.
+e. If you have determined that the is a lurking variable, make changes in the plots to explore the relationship between Weight and Length accordingly.
+
+```{r fig.width=10, fig.height=4}
+p1 <- ggplot(fr_crabs, aes(x=Length.NSW, y=Wgt, colour=Sex)) +
+         geom_point() +
+  scale_colour_brewer(palette="Dark2") +
+  theme(legend.position="bottom")
+p2 <- ggplot(fr_crabs, aes(x=Length.NSW, y=Wgt, colour=Sex)) +
+         geom_point() +
+  scale_y_log10() +
+  scale_colour_brewer(palette="Dark2") +
+  theme(legend.position="bottom")
+grid.arrange(p1, p2, ncol=2)
+```
+
+*Sex of the crab makes a difference in the relationship. I am not sure whether 1 or 2 means male. Can you work it out by googling mudcrabs?*
+
+f. How would you select the crabs that were close to re-shelling based on this data?
+
+*You would select the crabs that are heavier for their length.*
+
+
+## Exercise 3: Thrombolytic therapy
+
+The results of 70 studies on thrombolytic therapy after acute myocardial infarction are reported in the *Olkin95* data in the **meta** package. 
+
+a. What is acute myocardial infarction? *heart attack!*
+b. What is a meta-analysis?
+
+*Results from multiple studies are combined to incorporate the entire body of experiments/studies to address problems in the hope that it provides stronger conclusions or more precise answers. Typically this is applied to medical studies.*
+
+c. Draw a scatterplot of the number of observations in the experimental group against that number in the control group. What do you notice?
+
+```{r}
+data(Olkin95, package = "meta")
+ggplot(Olkin95, aes(x=n.e, y=n.c)) + geom_point()
+```
+
+*The two variables are perfectly related, and there are some very larger outliers.*
+
+d. What fraction of the studies have less than 100 patients in the experimental group? *0.64*
+
+```{r}
+Olkin95 %>% 
+  mutate(n.e.100 = ifelse(n.e < 100, "less", "more")) %>%
+  count(n.e.100)
+```
+
+e. Re-make the scatterplot, just on the studies with the fewer patients. What do you notice?
+
+```{r}
+Olkin95 %>% filter(n.e < 100) %>%
+  ggplot(aes(x=n.e, y=n.c)) + geom_point()
+```
+
+*The two variables are strongly positively related. There are 2, perhaps 3, outliers, that have very small numbers in the control group relative to the number in the experimental group.*
+
+## Exercise 4: Zuni educational funding
+
+a. Make a scatterplot of average revenue per student against the corresponding number of students. What do you learn?
+
+```{r}
+data(zuni, package = "lawstat")
+ggplot(zuni, aes(x=Mem, y=Revenue)) + geom_point()
+```
+
+*There are five very large outliers, that make it impossible to assess the relationship between the variables for the majority of observations.*
+
+b. What sort of transformation would be useful to re-make this plot? Are there still outliers? What would you do to look at the relationship without them, if so?
+  
+```{r}
+  ggplot(zuni, aes(x=Mem, y=Revenue)) + geom_point() +
+  scale_x_log10() + scale_y_log10()
+```
+
+*Taking logs of both variables mostly fixes the problem. The reason to take logs of both variables is that the pattern of skewness/outliers is along each axis, meaning that it is marginal structure. Both variables have this skewness/outlier pattern, so we transform each one. There are still four big outliers, particularly on the revenue variable. We could remove these observations, or set the limits in order to better assess the relationship of the rest of the observations.*
+
+c. There might be more that is needed to be done, to examine the relationship between revenue and reports. Describe the relationship now.
+
+```{r}
+ggplot(zuni, aes(x=Mem, y=Revenue)) + geom_point() +
+  scale_x_log10() + scale_y_log10() + 
+  ylim(c(2500, 4000))
+```
+
+*Its a weak relationship. It almost looks like there is a positive relationship up to about 3000, but this is probably imagining too much. There are some high revenue amounts for small numbers of students. There are low revenue amounts for higher number of students. It looks like there is a barrier, which forms the relationship of as number of students increase, revenue is roughly capped.*
+
+# Exercise 5: Bank discrimination
+
+a. Look at the help page for the `case1202` from the `Sleuth2` package. What does the variable "Senior" measure? "Exper"? Age?
+
+*Senior is the seniority of the employee in the company. Experience is the months of prior experience coming into the company. Age is given in months, which is a bit strange!*
+
+b. Make all the pairwise scatterplots of Senior, Exper and Age. What do you learn about the relationship between these three pairs of variables? How can the age be 600? Are there some wizards or witches or vampires in the data?
+
+```{r fig.width=10, fig.height=3}
+data(case1202, package = "Sleuth2")
+p1 <- ggplot(case1202, aes(x=Age, y=Senior)) +
+  geom_point()
+p2 <- ggplot(case1202, aes(x=Exper, y=Senior)) +
+  geom_point()
+p3 <- ggplot(case1202, aes(x=Age, y=Exper)) +
+  geom_point()
+grid.arrange(p1, p2, p3, ncol=3)
+```
+
+*Experience and age is positively related, fairly moderate to strong relationship. There are more younger less experienced employees. There is no relationship between seniority and age, or experience.*
+
+c. Colour the observations by Sex. What do you learn?
+
+```{r fig.width=10, fig.height=4}
+p1 <- ggplot(case1202, aes(x=Age, y=Senior, colour=Sex)) +
+  geom_point() + 
+  scale_colour_brewer("", palette="Dark2") +
+  theme(legend.position="bottom")
+p2 <- ggplot(case1202, aes(x=Exper, y=Senior, colour=Sex)) +
+  geom_point() + 
+  scale_colour_brewer("", palette="Dark2") + 
+  theme(legend.position="bottom")
+p3 <- ggplot(case1202, aes(x=Age, y=Exper, colour=Sex)) +
+  geom_point() + 
+  scale_colour_brewer("", palette="Dark2") + 
+  theme(legend.position="bottom")
+grid.arrange(p1, p2, p3, ncol=3)
+```
+
+*This is really interesting! The older men almost always come to the company with less experience than the women. Beyond this, though, there is not much that can be said about the relationship between the three variables in the other plots. Maybe small effect, that at older age and low seniority, there are only female employees.*
+
+d. Instead make faceted histograms (stacked) of the three variables against age. What do you learn about the difference in distribution of these three variables between the sexes.
+
+```{r fig.width=10, fig.height=5}
+p1 <- ggplot(case1202, aes(x=Senior)) +
+  geom_histogram(binwidth=5, colour="white") +
+  facet_wrap(~Sex, ncol=1)
+p2 <- ggplot(case1202, aes(x=Age)) +
+  geom_histogram(binwidth=50, colour="white") +
+  facet_wrap(~Sex, ncol=1)
+p3 <- ggplot(case1202, aes(x=Exper)) +
+  geom_histogram(binwidth=50, colour="white") +
+  facet_wrap(~Sex, ncol=1)
+grid.arrange(p1, p2, p3, ncol=3)
+```
+
+*This is interesting again! The distribution of seniority for women is quite uniform, bur for men has a mode around 85-90. For age, there is a bimodal pattern for women, young and older - I wonder if there is a child-bearing years drop out among women. With men, there is a large spike, of young men, and few older men. The experience that employees come into the company with has a different distribution for men and women: for men it tends to be less experience, and for women this is true too, although the mode is at more experience than for the men. This suggests that men are being hired into the company with less experience than the women.*
+
+e. The data also has starting salary and annual salary. Plot these two variables, faceted by Sex, and explain the relationships. 
+
+```{r fig.width=10, fig.height=5}
+ggplot(case1202, aes(x=Sal77, y=Bsal)) +
+  geom_point() + facet_wrap(~Sex)
+```
+
+*This is where it gets a bit depressing: the women generally have lower salaries than men, both starting salary and annual salary.*
+
+f. Examine this against the two different salaries against `Senior` and `Exper`, separately by Sex. What is the relationship?
+
+```{r fig.width=8, fig.height=8}
+p1 <- ggplot(case1202, aes(x=Senior, y=Sal77, colour=Sex)) +
+  geom_point() + 
+  geom_smooth(method="lm", se=F) +
+  scale_colour_brewer("", palette="Dark2") +
+  theme(legend.position="bottom")
+p2 <- ggplot(case1202, aes(x=Exper, y=Sal77, colour=Sex)) +
+  geom_point() + 
+  geom_smooth(method="lm", se=F) +
+  scale_colour_brewer("", palette="Dark2") +
+  theme(legend.position="bottom")
+p3 <- ggplot(case1202, aes(x=Senior, y=Bsal, colour=Sex)) +
+  geom_point() + 
+  geom_smooth(method="lm", se=F) +
+  scale_colour_brewer("", palette="Dark2") +
+  theme(legend.position="bottom")
+p4 <- ggplot(case1202, aes(x=Exper, y=Bsal, colour=Sex)) +
+  geom_point() + 
+  geom_smooth(method="lm", se=F) +
+  scale_colour_brewer("", palette="Dark2") +
+  theme(legend.position="bottom")
+grid.arrange(p1, p2, p3, p4, ncol=2)
+```
+
+*This is really depressing! At all levels women are paid substantially less than the men. Against seniority, it is the same trend, but a full $1000 less for women, on average. The annual salary tends to decline with seniority - that's a bit surprising. The annual salary tends to increase with more experience, and almost is equal between the sexes at the most senior levels. Starting salary increases slightly with seniority, for women, but is almost flat for men. Strangely starting salary declines for both men and women with experience!*
+
+g. Would you say that this data provides evidence of sex discrimination?
+
+*YES! All the supporting evidence is in the plots from the previous parts.*
+
+# Exercise 6: Baker field corn yield
+ 
+a. Construct a histogram of yield, with an appropriate choice in bin width. Describe the shape. 
+
+```{r fig.width=6, fig.height=4}
+corn <- read_csv("https://eda.numbat.space/data/baker.csv") 
+ggplot(corn, aes(x=Corn97BU)) + 
+  geom_histogram(binwidth=10, colour="white")
+```
+
+*It's is unimodal and bell-shaped, with perhaps a little left-skew.*
+
+b. The variables X and Y provide the grid locations of the area being sampled. Make a bubble chart of the corn yield for the spatial locations of the measurements. Are there some areas of the field that have really low yield?
+
+c. Turn this into a tile map of the field instead. Is it easier to see the low yield locations in the field?
+
+```{r fig.width=8, fig.height=4}
+p1 <- ggplot(corn, aes(x=X, y=Y, size=Corn97BU)) + 
+  geom_point() + 
+  theme_void() + 
+  theme(aspect.ratio=1, legend.position="bottom")
+p2 <- ggplot(corn, aes(x=X, y=Y, fill=Corn97BU)) + 
+  geom_tile() + 
+  scale_fill_viridis_c() +
+  theme_void() + 
+  theme(aspect.ratio=1, legend.position="bottom")
+grid.arrange(p1, p2, ncol=2)
+```
+
+*There are two main locations in the field where the yield is low. (There are also some missing values, given by the blank squares. I think that this is much easier to see from the tile map.*
+
+d. Compute the correlation between corn yield and all of the soil chemistry variables. Make a scatterplot of yield against the chemical that is most correlated with yield. Describe the relationship. 
+
+e. If need be, make a transformation to linearise the relationship. 
+
+```{r}
+round(cor(corn$Corn97BU, corn[4:13]), 2)
+```
+
+*The strongest relationship is between copper and yield.*
+
+```{r fig.width=8, fig.height=4}
+p1 <- ggplot(corn, aes(x=Cu, y=Corn97BU)) + 
+  geom_point() 
+#ggplot(corn, aes(x=Cu, y=Corn97BU^5)) + 
+#  geom_point() 
+p2 <- ggplot(corn, aes(x=Cu, y=Corn97BU)) + 
+  geom_point() +
+  scale_x_log10()
+grid.arrange(p1, p2, ncol=2)
+```
+
+*The relationship is positive and moderately strong, and non-linear. The shape is in the -,+ side of the number plane, which means consider transforming $x$ using powers below 1, or $y$ with powers above 1. After trying various transformations, a log of copper seemed to produce the most linear relationship.*
+
+f. Make the field map for this chemical, alongside the field map (like you did in part c). Are the low values for the chemical in the same spatial locations as the low values for yield?  
+
+```{r eval=FALSE}
+p1 <- ggplot(corn, aes(x=X, y=Y, fill=Corn97BU)) + 
+  geom_tile() + 
+  scale_fill_viridis_c() +
+  theme_void() +
+  ggtitle("Yield") + 
+  theme(legend.position = "none")
+p2 <- ggplot(corn, aes(x=X, y=Y, fill=log(Cu))) + 
+  geom_tile() + 
+  scale_fill_viridis_c() +
+  theme_void() +
+  ggtitle("Cu") + 
+  theme(legend.position = "none")
+grid.arrange(p1, p2, ncol=2)
+```
+
+```{r fig.width=5, fig.height=5}
+ggplot(corn, aes(x=X, y=Y, fill=Corn97BU, colour=ifelse(Cu < 1, "low", "high"))) + 
+  geom_tile(size=1.5) + 
+  scale_fill_viridis_b() +
+  scale_colour_brewer("", palette="Dark2") +
+  theme_void() +
+  theme(aspect.ratio=1, legend.position = "bottom")
+```
+
+*I think its easier to see if we "hack" the plot and make the edges of the tile correspond to low copper values. Then it can be seen that these are mostly in the same locations as the low yield. This would be expected, but there is some variability in the relationship between copper and yield, so its interesting to see the spatial distribution of the low copper, especially relative to the yield.*

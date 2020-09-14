@@ -1098,7 +1098,7 @@ ggplot(df9, aes(month, temp)) +
 ]]
 .item[
 * Melbourne's daily maximum temperature from 1970 to 2020.
-* How are the temperature across months?
+* How are the temperature different across months?
 * What about the temperature within a month?
 * You'll explore this data in week 8 tutorial!
 ]

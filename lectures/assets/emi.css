@@ -195,6 +195,31 @@ li.panel-tab {
   overflow: scroll;
 }
 
+.s100 pre {
+  height:100px;
+  overflow: scroll;
+}
+
+.s200 pre {
+  height:200px;
+  overflow: scroll;
+}
+
+.s300 pre {
+  height:300px;
+  overflow: scroll;
+}
+
+.s400 pre {
+  height: 400px;
+  overflow: scroll;
+}
+
+.h100 pre:nth-child(2) {
+  height: 100px;
+  overflow: scroll;
+}
+
 .h200 pre:nth-child(2) {
   height: 200px;
   overflow: scroll;

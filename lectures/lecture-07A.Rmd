@@ -778,7 +778,7 @@ count: false
 ```{r barley-plot3}
 ggplot(barley, aes(yield, variety, color = year)) + 
   geom_point(size = 3, alpha = 0.4) + 
-  geom_point(data = subset(barley, site=="University Farm" & variety == "No. 475"), size = 3) +
+  geom_point(data = subset(barley, (site=="University Farm" & variety == "No. 475") | (site=="Grand Rapids" & variety == "Velvet")), size = 3) +
   facet_wrap(~site) + 
   theme(plot.title.position = "plot",
         plot.title = element_text(face = "bold")) + 
@@ -824,7 +824,7 @@ Immer, R. F., H. K. Hayes, and LeRoy Powers. (1934). Statistical Determination o
 ]
 .item[
 
-* Cleveland (1993) speculated that the year labels may have been reversed for No. 475 variety at the University Farm.
+* Cleveland (1993) speculated that the year labels may have been reversed for some data.
 * Wright (2013) investigated this by examining extended data from 1927 to 1936, in addition to weather covariates, and found that the observations are not particularly unusual.
 
 ]

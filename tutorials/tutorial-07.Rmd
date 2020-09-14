@@ -1,0 +1,410 @@
+---
+title: "ETC5521 Tutorial 7"
+subtitle: "Going beyond two variables, exploring high dimensions"
+author: "Dr Di Cook"
+date: "Week 7"
+output:
+  html_document:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  message = FALSE, 
+  warning = FALSE, 
+  cache = TRUE,
+  cache.path = "tutorial06-cache/",
+  fig.path = "images/tutorial06/",
+  fig.align = "center"
+)
+```
+
+```{r libraries}
+library(tidyverse)
+library(ggExtra)
+library(gridExtra)
+library(plotly)
+library(GGally)
+library(tourr)
+library(RColorBrewer)
+library(vcd)
+library(binostics)
+library(spinifex)
+library(vcd)
+```
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+These are exercises in plots to make to explore relationships between multiple variables. You will use interactive scatterplot matrices, interactive parallel coordinate plots and tours to explore the world beyond 2D.
+
+## `r emo::ji("wrench")` Preparation 
+
+Install the following R-packages if you do not have it already:
+
+```{r pkgs, echo=TRUE, eval = FALSE}
+install.packages(c("tourr", "spinifex", "plotly", "vcd", "SMPracticals", "vcdExtra", "binostics", "RColorBrewer"))
+remotes::install_github("ggobi/GGally")
+```
+
+**GRAB A COPY OF THE .Rmd FILE TO GET HELPFUL CODE FOR STARTING ON THE PROBLEMS** If you see `???` in the code this is a place where you will need to fill in something!
+
+## Exercise 0: Introduction
+
+In the chat window, say hello, and if you feel comfortable tell us something fun about yourself, or what you have done this last week.
+
+Some of the following are questions based on those in Unwin (2015) Graphical Data Analysis with R Chapter 5  and 6. 
+
+## Exercise 1:  Melbourne housing
+
+a. Read in a copy of the Melbourne housing data from  [Nick Tierney's github repo](https://github.com/njtierney/melb-housing-data) which is a collation from the version at [kaggle](https://www.kaggle.com/anthonypino/melbourne-housing-market/version/21). Its fairly large, so let's start simply, and choose two suburbs to focus on. I recommend "South Yarra" and "Brighton". (Note: there are a number of missing values. I recommend removing these before making plots.)
+b. Make a scatterplot matrix of price, rooms, bedroom2, bathroom, suburb, type. The plot will be easier to read if you put the numerical variables first, and then the categorical variables. What are the associations that can be seen?
+c. Subset the data to South Yarra only. Make an interactive scatterplot matrix of rooms, bedroom2, bathroom and price, coloured by type of property. There is a really high price property. Select this case, and determine what's special about it -- why did it sell for so much? Select the outlier in bedrooms and bathrooms, and examine the other characteristics of this property.
+d. Examine price vs rooms coloured by bathrooms, faceted by suburb and type, and with a linear model overlaid. What do you learn about average house prices relative to number of rooms and number of bathrooms, for the different property types and suburbs? (Remove the one really high priced property first, because it affects what we can learn about the rest of the data.)
+e. If we throw all the neighbourhoods in together to analyse price and property characteristics, what pitfall might we encounter?
+
+```{r houses, eval = FALSE}
+# Read the data
+mel_houses <- read_csv("https://raw.githubusercontent.com/njtierney/melb-housing-data/master/data/housing.csv") %>%
+  filter(suburb %in% c(???, ???)) %>%
+  filter(!is.na(???)) 
+
+# Make a scatterplot matrix
+ggpairs(mel_houses, columns=???)
+
+# Select one suburb to investigate
+south_yarra <- mel_houses %>% 
+  filter(suburb==???) %>%
+  select(???)
+
+# This code will generate an interactive scatterplot matrix
+highlight_key(south_yarra) %>%
+  GGally::ggpairs(aes(color = type), columns = 1:4, upper=list(continuous="points")) %>%
+  ggplotly() %>%
+  highlight("plotly_selected")
+```
+
+## Exercise 2:  Olive oils
+
+Following on from the olive oils example from class, we will explore the oils from the south here. 
+
+a. Grab a copy of the data, and subset to contain just the samples from region = south (1), and also drop eicosenoic acid, because there is nothing useful about this variable for the southern oils.
+b. Only looking at areas (1-3), that is not Sicily:
+    - Make an interactive parallel coordinate plot of the fatty acids (except eicosenoic), where the lines are coloured by area. (Code is provided, code is a bit tricky, but worth it!)
+    - Look at the data in a tour.
+    - Describe what you learn about differences between the three areas, whether these are separated. Are some variables more useful for distinguishing the three areas? Are there any outliers? 
+c. Re-do b. with Sicily. Explain what you learn about Sicily relative to the other areas.
+d. Do some googling. What can you find out about Sicilian olive oils? Are they higher in value? Does Sicily even grow olives, or does it use olives from neighbouring areas?
+
+```{r olive, eval = FALSE}
+# Read data and filter to just south
+olive <- read_csv("http://ggobi.org/book/data/olive.csv") %>%
+  rename(id = X1) %>% 
+  filter(region == 1) %>%
+  select(palmitic:arachidic, id, area) %>%
+  mutate(area = as.integer(area))
+
+# Set our colours for the par coords, and also tour
+clrs <- brewer.pal(4, "Dark2")
+
+# Look at first three areas, first
+not_sicily <- olive %>%
+  filter(area != 4)
+
+# Make the interactive parcoords with plotly
+# SOME NOTES ABOUT THE CODE:
+#    - Notice that some variables have been flipped by
+#      putting a minus sign in front, this is to make
+#      the correlation between variables positive, making
+#      the par coords easier to read.
+#    - Note the strange colour mapping: colour value has 
+#      to range between 0-1 weirdly enough, so 
+#      area 1 becomes 0, area 3 becomes 1
+#    - The range of each variable needs to be stated
+#      so that each is scaled from min to max for the display
+# ABOUT THE INTERACTIVITY
+#    - Click and drag along an axis to select observations
+#    - Click and drag the variable label to re-order
+#      I find the best order to see groups is palmitoleic,
+#      oleic, palmitic, linoleic, linolenic, arachidic, stearic
+not_sicily_pcp <- not_sicily %>%
+  plot_ly(type = 'parcoords', 
+            line = list(color = ~area,
+                colorscale = list(c(0,clrs[1]), c(0.5,clrs[2]),
+                                  c(1,clrs[3]))),
+            dimensions = list(
+            list(range = c(875,1753),
+                 label = 'palmitic', values = ~palmitic),
+            list(range = c(35,280),
+                 label = 'palmitoleic', values = ~palmitoleic),
+            list(range = c(-375,-152),
+                 label = 'stearic', values = ~(-stearic)),
+            list(range = c(-8113,-6300),
+                 label = 'oleic', values = ~(-oleic)),
+            list(range = c(448,1462),
+                 label = 'linoleic', values = ~linoleic),
+            list(range = c(-74,-20),
+                 label = 'linolenic', values = ~(-linolenic)),
+            list(range = c(-102,-32),
+                 label = 'arachidic', values = ~(-arachidic))
+            )
+          )
+not_sicily_pcp
+
+# Now all four area
+olive_pcp <- olive %>%
+  plot_ly(type = 'parcoords', 
+            line = list(color = ~area,
+                colorscale = list(c(0,clrs[1]), c(0.33,clrs[2]),
+                                  c(0.67,clrs[3]), c(1,clrs[4]))),
+            dimensions = list(
+            list(range = c(875,1753),
+                 label = 'palmitic', values = ~palmitic),
+            list(range = c(35,280),
+                 label = 'palmitoleic', values = ~palmitoleic),
+            list(range = c(152,375),
+                 label = 'stearic', values = ~stearic),
+            list(range = c(6300,8113),
+                 label = 'oleic', values = ~oleic),
+            list(range = c(448,1462),
+                 label = 'linoleic', values = ~linoleic),
+            list(range = c(20,74),
+                 label = 'linolenic', values = ~linolenic),
+            list(range = c(32,102),
+                 label = 'arachidic', values = ~arachidic)
+            )
+          )
+olive_plty
+
+# Make a tour
+# To do this live
+set.seed(11111)
+col <- clrs[not_sicily$area]
+animate_xy(not_sicily[,1:7], fps=10, half_range=1.0, col=col)
+# To record a tour and replay it so you can stop anywhere
+# BUT unfortunately its not possible set the colours to your
+# choice of colour palette
+set.seed(42)
+not_sicily_stdd <- tourr::rescale(not_sicily[,1:7])
+tpath <- tourr::save_history(not_sicily_stdd, 
+                             tour_path = tourr::grand_tour(),
+                             max = 20)
+play_tour_path(tour_path = tpath, data = not_sicily_stdd,
+               color=factor(not_sicily$area), 
+               shape=factor(not_sicily$area))
+# To do a guided tour, use
+animate_xy(not_sicily[,1:7],
+           guided_tour(lda_pp(not_sicily$area),  
+              search_f = search_geodesic),
+           fps=10, half_range=1.0, col=col)
+```
+
+## Exercise 3: Baker field soils
+
+a. Make density plots of the soil variables in the Baker field corn yield data. Choose an appropriate transformation to symmetrise the distribution.
+b. Make a scatterplot matrix. If you can make an interactive one, that would be extra special. Describe the relationships between pairs of variables.
+c. Make a grand tour of soil variables. Describe the different patterns that you see in various projections. Is there clustering? Is there linear dependence? Non-linear dependence? outliers. For any structure that you see determine which variables contribute to it, and make plots of these variables (or check the scatterplot matrix) to check whether the pattern is visible there too.
+
+
+```{r corn, eval = FALSE, fig.width=6, fig.height=4}
+# Read the data and turn into long form to make side-by-side boxplots
+corn <- read_csv("https://eda.numbat.space/data/baker.csv") 
+corn_long <- corn %>% 
+  select(B:Zn) %>%
+  pivot_longer(everything(), 
+               names_to="var",
+               values_to="value")
+ggplot(corn_long, aes(x=value)) +
+  geom_density() +
+  facet_wrap(~var, ncol=4, scales="free")
+
+# Make appropriate transformations of the variables, and replot
+corn_trf <- corn %>%
+  mutate(B = log10(B),
+         Ca = log10(log10(Ca)),
+         Cu = sqrt(Cu),
+         K = ???, 
+         Mg = ???, 
+         Mn = ???,
+         Na = ???,
+         P = ???,
+         Zn = ???)
+corn_long <- corn_trf %>% 
+  select(B:Zn) %>%
+  pivot_longer(everything(), 
+               names_to="var",
+               values_to="value")
+ggplot(corn_long, aes(x=value)) +
+  geom_???() +
+  facet_wrap(~???, ncol=4, scales="free")
+
+# Examine data in a grand tour
+# THIS CODE WILL RUN IT LIVE IN THE RSTUDIO PLOT WINDOW
+set.seed(11111)
+animate_xy(corn_trf[,4:13], fps=10, half_range=1.0)
+
+# Now check whether structure that was seen is visible in the 
+# bivariate scatterplots. Making scatterplots of the pairs of variables
+# helps us check whether the patterns seen were indeed primarily
+# due to these variables 
+ggplot(corn_trf, aes(x=Ca, y=Mg)) + 
+  geom_point() + theme(aspect.ratio=1) # Outliers - but this shows quite an odd relationship
+ggplot(corn_trf, aes(x=Ca, y=Zn)) + 
+  geom_point() + theme(aspect.ratio=1) # Nonlinear? 
+ggplot(corn_trf, aes(x=Cu, y=K)) + 
+  geom_point() + theme(aspect.ratio=1) # Outliers - but this 
+
+# This code generates a tour path, and replays it with an animation
+# that you can stop and start. The function `play_tour_path` from
+# the spinifex package helps us do that.
+# You need to standardise the data, because the data projections are
+# generated with ggplot with the `play_tour_path` which assumes
+# standardised variables.
+corn_trf_stdd <- tourr::rescale(corn_trf[,4:13])
+set.seed(11111)
+tpath <- tourr::save_history(corn_trf_stdd, 
+                             tour_path = tourr::grand_tour(),
+                             max = 20)
+play_tour_path(tour_path = tpath, data = corn_trf_stdd)
+```
+
+## Exercise 4: Exam marks
+
+There is a dataset "mathmarks" in the SMPracticals package, which has marks out of 100 for 88 students. It is interesting to note that all students had marks for all tests, which makes one wonder whether marks for students who missed a test were dropped. Mechanics and vectors were closed book exams, and the others were open book.
+
+a. Make a side-by-side boxplot of the test scores. What do you learn  about  the test scores on the different subjects?
+b. Make a scatterplot matrix, even better if it is interactive. Describe the relationships between the tests. Is there something different about the open book vs closed book scores?
+c. Make an interactive parallel coordinate plot. Are there some students who have done consistently well on all tests? Consistently badly on all tests?  Badly on some but better on others?
+
+```{r math, eval = FALSE}
+data(mathmarks, package="SMPracticals")
+mathmarks %>% 
+  pivot_longer(everything(), names_to="var", values_to="marks") %>%
+  mutate(var = factor(var, levels=unique(var))) %>%
+  ggplot(aes(x=var, y=marks)) + 
+    geom_???()
+ggpairs(???)
+
+# This code makes the interactive parallel coordinate plot
+marks_pcp <- mathmarks %>%
+  plot_ly(type = 'parcoords', 
+            dimensions = list(
+            list(range = c(0,100),
+                 label = 'mechanics', values = ~mechanics),
+            list(range = c(0,100),
+                 label = 'vectors', values = ~vectors),
+            list(range = c(0,100),
+                 label = 'algebra', values = ~algebra),
+            list(range = c(1,100),
+                 label = 'analysis', values = ~analysis),
+            list(range = c(1,100),
+                 label = 'statistics', values = ~statistics)
+            )
+          )
+marks_pcp
+```
+
+## Exercise 5: Knowledge and resources
+
+The "vcdExtra" package contains a dataset "Dyke" about how 1729 survey  respondents' knowledge of cancer depended on whether they listened to the radio, read newspapers, did solid reading, or attended lectures.
+
+a. Make separate bar charts for each of the explanatory variables, with bars filled by the response variable `Knowledge`. What do you learn?
+b. Make a 100% bar chart of Newspaper, with Knowledge mapped to fill, and faceted by Reading. What do you learn about the relative proportions in the groups?
+c. Make a doubledecker plot of the data. What combination of factors leads to the highest level of knowledge about cancer?  What combination leads to the lowest?
+
+```{r knowledge, eval = FALSE}
+# Read the data
+data(Dyke, package="vcdExtra")
+Dyke_tsb <- as_tibble(Dyke)
+
+# Make separate bar charts
+ggplot(Dyke_tsb, aes(x=Knowledge, y=n)) + geom_col()
+
+# Make two variable bar charts, using fill colour
+ggplot(Dyke_tsb, aes(x=Reading, fill=Knowledge, y=n)) + 
+  geom_col() + scale_fill_brewer(palette="Dark2")
+
+# Make faceted bar charts to examine three variables
+ggplot(Dyke_tsb, aes(x=Reading, fill=Knowledge, y=n)) + 
+  geom_bar(stat="identity", position="fill") +
+  scale_fill_brewer(palette="Dark2") +
+  facet_wrap(~Radio, labeller=labeller(Radio=label_both))
+
+# The full doubledecker plot for examining all variables
+doubledecker(Knowledge~., Dyke)
+```
+
+## Exercise 6: Parkinsons
+
+This dataset is composed of a range of biomedical voice measurements from 31 people, 23 with Parkinson's disease (PD). Each column in the table is a particular voice measure, and each row corresponds one of 195 voice recording from these individuals ("name" column). The main aim of the data is to discriminate healthy people from those with PD, according to "status" column which is set to 0 for healthy and 1 for PD. 
+
+The data is available at [The UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Parkinsons) in ASCII CSV format. The rows of the CSV file contain an instance corresponding to one voice recording. There are around six recordings per patient, the name of the patient is identified in the first column. There are 24 variables in the file, including the persons name in column 1. 
+
+The data are originally analysed in:
+Max A. Little, Patrick E. McSharry, Eric J. Hunter, Lorraine O. Ramig (2008), 'Suitability of dysphonia measurements for telemonitoring of Parkinson's disease', IEEE Transactions on Biomedical Engineering (to appear).
+
+a. Compute the scagnostics for all pairs of variables, except for `name`. 
+b. Sort the scagnostics, show the top 10 on (i) Monotonic (ii) Clumpy (iii) Your choice, and plot the pair of variables with the highest values. 
+c. Make an interactive scatterplot matrix. Browse over it to choose other interesting pairs of variables and make the plots.
+d. The scagnostics help us to find interesting associations between pairs of variables. However, the problem here is to detect differences between Parkinsons patients and normal patients. How would you go about that? Think about some ideas long the line of scagnostics but look for differences between the two groups.
+
+```{r}
+# Read the data
+pk <- read_csv("https://eda.numbat.space/data/parkinsons.csv")
+
+# Compute the scagnostics on the relevant variables
+s <- scagnostics(as.data.frame(pk[,-c(1,18)])) # Drop name and status for calculations
+s <- as.data.frame(unclass(s))
+
+# Check the results for monotonic
+s %>% arrange(desc(Monotonic)) %>% 
+  select(Monotonic) %>% head()
+ggplot(data=pk, aes(x=`Shimmer:APQ3`, y=`Shimmer:DDA`)) + 
+  geom_point() # High on monotonic! Exactly the same!
+
+# Create an interactive splom
+s %>% 
+  mutate(id = rownames(s)) %>%
+  plot_ly() %>% 
+  add_trace(
+    type = 'splom',
+      dimensions = list(
+      list(label='Outlying', values=~Outlying),
+      list(label='Skewed', values=~Skewed),
+      list(label='Clumpy', values=~Clumpy),
+      list(label='Sparse', values=~Sparse),
+      list(label='Striated', values=~Striated),
+      list(label='Convex', values=~Convex),
+      list(label='Skinny', values=~Skinny),
+      list(label='Stringy', values=~Stringy),
+      list(label='Monotonic', values=~Monotonic)
+    ),
+    text=~id
+  )
+
+# Plot some of the pairs that have high scagnostics values
+ggplot(data=pk, aes(x=`MDVP:PPQ`, y=`Jitter:DDP`)) + 
+  geom_point() # High on monotonic and outlying
+
+# One way to examine difference between Parkinsons and healthy
+pk_med <- pk %>% select(-name) %>% 
+  group_by(status) %>%
+  summarise_all(list(median, sd)) %>%
+  pivot_longer(cols=`MDVP:Fo(Hz)_fn1`:`PPE_fn2`,
+               names_to="var", values_to="value") %>%
+  separate(var, c("var","stat"), "_") %>%
+  mutate(stat = fct_recode(stat, "m"="fn1", "s"="fn2")) %>%
+  pivot_wider(names_from=stat, values_from=value) %>%
+  group_by(var) %>%
+  summarise(d = (m[status==0]-m[status==1])/sqrt(s[status==0]^2+s[status==1]^2))
+pk_med %>% arrange(desc(d)) %>% head()
+
+ggplot(pk, aes(x=factor(status), y=`MDVP:Fo(Hz)`)) + 
+  geom_boxplot()
+```
+
+

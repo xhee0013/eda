@@ -352,7 +352,7 @@ b. Sort the scagnostics, show the top 10 on (i) Monotonic (ii) Clumpy (iii) Your
 c. Make an interactive scatterplot matrix. Browse over it to choose other interesting pairs of variables and make the plots.
 d. The scagnostics help us to find interesting associations between pairs of variables. However, the problem here is to detect differences between Parkinsons patients and normal patients. How would you go about that? Think about some ideas long the line of scagnostics but look for differences between the two groups.
 
-```{r}
+```{r eval = FALSE}
 # Read the data
 pk <- read_csv("https://eda.numbat.space/data/parkinsons.csv")
 

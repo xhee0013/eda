@@ -100,14 +100,15 @@ theme_set(ggthemes::theme_gdocs(base_size = 18) +
 
 <div class="grid" style="grid-template-columns: 300px auto;">
 <div class="item" width="100px">
+
 ```{r bt-table}
 data(gathmann.bt, package = "agridat")
 gathmann.bt %>% 
   filter(gathmann.bt=="Bt") %>% 
   select(Thrips = thysan, Spiders = aranei) %>% 
-  knitr::kable()
-  
+  knitr::kable(format = "html")
 ```
+
 </div>
 <div class="item" width="1000px">
 <ul>
@@ -272,7 +273,6 @@ Image source: https://www.infonet-biovision.org/PlantHealth/Pests/Thrips
 and https://cropwatch.unl.edu/2016/managing-spider-mites-corn-and-soybean
 ]
 
----
 
 ---
 
@@ -306,6 +306,7 @@ and https://cropwatch.unl.edu/2016/managing-spider-mites-corn-and-soybean
 * Is Ear 11 different?
 
 ```{r kernel-plot1, fig.height = 4, fig.width = 12}
+data(pearl.kernels, package = "agridat")
 df2 <- pearl.kernels %>% 
   pivot_longer(-c(ear, obs), 
                values_to = "count",
@@ -430,6 +431,11 @@ df2 %>%
 
 # .orange[Case study] .circle.bg-orange[3] Multi-environment soybean trial 
 
+```{r soy-data, include = FALSE}
+data(australia.soybean, package = "agridat")
+skimr::skim(australia.soybean)
+```
+
 * 58 soy varieties are grown in four locations in Queensland in 1970 then 1971.
 * Soy breeders are interested in finding the "best" variety.
 * So which variety is the best for yield?
@@ -449,8 +455,6 @@ australia.soybean %>%
 .panel[.panel-name[data]
 .h200.scroll-sign[
 ```{r soy-data, echo = TRUE, render=knitr::normal_print}
-data(australia.soybean, package = "agridat")
-skimr::skim(australia.soybean)
 ```
 ]]
 .panel[.panel-name[R]

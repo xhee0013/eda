@@ -37,6 +37,7 @@ schedule:
     assessment: "Assignment 2 **due Fri 18 Sep 11:55 PM**"
   - week: 8
     lecturer: Emi
+    readings: "Cook & Weisberg (1994) An Introduction to Regression Graphics Ch 6"
     topic: Sculpting data using models, checking assumptions, co-dependency and performing diagnostics
   - week: 9
     lecturer: Di

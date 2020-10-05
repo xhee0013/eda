@@ -108,6 +108,16 @@ Week 8 - Session 1
 
 ---
 
+class: nostripheader middle
+
+# Housekeeping
+
+* Week 10 Monday October 19th, **tutorial will be 4-5.30PM** and **lecture will be from 5.30-7.30PM**.
+* [Dr. Mine Çetinkaya-Rundel](https://www2.stat.duke.edu/~mc301/) will be guest lecturing from 6.30-7.30PM.
+* FLUX quiz for week 8 is available now and due Friday 5PM.
+
+---
+
 class: transition middle
 
 # Parametric regression
@@ -733,7 +743,7 @@ Would you consider the yellow points below as outliers?
 * The matrix `\(\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\)` is referred to as the .monash-blue[**hat matrix**].
 * The `\(i\)`-th diagonal element of `\(\mathbf{H}\)`, `\(h_{ii}\)`, is called the .monash-blue[**leverage**] of the `\(i\)`-th observation.
 * Leverages are always between zero and one,
-`$$0 \geq h_{ii} \geq 1.$$`
+`$$0 \leq h_{ii} \leq 1.$$`
 * Notice that leverages are not dependent on the response!
 * Points with high leverage can exert a lot of influence on the parameter estimates
 

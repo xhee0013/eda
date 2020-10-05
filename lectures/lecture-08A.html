@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Emi Tanaka" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="assets/panelset-modified.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/panelset.css" type="text/css" />
+    <link rel="stylesheet" href="assets/emi.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/steve-johnson--auJqHRvM_k-unsplash.jpg)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Sculpting data using models, checking assumptions, co-dependency and performing diagnostics&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Emi Tanaka*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 8 - Session 1
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;style type="text/css"&gt;
+.gray80 {
+  color: #505050!important;
+  font-weight: 300;
+}
+.bg-gray80 {
+  background-color: #DCDCDC!important;
+}
+&lt;/style&gt;
+
+---
+
+class: transition middle
+
+# Parametric regression
+
+---
+
+
+
+# Parametric regression
+
+.grid[
+.item.border-right[
+* .monash-blue[**Parametric**] means that the researcher or analyst assumes in advance that the data fits some type of distribution (e.g. the normal distribution). E.g. one may assume that
+`$$\color{blue}{y_i} = \color{red}{\beta_0} + \color{red}{\beta_1} \color{blue}{x_i} + \color{red}{\beta_2} \color{blue}{x_i^2} + \epsilon_i,$$`
+where `\(\epsilon_i \sim N(0, \color{red}{\sigma^2})\)`.
+
+  * `\(\color{red}{red} = \text{estimated}\)`
+  * `\(\color{blue}{blue} = \text{observed}\)`
+
+
+
+]
+.item[
+
+## Example
+
+&lt;img src="images/week8A/quad-good-fit-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+
+]
+]
+
+---
+
+count: false
+
+# Parametric regression
+
+.grid[
+.item.border-right[
+* .monash-blue[**Parametric**] means that the researcher or analyst assumes in advance that the data fits some type of distribution (e.g. the normal distribution). E.g. one may assume that
+`$$\color{blue}{y_i} = \color{red}{\beta_0} + \color{red}{\beta_1} \color{blue}{x_i} + \color{red}{\beta_2} \color{blue}{x_i^2} + \epsilon_i,$$`
+where `\(\epsilon_i \sim N(0, \color{red}{\sigma^2})\)`.
+
+  * `\(\color{red}{red} = \text{estimated}\)`
+  * `\(\color{blue}{blue} = \text{observed}\)`
+* Because some type of distribution is assumed in advance, parametric fitting can lead to fitting a smooth curve that misrepresents the data.
+
+]
+.item[
+
+## Examples
+
+&lt;img src="images/week8A/quad-good-fit-1.png" width="432" style="display: block; margin: auto;" /&gt;
+Still assuming a quadratic fit:
+
+&lt;img src="images/week8A/quad-bad-fit-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+]
+]
+
+
+
+---
+
+# Simulating data from parametric models
+
+.grid[
+.item.border-right[
+* In ETC5512 Wild-Caught Data, we talked about [generating data from a simple linear model](https://wcd.numbat.space/slides/week08-pisa#38).
+* If a model is say:
+`$$y = x^2 + e, \qquad e \sim N(0, 2^2)$$`
+we can simulate say `\(200\)` observations from this model for `\(x\in(-10,10)\)` by code as shown on the right. 
+
+&lt;img src="images/week8A/sim-plot-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+
+```r
+set.seed(1)
+df &lt;- tibble(id = 1:200) %&gt;% 
+        mutate(x = runif(n(), -10, 10),
+               y = x^2 + rnorm(n(), 0, 2))
+df
+```
+
+```
+## # A tibble: 200 x 3
+##       id     x      y
+##    &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;
+##  1     1 -4.69 20.8  
+##  2     2 -2.56  6.63 
+##  3     3  1.46  0.301
+##  4     4  8.16 67.0  
+##  5     5 -5.97 34.3  
+##  6     6  7.97 67.0  
+##  7     7  8.89 80.5  
+##  8     8  3.22 12.2  
+##  9     9  2.58  7.44 
+## 10    10 -8.76 80.2  
+## # … with 190 more rows
+```
+]
+]
+
+---
+
+class: transition middle
+
+# Logistic regression
+
+---
+
+# Logistic regression
+
+* Not all parametric models assume Normally distributed errors.
+* Logistic regression models the relationship between a set of explanatory variables `\((x_{i1}, ..., x_{ik})\)` and a set of .monash-blue[**binary outcomes**] `\(Y_i\)` for `\(i = 1, ..., r\)`.
+* We assume that `\(Y_i \sim B(n_i, p_i)\)` and the model is given by 
+
+`$$\text{logit}(p_i) = \text{ln}\left(\dfrac{p_i}{1 - p_i}\right) = \beta_0 + \beta_1x_{i1} + ... + \beta_k x_{ik}.$$`
+* The function `\(f(p) = \text{ln}\left(\dfrac{p}{1 - p}\right)\)` is called the .monash-blue[**logit**] function, continuous with range `\((-\infty, \infty)\)`, and if `\(p\)` is the probablity of an event, `\(f(p)\)` is the log of the odds.
+
+---
+
+# .orange[Case study] .circle.bg-orange[1] Menarche
+
+In 1965, the average age of 25 homogeneous groups of girls was
+recorded along with the number of girls who have reached
+menarche out of the total in each group.
+
+.panelset[
+.panel[.panel-name[📊]
+
+&lt;img src="images/week8A/menarche-plot-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+data(menarche, package = "MASS")
+skimr::skim(menarche)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values  
+## Name                       menarche
+## Number of rows             25      
+## Number of columns          3       
+## _______________________            
+## Column type frequency:             
+##   numeric                  3       
+## ________________________           
+## Group variables            None    
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate  mean     sd    p0   p25   p50   p75   p100 hist 
+## 1 Age                   0             1  13.1   2.03  9.21  11.6  13.1  14.6   17.6 ▅▇▇▇▁
+## 2 Total                 0             1 157.  195.   88     98   105   117   1049   ▇▁▁▁▁
+## 3 Menarche              0             1  92.3 204.    0     10    51    92   1049   ▇▁▁▁▁
+```
+
+]]
+.panel[.panel-name[R]
+
+```r
+ggplot(menarche, aes(Age, Menarche/Total)) + 
+  geom_point() +
+  geom_smooth(method = "glm",
+              formula = y ~ x,
+              se = FALSE,
+              method.args = list(family = "binomial"))
+```
+
+&lt;img src="images/week8A/menarche-plot-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+
+]
+
+.footnote[
+Milicer, H. and Szczotka, F. (1966) Age at Menarche in Warsaw girls in 1965. Human Biology 38, 199–203.
+]
+
+---
+
+# Simulating data from logistic regression 
+
+.grid[
+.item.border-right[
+
+
+
+```r
+fit1 &lt;- glm(Menarche/Total ~ Age, 
+            family = "binomial", 
+            data = menarche)
+(beta &lt;- coef(fit1))
+```
+
+```
+## (Intercept)         Age 
+##  -20.911682    1.608169
+```
+
+* The fitted regression model is given as:
+`$$\text{logit}(\hat{p}_i) = \hat{\beta}_0  + \hat{\beta}_1 x_{i1}.$$`
+* Taking the exponential of both sides and rearranging we get
+`$$\hat{p}_i = \dfrac{1}{1 + e^{-(\hat{\beta}_0  + \hat{\beta}_1 x_{i1})}}.$$`
+]
+.item[
+
+```r
+menarche %&gt;% 
+  rowwise() %&gt;% # simulating from first principles
+  mutate(
+    phat = 1/(1 + exp(-(beta[1] + beta[2] * Age))),
+*   simMenarche = rbinom(1, Total, phat))
+```
+
+```
+## # A tibble: 25 x 5
+## # Rowwise: 
+##      Age Total Menarche    phat simMenarche
+##    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;       &lt;int&gt;
+##  1  9.21   376        0 0.00224           2
+##  2 10.2    200        0 0.0111            5
+##  3 10.6     93        0 0.0199            0
+##  4 10.8    120        2 0.0294            5
+##  5 11.1     90        2 0.0434            8
+##  6 11.3     88        5 0.0635           10
+##  7 11.6    105       10 0.0920            8
+##  8 11.8    111       17 0.132            14
+##  9 12.1    100       16 0.185            25
+## 10 12.3     93       29 0.253            18
+## # … with 15 more rows
+```
+
+]
+
+]
+
+--
+
+&lt;div class="bg-white" style="position:absolute;bottom:10px;right:10px;width:40%;padding:20px;border:2px solid black;"&gt;
+&lt;i class="fas fa-sticky-note monash-blue"&gt;&lt;/i&gt; If simulating data from a model object, &lt;code&gt;simulate&lt;/code&gt; function usually can do this for you!
+&lt;/div&gt;
+
+
+
+---
+
+# Diagnostics for logistic regression models
+
+.grid[
+.item.border-right[
+
+* One diagnostic is to compare the observed and expected proportions under the logistic regression fit.
+
+
+```r
+df1 &lt;- menarche %&gt;% 
+  mutate(
+    pexp = 1/(1 + exp(-(beta[1] + beta[2] * Age))),
+    pobs = Menarche / Total)
+```
+&lt;img src="images/week8A/plot-logistic-1.png" width="288" style="display: block; margin: auto;" /&gt;
+
+]
+.item50[
+
+{{content}}
+
+]
+
+]
+
+--
+
+* Goodness-of-fit type test is used commonly to assess the fit as well.
+
+* E.g. Hosmer–Lemeshow test, where test statistic is given as 
+
+&lt;span style="font-size:14pt!important;"&gt;
+`$$H = \sum_{i = 1}^r \left(\dfrac{(O_{1i} - E_{1g})^2}{E_{1i}} + \dfrac{(O_{0i} - E_{0g})^2}{E_{0i}}\right)$$`
+where `\(O_{1i}\)` `\((E_{1i})\)` and `\(O_{0i}\)` `\((E_{0i})\)` are observed (expected) frequencies for successful and non-successful events for group `\(i\)`, respectively.
+&lt;/span&gt;
+
+
+```r
+vcdExtra::HLtest(fit1)
+```
+
+```
+## Hosmer and Lemeshow Goodness-of-Fit Test 
+## 
+## Call:
+## glm(formula = Menarche/Total ~ Age, family = "binomial", data = menarche)
+##  ChiSquare df   P_value
+##  0.1041887  8 0.9999997
+```
+
+---
+
+class: transition middle
+
+# Diagnostics for linear models
+
+---
+
+# Assumptions for linear models
+
+.grid[
+.item.border-right[
+For `\(i \in \{1, ..., n\}\)`,
+
+`$$Y_i = \beta_0 + \beta_1x_{i1} + ... + \beta_{k}x_{ik} + \epsilon_i,$$`
+where `\(\epsilon_i \sim NID(0, \sigma^2)\)` or in matrix format,
+
+`$$\boldsymbol{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim N(\boldsymbol{0}, \sigma^2 \mathbf{I}_n)$$`
+
+&lt;div style="font-size:12pt;padding-left:20px;"&gt;
+where 
+
+&lt;ul&gt;
+&lt;li&gt; `\(\boldsymbol{Y} = (Y_1, ..., Y_n)^\top\)`,&lt;/li&gt;
+&lt;li&gt; `\(\boldsymbol{\beta} = (\beta_0, ..., \beta_k)^\top\)`, &lt;/li&gt;
+&lt;li&gt; `\(\boldsymbol{\epsilon} = (\epsilon_1, ..., \epsilon_n)^\top\)`, and &lt;/li&gt;
+&lt;li&gt; `\(\mathbf{X} = \begin{bmatrix}\boldsymbol{1}_n &amp; \boldsymbol{x}_1 &amp; ... &amp; \boldsymbol{x}_k \end{bmatrix}\)`, where &lt;/li&gt;
+&lt;li&gt; `\(\boldsymbol{x}_j =(x_{1j}, ..., x_{nj})^\top\)` for `\(j \in \{1, ..., k\}\)`&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+
+]
+.item[
+
+]
+
+]
+
+---
+
+count: false
+
+# Assumptions for linear models
+
+.grid[
+.item.border-right[
+For `\(i \in \{1, ..., n\}\)`,
+
+`$$Y_i = \beta_0 + \beta_1x_{i1} + ... + \beta_{k}x_{ik} + \epsilon_i,$$`
+where `\(\color{red}{\epsilon_i \sim NID(0, \sigma^2)}\)` or in matrix format,
+
+`$$\boldsymbol{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}, \quad \color{red}{\boldsymbol{\epsilon} \sim N(\boldsymbol{0}, \sigma^2 \mathbf{I}_n)}$$`
+
+&lt;div style="font-size:12pt;padding-left:20px;"&gt;
+where 
+
+&lt;ul&gt;
+&lt;li&gt; `\(\boldsymbol{Y} = (Y_1, ..., Y_n)^\top\)`,&lt;/li&gt;
+&lt;li&gt; `\(\boldsymbol{\beta} = (\beta_0, ..., \beta_k)^\top\)`, &lt;/li&gt;
+&lt;li&gt; `\(\boldsymbol{\epsilon} = (\epsilon_1, ..., \epsilon_n)^\top\)`, and &lt;/li&gt;
+&lt;li&gt; `\(\mathbf{X} = \begin{bmatrix}\boldsymbol{1}_n &amp; \boldsymbol{x}_1 &amp; ... &amp; \boldsymbol{x}_k \end{bmatrix}\)`, where &lt;/li&gt;
+&lt;li&gt; `\(\boldsymbol{x}_j =(x_{1j}, ..., x_{nj})^\top\)` for `\(j \in \{1, ..., k\}\)`&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+
+]
+.item[
+This means that we assume
+
+1. `\(E(\epsilon_i) = 0\)` for `\(i \in \{1, ..., n\}.\)`
+2. `\(\epsilon_1, ..., \epsilon_n\)` are independent.
+3. `\(Var(\epsilon_i) = \sigma^2\)` for `\(i \in \{1, ..., n\}\)` (i.e. homogeneity).
+4. `\(\epsilon_1, ..., \epsilon_n\)` are normally distributed.
+
+{{content}}
+
+]
+
+]
+
+--
+
+&lt;br&gt;&lt;br&gt;
+&lt;i&gt;So how do we check it?&lt;/i&gt;
+
+
+
+
+---
+
+# Model diagnostics for linear models
+
+&lt;div class="grid" style="grid-template: 1fr 1fr / 1fr 1fr"&gt;
+
+.item[
+Plot `\(Y_i\)` vs `\(x_i\)` to see if there is `\(\approx\)` a linear relationship between `\(Y\)` and `\(x\)`.
+
+&lt;img src="images/week8A/unnamed-chunk-5-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+]
+.item.bg-gray80[
+
+A boxplot of the residuals `\(R_i\)` to check for symmetry.
+&lt;img src="images/week8A/unnamed-chunk-6-1.svg" width="180" style="display: block; margin: auto;" /&gt;
+
+]
+.item.bg-gray80[
+To check the homoscedasticity assumption, plot `\(R_i\)` vs `\(x_i\)`. There should be no obvious patterns.
+
+&lt;img src="images/week8A/unnamed-chunk-7-1.svg" width="158.4" style="display: block; margin: auto;" /&gt;
+]
+.item[
+A normal Q-Q plot, i.e. a plot of the ordered residuals vs `\(\Phi^{-1}(\frac{i}{n+1})\)`.
+
+&lt;img src="images/week8A/unnamed-chunk-8-1.svg" width="158.4" style="display: block; margin: auto;" /&gt;
+
+]
+
+&lt;/div&gt;
+
+
+
+
+---
+
+# Assessing (A1) `\(E(\epsilon_i) = 0\)` for `\(i=1,\ldots,n\)`
+
+* It is a property of the least squares method that $$\sum_{i=1}^n R_i = 0,\quad
+\text{so}\quad \bar R_i  = 0$$ for `\(R_i = Y_i - \hat{Y}_i\)`, hence (A1)  will always appear valid "overall". 
+* Trend in residual versus fitted values or covariate can indicate "local"
+failure of (A1). 
+* What do you conclude from the following plots?
+
+&lt;img src="images/week8A/sim-plots-1.svg" width="864" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Assessing (A2)-(A3) 
+
+.grid[.item.bg-gray80[
+
+### (A2) `\(\epsilon_1, \ldots ,\epsilon_n\)` are independent
+
+* If (A2) is correct, then residuals should appear randomly scattered
+about zero if plotted against fitted values or covariate.
+* Long sequences of positive residuals followed by sequences of negative residuals in `\(R_i\)` vs `\(x_i\)` plot suggests that the error terms are not independent.
+]
+.item[
+
+### (A3) `\(Var(\epsilon_i) = \sigma^2\)` for `\(i=1,\ldots,n\)`
+
+* If (A3) holds then the spread of the residuals should be roughly the same across the fitted values or covariate. 
+
+&lt;Br&gt;
+
+&lt;img src="images/week8A/sim-plots-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+
+]
+]
+
+---
+
+# Assessing (A4) `\(\epsilon_1, \ldots ,\epsilon_n\)` are normally distributed
+
+.grid[.item[
+### Q-Q Plots
+
+* The function `qqnorm(x)` produces a Q-Q plot of the ordered vector `x` against the quantiles of the normal distribution.
+* The `\(n\)` chosen normal quantiles `\(\Phi^{-1}(\frac{i}{n+1})\)` are easy to calculate but more sophisticated ways exist:
+   * `\(\frac{i}{n+1} \mapsto \frac{i-3/8}{n+1/4}\)`, default in `qqnorm`. 
+   * `\(\frac{i}{n+1} \mapsto \frac{i-1/3}{n+1/3}\)`, recommended by Hyndman and Fan (1996).
+&lt;!-- * Symmetry, heavy or light tails, location and spread can be "easily" seen in Q-Q plots. How? --&gt;
+
+]
+.item.bg-gray80[
+
+### In R
+
+
+```r
+fit &lt;- lm(y ~ x)
+```
+
+
+By "hand"
+
+```r
+plot(qnorm((1:n) / (n + 1)), sort(resid(fit)))
+```
+
+By `base`
+
+
+```r
+qqnorm(resid(fit))
+qqline(resid(fit))
+```
+
+By `ggplot2`
+
+
+```r
+data.frame(residual = resid(fit)) %&gt;% 
+  ggplot(aes(sample = residual)) + 
+  stat_qq() + stat_qq_line(color="blue")
+```
+
+
+]
+]
+
+.footnote[
+Reference: Hyndman and Fan (1996). *Sample quantiles in statistical packages*, American Statistician, 50, 361--365.
+]
+
+---
+
+# Examining the simulated data further
+
+&lt;div class="grid" style="grid-template: 1fr 1fr / 1fr 1fr"&gt;
+
+.item[
+&lt;img src="images/week8A/unnamed-chunk-13-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+]
+.item.bg-gray80[
+
+&lt;img src="images/week8A/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+
+
+]
+.item.bg-gray80[
+
+{{content}}
+
+]
+.item[
+&lt;img src="images/week8A/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;" /&gt;
+
+]
+
+&lt;/div&gt;
+
+--
+
+Simulation scheme
+
+```r
+n &lt;- 100
+x &lt;- seq(0, 1, length.out = n)
+y1 &lt;- x + rnorm(n) / 3                  #  Linear
+y2 &lt;- 3 * (x - 0.5) ^ 2 + 
+  c(rnorm(n / 2)/3, rnorm(n / 2)/6)     #  Quadratic
+y3 &lt;- -0.25 * sin(20 * x - 0.2) + 
+  x + rnorm(n) / 3                      #  Non-linear
+
+M1 &lt;- lm(y1 ~ x); M2 &lt;- lm(y2 ~ x); M3 &lt;- lm(y3 ~ x)
+```
+
+---
+
+# Revisiting outliers
+
+* We defined [outliers in week 4](https://eda.numbat.space/lectures/lecture-04a#9) as "observations that are significantly different from the majority" when studying univariate variables.
+* There is actually no hard and fast definition. &lt;br&gt;&lt;br&gt;
+
+.info-box[
+We can also define an outlier as a data point that emanates from a different model than do the rest of the data.
+]
+
+&lt;br&gt;
+
+* Notice that this makes this definition *dependent on the model* in question.
+
+---
+
+class: transition middle
+
+# Pop Quiz
+
+Would you consider the yellow points below as outliers?
+
+&lt;img src="images/week8A/unnamed-chunk-17-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Outlying values 
+
+
+.grid[
+.item.border-right[
+* As with simple linear regression the fitted model should not be used to predict `\(Y\)` values for `\(\boldsymbol{x}\)` combinations that are well away from the set of observed `\(\boldsymbol{x}_i\)` values. 
+* This is not always easy to detect!
+
+&lt;img src="images/week8A/unnamed-chunk-18-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+]
+.item[
+
+* Here, a point labelled P has `\(x_1\)` and `\(x_2\)` coordinates well within their respective ranges but P is not close to the observed sample values in 2-dimensional space. 
+
+* In higher dimensions this type of behaviour is even harder to detect but we need to be on guard against extrapolating to extreme values. 
+
+
+]
+]
+
+---
+
+# Leverage 
+
+* The matrix `\(\mathbf{H} = \mathbf{X}(\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\)` is referred to as the .monash-blue[**hat matrix**].
+* The `\(i\)`-th diagonal element of `\(\mathbf{H}\)`, `\(h_{ii}\)`, is called the .monash-blue[**leverage**] of the `\(i\)`-th observation.
+* Leverages are always between zero and one,
+`$$0 \geq h_{ii} \geq 1.$$`
+* Notice that leverages are not dependent on the response!
+* Points with high leverage can exert a lot of influence on the parameter estimates
+
+---
+
+# Studentized residuals
+
+In order to obtain residuals with equal variance, many texts recommend using the .monash-blue[**studentised residuals**]
+`$$R_i^* = \dfrac{R_i} {\hat{\sigma} \sqrt{1 - h_{ii}}}$$`
+for diagnostic checks.
+
+---
+
+# Cook's distance
+
+* .brand-blue[Cook's distance], `\(D\)`, is another measure of influence: 
+`\begin{eqnarray*}
+D_i &amp;=&amp; \dfrac{(\hat{\boldsymbol{\beta}}- \hat{\boldsymbol{\beta}}_{[-i]})^\top Var(\hat{\boldsymbol{\beta}})^{-1}(\hat{\boldsymbol{\beta}}- \hat{\boldsymbol{\beta}}_{[-i]})}{p}\\
+&amp;=&amp;\frac{R_i^2 h_{ii}}{(1-h_{ii})^2p\hat\sigma^2},
+\end{eqnarray*}`
+where `\(p\)` is the number of elements in `\(\boldsymbol{\beta}\)`, `\(\hat{\boldsymbol{\beta}}_{[-i]}\)` and `\(\hat Y_{j[-i]}\)` are least squares estimates and the fitted value obtained by fitting the model ignoring the `\(i\)`-th data point `\((\boldsymbol{x}_i,Y_i)\)`, respectively.
+
+---
+
+
+# .orange[Case study] .circle.bg-orange[2] Social media marketing
+
+Data collected from advertising experiment to study the impact of three advertising medias (youtube, facebook and newspaper) on sales.
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+
+
+
+&lt;img src="images/week8A/marketing-plot-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+data(marketing, package="datarium")
+skimr::skim(marketing)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values   
+## Name                       marketing
+## Number of rows             200      
+## Number of columns          4        
+## _______________________             
+## Column type frequency:              
+##   numeric                  4        
+## ________________________            
+## Group variables            None     
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate  mean     sd    p0   p25   p50   p75  p100 hist 
+## 1 youtube               0             1 176.  103.    0.84  89.2 180.  263.  356.  ▇▆▆▇▆
+## 2 facebook              0             1  27.9  17.8   0     12.0  27.5  43.8  59.5 ▇▆▆▆▆
+## 3 newspaper             0             1  36.7  26.1   0.36  15.3  30.9  54.1 137.  ▇▆▃▁▁
+## 4 sales                 0             1  16.8   6.26  1.92  12.4  15.5  20.9  32.4 ▁▇▇▅▂
+```
+
+]]
+.panel[.panel-name[R]
+
+```r
+GGally::ggpairs(marketing, progress=F)
+```
+
+]
+
+]
+
+
+
+
+
+---
+
+# Extracting values from models in R
+
+* The leverage value, studentised residual and Cook's distance can be easily extracted from a model object using `broom::augment`.
+  * `.hat` is the leverage value
+  * `.std.resid` is the studentised residual
+  * `.cooksd` is the Cook's distance
+
+
+```r
+fit &lt;- lm(sales ~ youtube * facebook, data = marketing)
+broom::augment(fit)
+```
+
+```
+## # A tibble: 200 x 9
+##    sales youtube facebook .fitted  .resid .std.resid    .hat .sigma   .cooksd
+##    &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
+##  1 26.5    276.     45.4    26.0   0.496      0.442  0.0174    1.13 0.000864 
+##  2 12.5     53.4    47.2    12.8  -0.281     -0.252  0.0264    1.13 0.000431 
+##  3 11.2     20.6    55.1    11.1   0.0465     0.0423 0.0543    1.14 0.0000256
+##  4 22.2    182.     49.6    21.2   1.04       0.923  0.0124    1.13 0.00268  
+##  5 15.5    217.     13.0    15.2   0.316      0.280  0.0104    1.13 0.000207 
+##  6  8.64    10.4    58.7    10.5  -1.91      -1.75   0.0709    1.13 0.0583   
+##  7 14.2     69      39.4    13.0   1.15       1.02   0.0149    1.13 0.00395  
+##  8 15.8    144.     23.5    14.6   1.23       1.09   0.00577   1.13 0.00173  
+##  9  5.76    10.3     2.52    8.39 -2.63      -2.39   0.0553    1.12 0.0838   
+## 10 12.7    240.      3.12   13.4  -0.727     -0.649  0.0219    1.13 0.00236  
+## # … with 190 more rows
+```
+
+---
+
+# Resources and Acknowledgement
+
+- Some of these slides were inspired by STAT3012 Applied Linear Models at The University of Sydney by Prof Samuel Muller
+- Cook &amp; Weisberg (1994) 
+"An Introduction to Regression Graphics"
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+---
+
+
+background-image: url(images/steve-johnson--auJqHRvM_k-unsplash.jpg)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Emi Tanaka
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

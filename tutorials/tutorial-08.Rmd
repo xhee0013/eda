@@ -1,0 +1,154 @@
+---
+title: "ETC5521 Tutorial 8"
+subtitle: "Making comparisons between groups and strata"
+author: "Dr Emi Tanaka"
+date: "Week 8"
+output:
+  bookdown::html_document2:
+    toc: true
+    number_sections: false
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  message = FALSE, 
+  warning = FALSE, 
+  cache = TRUE,
+  cache.path = "tutorial08-cache/",
+  fig.path = "images/tutorial08/",
+  fig.align = "center"
+)
+```
+
+```{r pkgs}
+library(tidyverse)
+library(colorspace)
+library(here)
+library(knitr)
+library(kableExtra)
+```
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+These are exercises so that you can make some numerical and graphical comparisons for various datasets and make you think about the comparisons you are making.
+
+
+## `r emo::ji("wrench")` Preparation 
+
+Install the following R-packages if you do not have it already:
+
+```{r install-pkgs, echo = TRUE, eval = FALSE}
+install.packages(c("MASS", "gclus", "meta"))
+```
+
+Download:
+
+* The daily maximum temperature from 1970 to 2020 observed at the weather station located in Melbourne Airport can be downloaded <a href="https://raw.githubusercontent.com/numbats/eda/master/data/melb_temp.csv" download>here</a>.
+
+
+## Exercise 0: Introduction
+
+In the chat window, say hello, and if you feel comfortable tell us something fun about yourself, or what you have done this last week.
+
+Some of the following are questions based on those in Unwin (2015) Graphical Data Analysis with R Chapter 10. 
+
+## Exercise 1: Melbourne daily maximum temperature
+
+The csv file `melb_temp.csv` contains data on the daily maximum temperature from 1970 to 2020 collected from the weather station at Melbourne Airport. Use this to answer the following questions. In Australia:
+
+- Summer is from the beginning of December to the end of February,
+- Autumn is from the beginning of March to the end of May,
+- Winter is from the beginning of June to the end of August, and
+- Spring is from the beginning of September to the end of November. 
+
+
+
+(a) Are there any winter where the daily maximum temperature is different to winter in other years? How is it different? What sort of graphics help to show you this?
+(b) How are the maximum temperature different across the seasons? Produce graphics make the comparison easier. 
+
+
+## Exercise 2: Hate Crime
+
+```{r crime}
+df <- tribble(~year, ~offense, ~victim,
+              2000, "Anti-Black", 3535,
+              2000, "Sexual Orientation", 1558,
+              2000, "Anti-Islamic", 36,
+              2001, "Anti-Black", 3700,
+              2001, "Sexual Orientation", 1664,
+              2001, "Anti-Islamic", 554,
+              2002, "Anti-Black", 3076,
+              2002, "Sexual Orientation", 1513,
+              2002, "Anti-Islamic", 174) %>% 
+  mutate(offense = fct_reorder(offense, -victim))
+```
+
+
+A certain person made the following statement and used the graph in Figure \@ref(fig:crime-plot) to illustrate his point. 
+
+<blockquote>
+The post-9/11 upsurge in hate crimes against Muslims was real and unforgivable, but the horrible truth is that it didn’t loom that large compared with what Blacks face year in and year out.
+</blockquote>
+
+```{r crime-plot, fig.cap = "Victims of hate crime in USA in years 2000-2002."}
+ggplot(df, aes(offense, victim)) + 
+  geom_col(aes(fill = offense)) +
+  facet_grid(. ~ year) + 
+  guides(x = guide_axis(n.dodge = 2),
+         fill = FALSE) + 
+  labs(x = "Offense", y = "Number of victims") +
+  scale_fill_discrete_qualitative()
+```
+
+**Discuss whether Figure  \@ref(fig:crime-plot) supports his statement or not.** Is his comparison of the number of crimes against Muslim and Blacks fair? What graph would you suggest to make to support/disprove his statement? The data and additional information is provided below.
+
+Figure \@ref(fig:crime-plot) uses the data from the USA hate crime statistics found [here](https://ucr.fbi.gov/hate-crime). The number of victims by three particular hate crime is shown in Table \@ref(tab:crime-table).
+
+<!-- https://twitter.com/paulkrugman/status/1305237645459628044 -->
+
+
+
+```{r crime-table}
+df %>% 
+  kable(caption = "The number of victims by hate crime in the USA. Data sourced from https://ucr.fbi.gov/hate-crime.",
+        col.names = c("Year", "Offense", "Victims")) %>% 
+  kable_paper(bootstrap_options = "striped", full_width = F)
+```
+
+
+The [2000 USA Census reports](https://www.census.gov/prod/2001pubs/c2kbr01-5.pdf) that there were a total of 36.4 million people who reported themselves as Black or African American. [Weeks (2003)](https://www.persee.fr/doc/espos_0755-7809_2003_num_21_1_2066) estimated there are 3.4 million Muslims in the USA. The LGBT population is harder to estimate but reports indicate 2-10% of the population so likely below 28.2 million people in the USA.
+
+
+
+# Exercise 3: Petrol consumption
+
+The `mtcars` dataset and `Cars93` dataset from the `MASS` R-package contains information on petrol consumption from different car models. Use these two datasets to answer the following questions.
+
+[Unwin Ch 10 Q2] In most European countries, consumption is measured with litres needed to drive 100km. 
+
+(a) Draw comparative plots of petrol consumption, measured in gallons needed to drive 100 miles, for the two datasets. What features, if any, are notable from the plots?
+(b) Carry out a $t$-test comparing the means of petrol consumption for the two datasets. 
+(c) A major influence on petrol consumption is the weight of a car. Draw scatter plots of `MPG.city` and `1/MPG.city` against `Weight` for the `Cars93` dataset. What conclusion do you draw and which scatter plot do you prefer?
+
+
+# Exercise 4: Swiss bank notes
+
+[Unwin Ch 10 Q6]  The dataset `bank` in `gclus` has information about the lengths of Swiss banknotes. 
+
+
+(a) Consider the variables `Right` and `Left`, measurements of the right and left edge widths of the notes, respectively. What do the distribution of the differences between these measurements for each note look like for the two groups? Are the differences significantly different from zero?
+(b) The measurements `Bottom` and `Top` for the margin widths might also be expected to be close to equal for each note. Are they and does the difference relate to the edge width differences?
+(c) Instead of using absolute differences, proportionate differences could be used. Draw a plot to compare the scales of the proportionate differences for the edges and margins. What denominator would you suggest? Do you think the data are reported precisely enough for these analyses? Can you think of another metric that differentiates between genuine and counterfeit banknotes?
+
+
+# Exercise 5: Olkin95
+
+[Unwin Ch 10 Q7]  There are data on 70 different studies of thrombolytic therapy after acute myocardial infarction in the `Olkin95` dataset in the `meta` package.
+
+(a) Plot the event rates for the experimental groups against the corresponding rates for the control groups. What does your plot show?
+(b) The sizes of the studies should also be taken into account. Draw a scatterplot of the rate of differences in each study against the size of the study, using the total number of participants for the size. What conclusions would you draw from your plot? How much does it matter, if at all, that the experimental and control groups are not always the same size?

@@ -1,0 +1,575 @@
+---
+title: "ETC5521: Exploratory Data Analysis"
+subtitle: "Sculpting data using models, checking assumptions, co-dependency and performing diagnostics"
+author: "Emi Tanaka"
+email: "ETC5521.Clayton-x@monash.edu"
+date: "Week 8 - Session 2"
+color_theme: "yellow"
+bgimg: "images/steve-johnson--auJqHRvM_k-unsplash.jpg"
+output:
+  xaringan::moon_reader:
+    css:
+      - ninjutsu 
+      - "assets/animate.css"
+      - "assets/fira-code.css"
+      - "assets/boxes.css"
+      - "assets/styles.css"
+      - "assets/custom.css"
+      - "assets/monash-logo.css"
+      - "assets/monash-brand.css"
+      - "assets/monash-fonts.css"
+      - "assets/table.css"
+      - "assets/panelset.css"
+      - "assets/emi.css"
+    self_contained: false 
+    seal: false 
+    chakra: 'libs/remark-latest.min.js'
+    lib_dir: libs
+    includes:
+      in_header: "assets/custom.html"
+    mathjax: "assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    nature:
+      highlightStyle: github
+      highlightLanguage: r 
+      highlightLines: true
+      highlightSpans: false 
+      countIncrementalSlides: false
+      slideNumberFormat: '%current%/%total%'
+      navigation:
+        scroll: false 
+        touch: true
+        click: false
+      ratio: '16:9'
+---
+
+```{r, include = FALSE}
+current_file <- knitr::current_input()
+```
+```{r, include = FALSE, eval = F}
+input <- fs::path_ext_set(current_file, "html")
+pagedown::chrome_print(input = input, format = "pdf", wait = 20)
+```
+
+```{r, include = FALSE}
+library(tidyverse)
+library(colorspace)
+library(patchwork)
+library(gganimate)
+library(broom)
+options(width = 200)
+knitr::opts_chunk$set(
+  fig.path = "images/week8B/",
+  fig.width = 6,
+  fig.height = 6,
+  fig.align = "center",
+  dev.args = list(bg = 'transparent'),
+  #out.width = "100%",
+  fig.retina = 3,
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  cache = TRUE,
+  cache.path = "cache/week8/"
+)
+theme_set(ggthemes::theme_gdocs(base_size = 18) +
+            theme(plot.background = element_rect(fill = 'transparent', colour = NA), axis.line.y = element_line(color = "black", linetype = "solid"),
+                  plot.title.position = "plot",
+                  plot.title = element_text(size = 24),
+                  panel.background  = element_rect(fill = 'transparent', colour = NA),
+                  legend.background = element_rect(fill = 'transparent', colour = NA),
+                  legend.key        = element_rect(fill = 'transparent', colour = NA)
+                  ) )
+```
+
+
+```{r titleslide, child="components/titleslide.Rmd"}
+```
+
+```{css, echo = FALSE}
+.gray80 {
+  color: #505050!important;
+  font-weight: 300;
+}
+```
+
+---
+
+class: transition middle
+
+# Non-parametric regression
+
+---
+
+# LOESS
+
+.grid[
+.item.border-right[
+* LOESS (LOcal regrESSion) and LOWESS (LOcally WEighted
+Scatterplot Smoothing) are .monash-blue[**non-parametric regression**] methods (LOESS is a generalisation of LOWESS)
+* **LOESS fits a low order polynomial to a subset of neighbouring data** and can be fitted using `loess` function in `R`
+* a user specified "bandwidth" or "smoothing parameter" $\color{blue}{\alpha}$ determines how much of the data is used to fit each local polynomial.
+
+]
+.item[
+
+```{r dummy, fig.height = 3.2, fig.width = 6}
+df2 <- tibble(id = 1:200) %>% 
+  mutate(x = runif(n(), -10, 10),
+         y = 0.5 * x + 3 * sin(x) + rnorm(n(), 0, 2))
+
+```
+```{r df2-plot, fig.height = 3}
+ggplot(df2, aes(x, y)) +
+  geom_point() +
+  geom_smooth(se = FALSE, color = "red",
+              # note "loess" doesn't take method.args! 
+              # looks like a BUG in ggplot2
+              method = stats::loess, size = 1,
+              method.args = list(span = 0.4)) 
+```
+
+
+
+* $\alpha \in \left(\frac{\lambda + 1}{n}, 1\right)$ (default `span=0.75`) where $\lambda$ is the degree of the local polynomial (default `degree=2`) and $n$ is the number of observations.
+* Large $\alpha$ produce a smoother fit.
+* Small $\alpha$ overfits the data with the fitted regression capturing the random error in the data.
+
+]
+
+]
+
+---
+
+# How `span` changes the loess fit
+
+```{r loess-span, fig.height = 5, fig.width = 8, out.width = "90%"}
+fits <- tibble(span = seq(.1, 1, .05)) %>%
+  rowwise() %>%
+  do(mutate(augment(loess(y ~ x, df2, span = .$span)),
+            span = .$span))
+
+p <- ggplot(fits, aes(x, y)) +
+  geom_point() +
+  geom_line(aes(y = .fitted), color = "red", size = 1.2) +
+  labs(title = 'span = {closest_state}')
+
+p + transition_states(
+    span,
+    transition_length = 2,
+    state_length = 1
+  )
+```
+
+.footnote[
+Code inspired by http://varianceexplained.org/files/loess.html
+]
+
+---
+
+# How `loess` works
+
+```{r animate-loess, gganimate = list(nframes = 500), fig.height = 5, fig.width = 8, out.width = "90%"}
+dat <- df2 %>%
+  crossing(center = unique(df2$x)) %>%
+  mutate(dist = abs(x - center)) %>%
+  filter(rank(dist) / n() <= .4) %>%
+  mutate(weight = (1 - (dist / max(dist)) ^ 3) ^ 3) %>% 
+  arrange(x, center)
+p <- ggplot(dat, aes(x, y)) +
+  geom_point(data = df2, color = "gray") +
+  geom_point(aes(alpha = weight), color = "#6600cc") +
+  geom_smooth(data = df2,
+              se = FALSE, color = "red",
+              method = stats::loess, size = 1,
+              method.args = list(span = 0.4)) +
+  geom_smooth(aes(group = center, weight = weight), method = stats::lm, se = FALSE, formula = y ~ poly(x, 2)) +
+  geom_vline(aes(xintercept = center), lty = 2) +
+  labs("span = 0.4") +
+  guides(alpha = FALSE)#+
+  #ggforce::facet_wrap_paginate(~center, nrow = 3, ncol = 3)
+p + transition_states(center, 
+                      transition_length = 1, 
+                      state_length = 1)
+```
+
+
+
+.footnote[
+Code inspired by http://varianceexplained.org/files/loess.html
+]
+---
+
+# .orange[Case study] .circle.bg-orange[3] US economic time series
+
+This dataset was produced from US economic time series data available from http://research.stlouisfed.org/fred2. 
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+
+```{r economics-data, include = FALSE}
+data(economics, package = "ggplot2")
+skimr::skim(economics)
+```
+```{r economics-plot, fig.height = 6, fig.width = 7}
+ggplot(economics, aes(date, uempmed)) + 
+  geom_point() +
+  geom_smooth(method = loess, se = FALSE,
+              method.args = list(span = 0.1)) +
+  labs(x = "Date", y = "Median unemployment duration")
+```
+
+
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+```{r economics-data, echo = TRUE, render = knitr::normal_print}
+```
+
+]]
+.panel[.panel-name[R]
+```{r economics-plot, echo = TRUE, eval = FALSE}
+```
+
+]
+
+]
+
+
+
+
+
+---
+
+
+# How to fit LOESS curves in R?
+
+.grid[
+.item.border-right[
+
+## Model fitting
+
+The model can be fitted using the `loess` function where 
+
+* the default  span is 0.75 and 
+* the default local polynomial degree is 2.
+
+```{r loess, echo = TRUE}
+fit <- economics %>% 
+          mutate(index = 1:n()) %>% 
+          loess(uempmed ~ index, #<<
+                data = ., #<<
+                span = 0.75, #<<
+                degree = 2) #<<
+```
+]
+.item[
+
+{{content}}
+
+]
+
+]
+
+--
+
+## Showing it on the plot
+
+In `ggplot`, you can add the loess using `geom_smooth` with `method = loess` and method arguments passed as list:
+```{r loess-ggplot, echo = TRUE, fig.height = 3}
+ggplot(economics, aes(date, uempmed)) +
+  geom_point() + 
+  geom_smooth(method = loess,  #<<
+              method.args = list(span = 0.75, #<<
+                                 degree = 2)) #<<
+```
+
+
+
+
+
+
+---
+
+# Why non-parametric regression?
+
+* Fitting a line to a scatter plot where noisy data values, sparse data points or weak inter-relationships interfere with your ability to see a line of best fit.
+--
+
+* Linear regression where least squares fitting doesn't create a line of good fit or is too labour intensive to use.
+--
+
+* Data exploration and analysis.
+--
+
+* Recall: In a parametric regression, some type of distribution is assumed in advance; therefore fitted model can lead to fitting a smooth curve that
+misrepresents the data.
+--
+
+* In those cases, non-parametric regression may be a better choice. 
+--
+
+* *Can you think of where it might be useful?*
+
+---
+
+
+# .orange[Case study] .circle.bg-orange[4] Bluegills .font_small[Part 1/3]
+
+Data were collected on length (in mm) and the age (in years) of 78 bluegills captured from Lake Mary, Minnesota in 1981.
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+Which fit looks better?
+
+.grid[.item[
+```{r bluegills-data, include = FALSE}
+bg_df <- read.table(here::here("data/bluegills.txt"),
+           header = TRUE)
+skimr::skim(bg_df)
+```
+```{r bluegills-plot1, fig.height = 4, fig.width = 6}
+ggplot(bg_df, aes(age, length)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE) +
+  labs(tag = "(A)", title = "Linear regression", x = "Age (in years)", y = "Length (in mm)")
+```
+
+]
+.item[
+```{r bluegills-plot2, fig.height = 4, fig.width = 6}
+ggplot(bg_df, aes(age, length)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE,
+              formula = y ~ poly(x, 2)) +
+  labs(tag = "(B)", title = "Quadratic regression",
+       x = "Age (in years)", y = "Length (in mm)")
+```
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+```{r bluegills-data, echo = TRUE, render = knitr::normal_print}
+```
+
+]]
+.panel[.panel-name[R]
+```{r, ref.label = c("bluegills-plot1", "bluegills-plot2"), echo = TRUE, eval = FALSE}
+```
+
+]
+
+]
+
+
+.footnote[
+Weisberg (1986) A linear model approach to backcalculation of fish length, *Journal of the American Statistical Association* **81** (196) 922-929
+]
+
+---
+
+# .orange[Case study] .circle.bg-orange[4] Bluegills .font_small[Part 2/3]
+
+
+* Let's have a look at the residual plots.
+* Do you see any patterns on either residual plot?
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[.item[
+```{r bluegills-fit, include = FALSE}
+fit1 <- lm(length ~ age, data = bg_df)
+fit2 <- lm(length ~ poly(age, 2), data = bg_df)
+df1 <- augment(fit1)
+df2 <- mutate(augment(fit2), age = bg_df$age)
+summary(fit1)
+summary(fit2)
+```
+```{r bluegills-resplot1, fig.height = 4, fig.width = 6}
+ggplot(df1, aes(age, .std.resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  labs(x = "Age", y = "Residual",
+       tag = "(A)", title = "Linear regression")
+```
+
+]
+.item[
+```{r bluegills-resplot2, fig.height = 4, fig.width = 6}
+ggplot(df2, aes(age, .std.resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  labs(x = "Age", y = "Residual",
+       tag = "(B)", title = "Quadratic regression")
+```
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+```{r bluegills-fit, echo = TRUE, render = knitr::normal_print}
+```
+
+]]
+.panel[.panel-name[R]
+```{r, ref.label = c("bluegills-resplot1", "bluegills-resplot2"), echo = TRUE, eval = FALSE}
+```
+
+]
+
+]
+
+
+.footnote[
+Weisberg (1986) A linear model approach to backcalculation of fish length, *Journal of the American Statistical Association* **81** (196) 922-929
+]
+
+---
+
+# .orange[Case study] .circle.bg-orange[4] Bluegills .font_small[Part 3/3]
+
+
+The structure is easily visible with the LOESS curve:
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[.item[
+```{r bluegills-lresplot1, fig.height = 4, fig.width = 6}
+ggplot(df1, aes(age, .std.resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  labs(x = "Age", y = "Residual",
+       tag = "(A)", title = "Linear regression") +
+  geom_smooth(method = loess, color = "red",
+              se = FALSE)
+```
+
+]
+.item[
+```{r bluegills-lresplot2, fig.height = 4, fig.width = 6}
+ggplot(df2, aes(age, .std.resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  labs(x = "Age", y = "Residual",
+       tag = "(B)", title = "Quadratic regression") +
+  geom_smooth(method = loess, color = "red",
+              se = FALSE)
+```
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+```{r bluegills-fit, echo = TRUE, render = knitr::normal_print}
+```
+
+]]
+.panel[.panel-name[R]
+```{r, ref.label = c("bluegills-lresplot1", "bluegills-lresplot2"), echo = TRUE, eval = FALSE}
+```
+
+]
+
+]
+
+
+.footnote[
+Weisberg (1986) A linear model approach to backcalculation of fish length, *Journal of the American Statistical Association* **81** (196) 922-929
+]
+
+---
+
+
+# .orange[Case study] .circle.bg-orange[5] Soil resistivity in a field
+
+This data contains measurement of soil resistivity of an agricultural field.
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+
+```{r cleveland-data, include = FALSE}
+data(cleveland.soil, package = "agridat")
+skimr::skim(cleveland.soil)
+```
+.grid[.item[
+```{r cleveland-plot1, fig.height = 5, fig.width = 4}
+ggplot(cleveland.soil, aes(easting, northing)) +
+  geom_point()
+```
+]
+.item[
+```{r cleveland-plot2, fig.height = 5, fig.width = 7}
+library(lattice)
+cloud(resistivity ~ easting * northing, pch = ".", data = cleveland.soil)
+```
+
+]
+]
+
+
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+```{r cleveland-data, echo = TRUE, render = knitr::normal_print}
+```
+
+]]
+.panel[.panel-name[R]
+```{r cleveland-plot, echo = TRUE, eval = FALSE}
+```
+
+]
+
+]
+
+---
+
+# Conditioning plots (Coplots)
+
+```{r coplots, echo = TRUE, fig.height = 5.7, fig.width = 10}
+library(lattice)
+xyplot(resistivity ~ northing | equal.count(easting, 12),
+       data = cleveland.soil, cex = 0.2,  
+       type = c("p", "smooth"), col.line = "red", 
+       col = "gray", lwd = 2)
+```
+
+.footnote[
+See also: https://homepage.divms.uiowa.edu/~luke/classes/STAT4580/threenum.html
+]
+
+---
+
+# Coplots via `ggplot2`
+
+* Coplots with `ggplot2` where the panels have overlapping observations is tricky.
+* Below creates a plot for non-overlapping intervals of `easting`:
+
+```{r ggcoplots, echo = TRUE, fig.height = 4, fig.width = 10}
+ggplot(cleveland.soil, aes(northing, resistivity)) +
+  geom_point(color = "gray") + 
+  geom_smooth(method = "loess", color = "red", se = FALSE) +
+  facet_wrap(~ cut_number(easting, 12))
+```
+
+---
+
+# Resources
+
+
+- Cleveland (1993) “Visualising Data” 
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+---
+
+```{r endslide, child="components/endslide.Rmd"}
+```

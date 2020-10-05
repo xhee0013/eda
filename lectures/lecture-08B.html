@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Emi Tanaka" />
+    <script src="libs/header-attrs-2.3/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="assets/panelset-modified.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/panelset.css" type="text/css" />
+    <link rel="stylesheet" href="assets/emi.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/steve-johnson--auJqHRvM_k-unsplash.jpg)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Sculpting data using models, checking assumptions, co-dependency and performing diagnostics&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Emi Tanaka*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 8 - Session 2
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;style type="text/css"&gt;
+.gray80 {
+  color: #505050!important;
+  font-weight: 300;
+}
+&lt;/style&gt;
+
+---
+
+class: transition middle
+
+# Non-parametric regression
+
+---
+
+# LOESS
+
+.grid[
+.item.border-right[
+* LOESS (LOcal regrESSion) and LOWESS (LOcally WEighted
+Scatterplot Smoothing) are .monash-blue[**non-parametric regression**] methods (LOESS is a generalisation of LOWESS)
+* **LOESS fits a low order polynomial to a subset of neighbouring data** and can be fitted using `loess` function in `R`
+* a user specified "bandwidth" or "smoothing parameter" `\(\color{blue}{\alpha}\)` determines how much of the data is used to fit each local polynomial.
+
+]
+.item[
+
+
+&lt;img src="images/week8B/df2-plot-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+
+* `\(\alpha \in \left(\frac{\lambda + 1}{n}, 1\right)\)` (default `span=0.75`) where `\(\lambda\)` is the degree of the local polynomial (default `degree=2`) and `\(n\)` is the number of observations.
+* Large `\(\alpha\)` produce a smoother fit.
+* Small `\(\alpha\)` overfits the data with the fitted regression capturing the random error in the data.
+
+]
+
+]
+
+---
+
+# How `span` changes the loess fit
+
+&lt;img src="images/week8B/loess-span-1.gif" width="90%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+Code inspired by http://varianceexplained.org/files/loess.html
+]
+
+---
+
+# How `loess` works
+
+&lt;img src="images/week8B/animate-loess-1.gif" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+
+.footnote[
+Code inspired by http://varianceexplained.org/files/loess.html
+]
+---
+
+# .orange[Case study] .circle.bg-orange[3] US economic time series
+
+This dataset was produced from US economic time series data available from http://research.stlouisfed.org/fred2. 
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+
+
+&lt;img src="images/week8B/economics-plot-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+data(economics, package = "ggplot2")
+skimr::skim(economics)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values   
+## Name                       economics
+## Number of rows             574      
+## Number of columns          6        
+## _______________________             
+## Column type frequency:              
+##   Date                     1        
+##   numeric                  5        
+## ________________________            
+## Group variables            None     
+## 
+## ── Variable type: Date ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate min        max        median     n_unique
+## 1 date                  0             1 1967-07-01 2015-04-01 1991-05-16      574
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate      mean       sd       p0      p25      p50      p75     p100 hist 
+## 1 pce                   0             1   4820.    3557.      507.    1578.    3937.    7626.   12194.  ▇▅▃▂▃
+## 2 pop                   0             1 257160.   36682.   198712   224896   253060   290291.  320402.  ▇▇▆▆▇
+## 3 psavert               0             1      8.57     2.96      2.2      6.4      8.4     11.1     17.3 ▃▇▆▅▁
+## 4 uempmed               0             1      8.61     4.11      4        6        7.5      9.1     25.2 ▇▃▁▁▁
+## 5 unemploy              0             1   7771.    2642.     2685     6284     7494     8686.   15352   ▃▇▆▂▁
+```
+
+]]
+.panel[.panel-name[R]
+
+```r
+ggplot(economics, aes(date, uempmed)) + 
+  geom_point() +
+  geom_smooth(method = loess, se = FALSE,
+              method.args = list(span = 0.1)) +
+  labs(x = "Date", y = "Median unemployment duration")
+```
+
+]
+
+]
+
+
+
+
+
+---
+
+
+# How to fit LOESS curves in R?
+
+.grid[
+.item.border-right[
+
+## Model fitting
+
+The model can be fitted using the `loess` function where 
+
+* the default  span is 0.75 and 
+* the default local polynomial degree is 2.
+
+
+```r
+fit &lt;- economics %&gt;% 
+          mutate(index = 1:n()) %&gt;% 
+*         loess(uempmed ~ index,
+*               data = .,
+*               span = 0.75,
+*               degree = 2)
+```
+]
+.item[
+
+{{content}}
+
+]
+
+]
+
+--
+
+## Showing it on the plot
+
+In `ggplot`, you can add the loess using `geom_smooth` with `method = loess` and method arguments passed as list:
+
+```r
+ggplot(economics, aes(date, uempmed)) +
+  geom_point() + 
+* geom_smooth(method = loess,
+*             method.args = list(span = 0.75,
+*                                degree = 2))
+```
+
+&lt;img src="images/week8B/loess-ggplot-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+
+---
+
+# Why non-parametric regression?
+
+* Fitting a line to a scatter plot where noisy data values, sparse data points or weak inter-relationships interfere with your ability to see a line of best fit.
+--
+
+* Linear regression where least squares fitting doesn't create a line of good fit or is too labour intensive to use.
+--
+
+* Data exploration and analysis.
+--
+
+* Recall: In a parametric regression, some type of distribution is assumed in advance; therefore fitted model can lead to fitting a smooth curve that
+misrepresents the data.
+--
+
+* In those cases, non-parametric regression may be a better choice. 
+--
+
+* *Can you think of where it might be useful?*
+
+---
+
+
+# .orange[Case study] .circle.bg-orange[4] Bluegills .font_small[Part 1/3]
+
+Data were collected on length (in mm) and the age (in years) of 78 bluegills captured from Lake Mary, Minnesota in 1981.
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+Which fit looks better?
+
+.grid[.item[
+
+&lt;img src="images/week8B/bluegills-plot1-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+&lt;img src="images/week8B/bluegills-plot2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+bg_df &lt;- read.table(here::here("data/bluegills.txt"),
+           header = TRUE)
+skimr::skim(bg_df)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values
+## Name                       bg_df 
+## Number of rows             78    
+## Number of columns          2     
+## _______________________          
+## Column type frequency:           
+##   numeric                  2     
+## ________________________         
+## Group variables            None  
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate   mean     sd    p0   p25   p50   p75  p100 hist 
+## 1 age                   0             1   3.63  0.927     1    3      4     4     6 ▂▃▇▂▁
+## 2 length                0             1 144.   24.1      62  137.   150   160   188 ▁▁▂▇▂
+```
+
+]]
+.panel[.panel-name[R]
+
+```r
+ggplot(bg_df, aes(age, length)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE) +
+  labs(tag = "(A)", title = "Linear regression", x = "Age (in years)", y = "Length (in mm)")
+ggplot(bg_df, aes(age, length)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE,
+              formula = y ~ poly(x, 2)) +
+  labs(tag = "(B)", title = "Quadratic regression",
+       x = "Age (in years)", y = "Length (in mm)")
+```
+
+]
+
+]
+
+
+.footnote[
+Weisberg (1986) A linear model approach to backcalculation of fish length, *Journal of the American Statistical Association* **81** (196) 922-929
+]
+
+---
+
+# .orange[Case study] .circle.bg-orange[4] Bluegills .font_small[Part 2/3]
+
+
+* Let's have a look at the residual plots.
+* Do you see any patterns on either residual plot?
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[.item[
+
+&lt;img src="images/week8B/bluegills-resplot1-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+&lt;img src="images/week8B/bluegills-resplot2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+fit1 &lt;- lm(length ~ age, data = bg_df)
+fit2 &lt;- lm(length ~ poly(age, 2), data = bg_df)
+df1 &lt;- augment(fit1)
+df2 &lt;- mutate(augment(fit2), age = bg_df$age)
+summary(fit1)
+```
+
+```
+## 
+## Call:
+## lm(formula = length ~ age, data = bg_df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -26.523  -7.586   0.258  10.102  20.414 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   62.649      5.755   10.89   &lt;2e-16 ***
+## age           22.312      1.537   14.51   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 12.51 on 76 degrees of freedom
+## Multiple R-squared:  0.7349,	Adjusted R-squared:  0.7314 
+## F-statistic: 210.7 on 1 and 76 DF,  p-value: &lt; 2.2e-16
+```
+
+```r
+summary(fit2)
+```
+
+```
+## 
+## Call:
+## lm(formula = length ~ poly(age, 2), data = bg_df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -19.846  -8.321  -1.137   6.698  22.098 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    143.603      1.235 116.290  &lt; 2e-16 ***
+## poly(age, 2)1  181.565     10.906  16.648  &lt; 2e-16 ***
+## poly(age, 2)2  -54.517     10.906  -4.999 3.67e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 10.91 on 75 degrees of freedom
+## Multiple R-squared:  0.8011,	Adjusted R-squared:  0.7958 
+## F-statistic: 151.1 on 2 and 75 DF,  p-value: &lt; 2.2e-16
+```
+
+]]
+.panel[.panel-name[R]
+
+```r
+ggplot(df1, aes(age, .std.resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  labs(x = "Age", y = "Residual",
+       tag = "(A)", title = "Linear regression")
+ggplot(df2, aes(age, .std.resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  labs(x = "Age", y = "Residual",
+       tag = "(B)", title = "Quadratic regression")
+```
+
+]
+
+]
+
+
+.footnote[
+Weisberg (1986) A linear model approach to backcalculation of fish length, *Journal of the American Statistical Association* **81** (196) 922-929
+]
+
+---
+
+# .orange[Case study] .circle.bg-orange[4] Bluegills .font_small[Part 3/3]
+
+
+The structure is easily visible with the LOESS curve:
+
+.panelset[
+.panel[.panel-name[📊]
+
+.grid[.item[
+&lt;img src="images/week8B/bluegills-lresplot1-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+]
+.item[
+&lt;img src="images/week8B/bluegills-lresplot2-1.png" width="432" style="display: block; margin: auto;" /&gt;
+]
+]
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+fit1 &lt;- lm(length ~ age, data = bg_df)
+fit2 &lt;- lm(length ~ poly(age, 2), data = bg_df)
+df1 &lt;- augment(fit1)
+df2 &lt;- mutate(augment(fit2), age = bg_df$age)
+summary(fit1)
+```
+
+```
+## 
+## Call:
+## lm(formula = length ~ age, data = bg_df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -26.523  -7.586   0.258  10.102  20.414 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   62.649      5.755   10.89   &lt;2e-16 ***
+## age           22.312      1.537   14.51   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 12.51 on 76 degrees of freedom
+## Multiple R-squared:  0.7349,	Adjusted R-squared:  0.7314 
+## F-statistic: 210.7 on 1 and 76 DF,  p-value: &lt; 2.2e-16
+```
+
+```r
+summary(fit2)
+```
+
+```
+## 
+## Call:
+## lm(formula = length ~ poly(age, 2), data = bg_df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -19.846  -8.321  -1.137   6.698  22.098 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    143.603      1.235 116.290  &lt; 2e-16 ***
+## poly(age, 2)1  181.565     10.906  16.648  &lt; 2e-16 ***
+## poly(age, 2)2  -54.517     10.906  -4.999 3.67e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 10.91 on 75 degrees of freedom
+## Multiple R-squared:  0.8011,	Adjusted R-squared:  0.7958 
+## F-statistic: 151.1 on 2 and 75 DF,  p-value: &lt; 2.2e-16
+```
+
+]]
+.panel[.panel-name[R]
+
+```r
+ggplot(df1, aes(age, .std.resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  labs(x = "Age", y = "Residual",
+       tag = "(A)", title = "Linear regression") +
+  geom_smooth(method = loess, color = "red",
+              se = FALSE)
+ggplot(df2, aes(age, .std.resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  labs(x = "Age", y = "Residual",
+       tag = "(B)", title = "Quadratic regression") +
+  geom_smooth(method = loess, color = "red",
+              se = FALSE)
+```
+
+]
+
+]
+
+
+.footnote[
+Weisberg (1986) A linear model approach to backcalculation of fish length, *Journal of the American Statistical Association* **81** (196) 922-929
+]
+
+---
+
+
+# .orange[Case study] .circle.bg-orange[5] Soil resistivity in a field
+
+This data contains measurement of soil resistivity of an agricultural field.
+
+
+.panelset[
+.panel[.panel-name[📊]
+
+
+
+.grid[.item[
+&lt;img src="images/week8B/cleveland-plot1-1.png" width="288" style="display: block; margin: auto;" /&gt;
+]
+.item[
+&lt;img src="images/week8B/cleveland-plot2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+]
+
+
+]
+.panel[.panel-name[data]
+.h200.scroll-sign[
+
+```r
+data(cleveland.soil, package = "agridat")
+skimr::skim(cleveland.soil)
+```
+
+```
+## ── Data Summary ────────────────────────
+##                            Values        
+## Name                       cleveland.soil
+## Number of rows             8641          
+## Number of columns          5             
+## _______________________                  
+## Column type frequency:                   
+##   logical                  1             
+##   numeric                  4             
+## ________________________                 
+## Group variables            None          
+## 
+## ── Variable type: logical ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate  mean count               
+## 1 is.ns                 0             1 0.242 FAL: 6553, TRU: 2088
+## 
+## ── Variable type: numeric ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+##   skim_variable n_missing complete_rate   mean     sd     p0    p25    p50   p75   p100 hist 
+## 1 northing              0             1  1.90   1.11  -0.01   0.978  1.81   2.91   3.81 ▆▇▅▇▆
+## 2 easting               0             1  0.739  0.429 -0.004  0.362  0.729  1.10   1.56 ▆▇▆▆▅
+## 3 resistivity           0             1 50.9   28.8    0.89  29.6   47.8   71.0  166.   ▇▇▅▁▁
+## 4 track                 0             1 16.9   12.4    1      5     14     29     40    ▇▃▂▃▃
+```
+
+]]
+.panel[.panel-name[R]
+
+
+]
+
+]
+
+---
+
+# Conditioning plots (Coplots)
+
+
+```r
+library(lattice)
+xyplot(resistivity ~ northing | equal.count(easting, 12),
+       data = cleveland.soil, cex = 0.2,  
+       type = c("p", "smooth"), col.line = "red", 
+       col = "gray", lwd = 2)
+```
+
+&lt;img src="images/week8B/coplots-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+See also: https://homepage.divms.uiowa.edu/~luke/classes/STAT4580/threenum.html
+]
+
+---
+
+# Coplots via `ggplot2`
+
+* Coplots with `ggplot2` where the panels have overlapping observations is tricky.
+* Below creates a plot for non-overlapping intervals of `easting`:
+
+
+```r
+ggplot(cleveland.soil, aes(northing, resistivity)) +
+  geom_point(color = "gray") + 
+  geom_smooth(method = "loess", color = "red", se = FALSE) +
+  facet_wrap(~ cut_number(easting, 12))
+```
+
+&lt;img src="images/week8B/ggcoplots-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Resources
+
+
+- Cleveland (1993) “Visualising Data” 
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+---
+
+
+background-image: url(images/steve-johnson--auJqHRvM_k-unsplash.jpg)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Emi Tanaka
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

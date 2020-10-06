@@ -56,10 +56,10 @@ schedule:
 team:
   - name: Prof Di Cook
     role: lecturer
-    consult: Thu 11.30-12.30pm (Wk 1-2, 5-6, 9, 11-12)
+    consult: Thu 11.30-12.30pm (Wk 1-2, 5-6, 8, 11)
   - name: Dr Emi Tanaka (Chief Examiner)
     role: lecturer
-    consult: Thu 11.30-12.30pm (Wk 3-4, 7-8, 10-12)
+    consult: Thu 11.30-12.30pm (Wk 3-4, 7, 9-10, 12)
   - name: Sayani Gupta
     role: tutor
     consult: Tue 1.45-2.30pm (Wk 1-12)

@@ -1,0 +1,348 @@
+---
+title: "ETC5521 Tutorial 8 Solution"
+subtitle: "Making comparisons between groups and strata"
+author: "Dr Emi Tanaka"
+date: "Week 8"
+output:
+  html_document:
+    toc: true
+    code_folding: hide
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, 
+  message = FALSE, 
+  warning = FALSE, 
+  cache = TRUE,
+  cache.path = "tutorial08-cache/",
+  fig.path = "images/tutorial08/",
+  fig.align = "center"
+)
+library(tidyverse)
+library(here)
+library(colorspace)
+library(janitor)
+library(lubridate)
+```
+
+## Exercise 1: Melbourne daily maximum temperature
+
+```{r melb-data}
+melb_df <- read_csv(here("data", "melb_temp.csv")) %>% 
+  clean_names() %>% 
+  rename(temp = maximum_temperature_degree_c) %>% 
+  filter(!is.na(temp)) %>% 
+  select(year, month, day, temp) %>% 
+  mutate(date = as.Date(paste(year, month, day, sep = "-")),
+         # so there is a common scale for x axis
+         # year 2000 is a dummy
+         dummy_mday = ymd(paste0(2000, month, day, sep = "-")))
+```
+
+
+
+(a) Are there any winter where the daily maximum temperature is different to winter in other years? How is it different? What sort of graphics help to show you this?
+
+There are a number of graphics that you could chose for comparison which focus on particular features to compare. E.g. 
+
+* Plot (A) below shows a line plot of (maximum) temperature over time facetted by year with the background shadow showing the temperatures for all years. 
+* Plot (A) makes it easier to **compare the trend** of maximum temperature across the winter days. You can see for example that the there are some winters where the days start to warm up as it gets close to spring. You may notice that end of 1982 was one of the warmest towards the last weeks of winter.
+* Plot (B) shows the boxplot of the maximum temperatures over winter per year. This plot makes it easier to **compare the distribution** of maximum temperature across the winter days. 
+* In Plot (B), the year is ordered chronologically that allows to see the trend across years but if the interest is to compare the distribution, then it is easier to compare by ordering years according to the median (or other metric) maximum temperature. Plot (C) does this in addition to coloring the boxplot in a diverging scale such that the middle point is 1995. Post-1995 years colored with an orange hue and pre-1995 is colored with a green hue.
+* Plot (C) makes it easier to compare the median maximum temparture as well the spread (though interquartile range).
+* The color in Plot (C) makes it easy to see the lower median maximum temperatures mostly predated 1995. However note that another graph like Plot (D) that directly compares the distribution of temperature pre-1995 and post-1995 may be more appropriate if the focus of attention is comparison pre- and post-1995.  
+
+```{r melb-temp, fig.height = 10}
+winter_df <- melb_df %>% 
+  filter(month %in% c("06", "07", "08")) 
+ggplot(winter_df, aes(dummy_mday, temp)) +
+  geom_point(data = select(winter_df, -year), 
+             color = "gray", size = 0.1) +
+  geom_line() + 
+  facet_wrap(~year) +
+  labs(tag = "(A)", x = "Month",
+       y = "Temperature (°C)")
+
+ggplot(winter_df, aes(temp, as.factor(year))) + 
+  geom_boxplot() +
+  labs(tag = "(B)", y = "Year",
+       x = "Temperature (°C)")
+
+winter_df %>% 
+  mutate(year = fct_reorder(as.factor(year), temp)) %>% 
+  ggplot(aes(temp, year)) + 
+  geom_boxplot(aes(color = as.numeric(as.character(year)))) +
+  labs(tag = "(C)", y = "Year",
+       x = "Temperature (°C)",
+       color = "Year") +
+  scale_color_continuous_divergingx(mid = 1995) 
+
+winter_df %>% 
+  mutate(pre1995 = ifelse(year < 1995, "Pre-1995", "Post-1995")) %>% 
+  ggplot(aes(pre1995, temp)) + 
+  geom_boxplot() +
+  labs(tag = "(D)", y = "Temperature (°C)",
+       x = "Time Period") +
+  scale_color_continuous_divergingx(mid = 1995) 
+```
+
+(b) How are the maximum temperature different across the seasons? Produce graphics make the comparison easier. 
+
+
+## Exercise 2: Hate Crime
+
+* The use of a line plot rather than bar plot makes it easier to compare the trend across years.
+* The second sentence compares the number of victims of anti-Black hate crimes and of anti-Islamic hate crimes. 
+* The problem with this comparison is that the population size is vastly different for the two comparisons. 
+* While the number of anti-Black victims are far larger than anti-Islamic victims as shown in Plot (A) below, the Muslim community is roughly 10% of the size of the Black community. 
+* Assuming the population size is roughly the same across 2000-2002, a rough estimate of the proportions of hate crime victims for each population is compared in Plot (B).  
+* The significant surge in anti-Islamic crimes in 2001 is more apparent in Plot (B).
+* Plot (C) shows the odds ratio with respect to year 2000. This shows that the anti-Islamic crime in 2001 was nearly 15 times higher than in 2000 lowering to about 4.8 in 2001. This however is higher than that of the incidences related to anti-Black and sexual orientation hate crimes which remain somewhat stable from 2000-2002 (odds ratio is close to 1 or slightly lower). 
+
+```{r crime}
+df <- tribble(~year, ~offense, ~victim,
+              2000, "Anti-Black", 3535,
+              2000, "Sexual Orientation", 1558,
+              2000, "Anti-Islamic", 36,
+              2001, "Anti-Black", 3700,
+              2001, "Sexual Orientation", 1664,
+              2001, "Anti-Islamic", 554,
+              2002, "Anti-Black", 3076,
+              2002, "Sexual Orientation", 1513,
+              2002, "Anti-Islamic", 174) %>% 
+  mutate(offense = fct_reorder(offense, -victim))
+
+pop_df <- tribble(~pop, ~size,
+                  "Anti-Black", 36.4e6,
+                 "Sexual Orientation", 28.2e6,
+                 "Anti-Islamic", 3.4e6)
+
+crime_df <- left_join(df, pop_df, by = c("offense" = "pop")) %>% 
+  mutate(prop = victim / size)
+```
+
+```{r crime-plot} 
+ggplot(crime_df, aes(as.factor(year), victim, color = offense)) + 
+  geom_point() + 
+  geom_line(aes(group = offense)) + 
+  scale_color_discrete_qualitative() +
+  labs(x = "Year", y = "The number of victims",
+       color = "Offense", tag = "(A)")
+
+ggplot(crime_df, aes(as.factor(year), prop * 10000, color = offense)) + 
+  geom_point() + 
+  geom_line(aes(group = offense)) + 
+  scale_color_discrete_qualitative() +
+  labs(x = "Year", y = "Incidence estimate per 10,000 people",
+       color = "Offense", tag = "(B)")
+
+year2000dict <- crime_df %>% 
+  filter(year == 2000) %>% 
+  select(offense, prop) %>% 
+  deframe()
+
+crime_df %>% 
+  mutate(rel2000 = prop / year2000dict[offense]) %>% 
+  filter(year != 2000) %>% 
+  ggplot(aes(as.factor(year), rel2000, color = offense)) + 
+  geom_point() + 
+  geom_line(aes(group = offense)) + 
+  scale_color_discrete_qualitative() +
+  scale_y_continuous(breaks = c(1, 4, 5, 15, 16)) +
+  labs(x = "Year", y = "Odds ratio with respect to year 2000",
+       color = "Offense", tag = "(C)")
+```
+
+
+
+
+
+# Exercise 3: Petrol consumption
+
+
+```{r cars-data}
+data(Cars93, package = "MASS")
+```
+
+
+(a) Draw comparative plots of petrol consumption, measured in gallons needed to drive 100 miles, for the two datasets. What features, if any, are notable from the plots?
+
+The driving condition is unknown for `mtcars` dataset but if we assume that it would be similar to city then if we compare the distribution between the gallon per 100 miles for the two datasets, there is a small descrease in the gallon needed to drive 100 miles for cars in the `Cars93` dataset than those in the `mtcars` dataset. This could be because the car models are from 1993 for the former and 1974 for the latter and technological advances made the petrol consumption more efficient in cars.
+
+```{r Q3A}
+df <- bind_rows(tibble(mpg = mtcars$mpg,
+                       year = 1974, 
+                       loc = "unknown"),
+                tibble(mpg = Cars93$MPG.city,
+                       year = 1993,
+                       loc = "city"),
+                tibble(mpg = Cars93$MPG.highway,
+                       year = 1993,
+                       loc = "highway")) %>% 
+  mutate(gp100m = 1 / (100 * mpg)) %>% 
+  mutate(loc = fct_reorder(loc, gp100m),
+         year = factor(year))
+ggplot(df, aes(loc, gp100m)) + 
+  geom_violin(aes(fill = year)) +
+  geom_boxplot(width = 0.1) +
+  labs(x = "Driving condition", y = "Gallon per 100 miles",
+       fill = "Year") +
+  scale_fill_discrete_qualitative()
+```
+
+(b) Carry out a $t$-test comparing the means of petrol consumption for the two datasets. 
+
+Below I use the default `var.equal = FALSE` as the spread appears to be slightly larger in 1974.
+
+```{r Q3B}
+with(df, 
+     t.test(gp100m[loc=="city"],
+            gp100m[loc=="unknown"]))
+```
+
+
+(c) A major influence on petrol consumption is the weight of a car. Draw scatter plots of `MPG.city` and `1/MPG.city` against `Weight` for the `Cars93` dataset. What conclusion do you draw and which scatter plot do you prefer?
+
+Plot (A) shows a linear trend where the petrol consumed to drive each mile increases linearly with the increase in weight of the car.
+
+Plot (B) show a quadratic decrease in miles that car travelled per gallon for each unit increase in weight of the car. 
+
+```{r Q3C}
+ggplot(Cars93, aes(Weight, 1/MPG.city)) +
+  geom_point() +
+  geom_smooth() + 
+  labs(tag = "(A)")
+
+ggplot(Cars93, aes(Weight, MPG.city)) +
+  geom_point() +
+  geom_smooth() + 
+  labs(tag = "(B)")
+
+```
+
+
+# Exercise 4: Swiss bank notes
+
+```{r bank-data}
+data(bank, package = "gclus")
+```
+
+(a) Consider the variables `Right` and `Left`, measurements of the right and left edge widths of the notes, respectively. What do the distribution of the differences between these measurements for each note look like for the two groups? Are the differences significantly different from zero?
+
+Looking at the plot below, it is easy to see that the edge length on the left seems to be generally longer for the left for the genuine Swiss bank notes but appear less so for counterfeit notes. There are a couple of what appears like outliers in the difference of right and left lengths in the genuine notes. 
+
+A Wilcoxon rank sum test suggests that the mean differences are different between the two groups and this is still the case even removing the two outlying observations. 
+
+```{r Q4A}
+bank %>% 
+  mutate(Status = fct_recode(as.character(Status), 
+                             genuine = '0',
+                             counterfeit = '1')) %>% 
+  ggplot(aes(Right - Left)) + 
+  geom_histogram(binwidth = 0.1, color = "white") +
+  geom_vline(xintercept = 0, color = "red") +
+  facet_grid(Status ~ .)
+
+with(mutate(bank, diff = Right - Left), 
+  wilcox.test(diff[Status==0],
+              diff[Status==1]))
+with(mutate(bank, diff = Right - Left) %>% 
+       filter(diff > -1), 
+  wilcox.test(diff[Status==0],
+              diff[Status==1]))
+```
+
+
+(b) The measurements `Bottom` and `Top` for the margin widths might also be expected to be close to equal for each note. Are they and does the difference relate to the edge width differences?
+
+Genuine Swiss banknotes generally seem to have longer length for the top than bottom dimension. For the genuine note, bigger difference in margin generally implies bigger difference in edges.
+
+```{r Q4B} 
+df <- bank %>% 
+  mutate(difftb = Top - Bottom,
+         diffrl = Right - Left) %>% 
+  mutate(Status = fct_recode(as.character(Status), 
+                             genuine = '0',
+                             counterfeit = '1'))
+ggplot(df, aes(difftb)) +
+  geom_histogram(bindwidth = 0.1, color = "white") +
+  facet_grid(Status ~ .) + 
+  geom_vline(xintercept = 0, color = "red") +
+  labs(x = "Top - Bottom")
+
+ggplot(df, aes(difftb, diffrl)) +
+  facet_wrap(~Status) + 
+  geom_vline(xintercept = 0, color = "red") +
+  geom_hline(yintercept = 0, color = "red") +
+  geom_point() + 
+  labs(x = "Top - Bottom", y = "Right - Left")
+```
+
+
+(c) Instead of using absolute differences, proportionate differences could be used. Draw a plot to compare the scales of the proportionate differences for the edges and margins. What denominator would you suggest? Do you think the data are reported precisely enough for these analyses? Can you think of another metric that differentiates between genuine and counterfeit banknotes?
+
+There are four different combinations of proportionate differences in edge and margin lengths as shown in Plot (A)-(D). None of these are particularly striking to differentiate between the genuine and counterfeit banknotes. The metric used in Plot (E), engineered by Sherry Zhang, does a splendid job of segregating the two group types.
+
+```{r Q4C}
+ggplot(df, aes(abs(Right - Left)/Right, abs(Top - Bottom)/Top)) +
+  geom_point() + 
+  facet_wrap(~Status) + 
+  labs(tag = "(A)")
+
+ggplot(df, aes(abs(Right - Left)/Right, abs(Top - Bottom)/Bottom)) +
+  geom_point() + 
+  facet_wrap(~Status) + 
+  labs(tag = "(B)")
+
+ggplot(df, aes(abs(Right - Left)/Left, abs(Top - Bottom)/Top)) +
+  geom_point() + 
+  facet_wrap(~Status) + 
+  labs(tag = "(C)")
+
+ggplot(df, aes(abs(Right - Left)/Left, abs(Top - Bottom)/Bottom)) +
+  geom_point() + 
+  facet_wrap(~Status) + 
+  labs(tag = "(D)")
+
+
+ggplot(df, aes((Right + Left)/mean(Right + Left), (Top + Bottom)/mean(Top + Bottom))) +
+  facet_wrap(~Status) + 
+  geom_point() +
+  labs(tag = "(E)")
+```
+
+
+# Exercise 5: Olkin95
+
+```{r meta-data}
+data(Olkin95, package = "meta")
+```
+
+
+(a) Plot the event rates for the experimental groups against the corresponding rates for the control groups. What does your plot show?
+
+
+The event rate appears to be higher in general for the control group than the experimental group.
+
+```{r Q5A}
+ggplot(Olkin95, aes(event.e / n.e, event.c / n.c)) +
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) +
+  labs(x = "Event rate in the experimental group",
+       y = "Event rate in the control group")
+```
+
+
+(b) The sizes of the studies should also be taken into account. Draw a scatterplot of the rate of differences in each study against the size of the study, using the total number of participants for the size. What conclusions would you draw from your plot? How much does it matter, if at all, that the experimental and control groups are not always the same size?
+
+The experimental group generally appears to have a lower rate of events than the control group. This particularly seems to be the case for larger studies.
+
+```{r Q5B}
+ggplot(Olkin95, aes((n.e + n.c), event.e / n.e - event.c / n.c)) + 
+  labs(x = "Study size", y = "Difference in the rate of event (Experimental - Control)") +
+  scale_x_log10() +
+  geom_hline(yintercept = 0, color = "red") +
+  geom_point() 
+```
+

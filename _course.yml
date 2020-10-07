@@ -41,7 +41,7 @@ schedule:
     topic: Sculpting data using models, checking assumptions, co-dependency and performing diagnostics
   - week: 9
     lecturer: Di
-    readings: "Unwin (2015) Graphical Data Analysis Ch 11"
+    readings: "[Reintroducing tsibble: data tools that melt the clock](https://blog.earo.me/2018/12/20/reintro-tsibble/); Unwin (2015) Graphical Data Analysis Ch 11"
     topic: Exploring data having a space and time context
   - week: 10
     lecturer: Emi

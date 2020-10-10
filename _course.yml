@@ -44,10 +44,10 @@ schedule:
     readings: "[Reintroducing tsibble: data tools that melt the clock](https://blog.earo.me/2018/12/20/reintro-tsibble/); Unwin (2015) Graphical Data Analysis Ch 11"
     topic: Exploring data having a space and time context
   - week: 10
-    lecturer: Emi
-    topic: Extending beyond the data, what can and cannot be inferred more generally, given the data collection
+    lecturer: Di/Guest
+    topic: Exploring data having a space and time context
   - week: 11
-    lecturer: Emi/Di
+    lecturer: Emi
     topic: Using computational tools to determine whether what is seen in the data can be assumed to apply more broadly
   - week: 12
     lecturer: Emi/Di
@@ -56,10 +56,10 @@ schedule:
 team:
   - name: Prof Di Cook
     role: lecturer
-    consult: Thu 11.30-12.30pm (Wk 1-2, 5-6, 8, 11)
+    consult: Thu 11.30-12.30pm (Wk 1-2, 5-6, 9-10)
   - name: Dr Emi Tanaka (Chief Examiner)
     role: lecturer
-    consult: Thu 11.30-12.30pm (Wk 3-4, 7, 9-10, 12)
+    consult: Thu 11.30-12.30pm (Wk 3-4, 7-8, 11-12)
   - name: Sayani Gupta
     role: tutor
     consult: Tue 1.45-2.30pm (Wk 1-12)

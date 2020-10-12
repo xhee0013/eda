@@ -1,3 +1,5 @@
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
 li {
   position: relative;
   display: list-item;
@@ -9,8 +11,22 @@ li {
   padding-top: 0;
 }
 
+.pad0 {
+  padding: 0 0 0 0;
+}
+
+ul {
+    display: block;
+    list-style: none; /* Remove list bullets */
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 0;
+}
+
 ul li:before {
-  content: "\f1b0";
+  content: "\f017";
   font-size: 28px;
   font-family: "FontAwesome";
   margin-right: 10px;
@@ -18,18 +34,19 @@ ul li:before {
 }
 
 ul li li:before {
-  content: "\f140";
+  content: "\f0c2";
   font-size: 28px;
   font-family: "FontAwesome";
   margin-right: 10px;
   color: #D93F00;
 }
+
 .grid2, .grid2-col, .grid2-row {
   display: grid;
   margin-left: 1em;
   margin-right: 1em;
   width: calc(70% + 8em);
-  height: 100%;  
+  height: 100%;
 }
 
 .scroll-800 {
@@ -37,10 +54,193 @@ ul li li:before {
   height: 600px;
 }
 
+.scroll-500 {
+  overflow-y: scroll;
+  height: 500px;
+}
+
 pre {
-  text-align: left;!important
+  text-align: left!important
 }
 
 .custom-list ul li li li:before {
   content: "";
+}
+
+blockquote {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 40px;
+  margin-right: 40px;
+  font-style: italic;
+}
+
+.font_large .remark-code { font-size: 30pt;}
+.font_medium { font-size: 22pt;}
+.font_medium2 { font-size: 20pt;}
+.font_small { font-size: 18pt;}
+.font_smaller3 .remark-code { font-size: 11pt }
+.font_smaller4 .remark-code { font-size: 8pt }
+
+.pull-left {
+  float: left;
+  width: 47%;
+  padding-top: 50px;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+  padding-top: 50px;
+}
+
+.left-column {
+  float: left;
+  width: 20%;
+  padding-top: 10px;
+}
+.right-column {
+  float: right;
+  width: 80%;
+  padding-top: 10px;
+}
+
+.scroll-box-8 {
+  height:8em;
+  overflow-y: scroll;
+}
+.scroll-box-10 {
+  height:10em;
+  overflow-y: scroll;
+}
+.scroll-box-12 {
+  height:12em;
+  overflow-y: scroll;
+}
+.scroll-box-14 {
+  height:14em;
+  overflow-y: scroll;
+}
+.scroll-box-16 {
+  height:16em;
+  overflow-y: scroll;
+}
+.scroll-box-18 {
+  height:18em;
+  overflow-y: scroll;
+}
+.scroll-box-20 {
+  height:20em;
+  overflow-y: scroll;
+}
+.scroll-output {
+  height: 90%;
+  overflow-y: scroll;
+}
+
+.panelset {
+  font-size: 18pt;
+  list-style: none;
+   --panel-tab-active-border-color: transparent;
+   --panel-tab-inactive-opacity: 0.8;
+   --panel-tabs-border-bottom: transparent;
+}
+
+.panel-tab {
+  padding: 10px 10px!important;
+}
+
+.panelset .panel-tabs {
+  box-shadow: none!important;
+}
+
+ul.panel-tabs {
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+
+li.panel-tab {
+  margin: 0;
+  font-size: 12pt;
+}
+
+.panel-tab {
+  min-height: 0!important;
+}
+
+.h200 pre:nth-child(2) {
+  height: 200px;
+  overflow: scroll;
+}
+
+.scroll-sign::after {
+  content: "scroll ↓";
+  position: relative;
+  left: 47%;
+}
+
+.remark-code-line {
+  font-size: 14pt;
+}
+
+.clock {
+  font-size: 35pt;
+  width: 150px;
+  text-align: center;
+  color: black;
+  background-color: #006DAE!important;
+  background-image: none;
+}
+
+.clock.running {
+  background-color: #D93F00!important;
+  border: 3px solid black;
+  color: white!important;
+}
+
+.padded-multi-line {
+  display: block;
+  background-color: #D93F00;
+  color: white;
+  box-shadow: 10px 0 0 orange, -10px 0 0 orange;
+}
+
+.box {
+  display: block;
+}
+
+.info-box {
+  display: block;
+}
+
+.grid4x2 {
+  display: grid;
+  margin-left: 1em;
+  margin-right: -4em;
+  width: calc(80% + 4em);
+  height: calc(80% + 4em);
+  column-gap: 1em;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.bg-orange {
+  background-color: var(--color-orange)!important;
+}
+
+.circle {
+    border-radius: 50%;
+    width: 50px;
+    line-height: 50px;
+    padding: 3px;
+    display:inline-block;
+
+    background: white;
+    color: #006DAE;
+    text-align: center;
+    font-weight: bold;
+
+}
+
+.border-right {
+  border-right: 2px solid black;
 }

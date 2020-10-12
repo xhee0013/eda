@@ -1,0 +1,155 @@
+---
+title: "ETC5521 Tutorial 9"
+subtitle: "Sculpting data using models, checking assumptions, co-dependency and performing diagnostics"
+author: "Dr Emi Tanaka"
+date: "Week 9"
+output:
+  bookdown::html_document2:
+    toc: true
+    number_sections: false
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  message = FALSE, 
+  warning = FALSE, 
+  cache = TRUE,
+  cache.path = "cache/",
+  fig.path = "images/tutorial09/",
+  fig.align = "center"
+)
+```
+
+```{r pkgs}
+library(tidyverse)
+library(here)
+```
+
+## `r emo::ji("warning")` Tutorial will be recorded
+
+This tutorial, including the chat, will be recorded, so that you can re-visit the instructions later, as needed. This includes private chats. It is expected that you are respectful of your class members and tutors, while actively engaging in the work. 
+
+## `r emo::ji("target")` Objectives
+
+These exercise are to do some exploratory analysis with graphics and statistical models, focussing on logistic regression, LOESS and multiple linear regression.  
+
+
+## `r emo::ji("wrench")` Preparation 
+
+Download the following data: [`custody.txt`](https://raw.githubusercontent.com/numbats/eda/master/data/custody.txt), [`insure.txt`](https://raw.githubusercontent.com/numbats/eda/master/data/insure.txt), [`titanic.txt`](https://raw.githubusercontent.com/numbats/eda/master/data/titanic.txt), [`titanic-missing-age.csv`](https://raw.githubusercontent.com/numbats/eda/master/data/titanic-missing-age.csv) and [`HDLsamples.csv`](https://raw.githubusercontent.com/numbats/eda/master/data/HDLsamples.csv). 
+
+## Exercise 0: Introduction
+
+In the chat window, say hello, and if you feel comfortable tell us something fun about yourself, or what you have done this last week.
+
+
+## Exercise 1: Prison custody in Australia
+
+The data in `custody.txt` give the number of deaths in prison custody in Australia in each of the six years 1990 to 1995, given separately for Aboriginal and Torres Strait Islanders (indigenous) and others (non-indigenous).
+
+Variable | Description 
+--- | --- 
+Year | 1990 through 1995
+Indigenous | Yes = Aboriginal or Torres Strait Islander, No = Non-indigenous
+Prisoners | Total number in prison custody
+Deaths | Number of deaths in prison custody
+Population | Adult population (15+ years)
+
+The data were collected in response to the Royal Commission into Aboriginal Deaths in Custody, the final report of which was tabled in the Federal Parliament on the 9 May 1991 and the original source of the data is from *Indigenous deaths in custody 1989 - 1996 / a report prepared by the Office of the Aboriginal and Torres Strait Islander Social Justice Commissioner for the Aboriginal and Torres Strait Islander Commission*. Aboriginal and Torres Strait Islander Commission, Canberra, 1996.
+
+Read in the data `custody.txt` (optionally create a new variable `group` as below) and answer the following questions. 
+
+```{r custody-data, echo = TRUE}
+custody <- read.table(here("data/custody.txt"),
+                      header = TRUE) %>% 
+  mutate(group = ifelse(Indigenous=="Yes", 
+                        "Indigenous", 
+                        "Non-Indigenous"))
+```
+
+
+(a) The Royal Commission was concerned with the Aboriginal and Torres Strait Islander deaths in custody. How does the rate of deaths in custody of an incarcerated indigenous person compare to that of an incarcerated non-indigenous person? What graphics would you produce to study this comparison?
+(b) The work of the commission established that indigenous people in custody do not die at a greater rate than non-indigenous people in custody, however, the indigenous people are over-represented in custody. Produce graphics that support (or don't support) this statement.
+(c) The rate of incarceration for both indigenous people and non-indigenous people appear to be increasing with time. Plot the proportion of custody over time for indigenous and non-indigenous population. Would you think the proportion of incarceration is increasing at a constant rate each year for both groups? 
+(d) Fit the following models. What is the rate of increase in the proportion of incarceration for each group according to each of the models below? Is the rate constant each year?
+```{r custody-models, echo = TRUE}
+fit_ind <- lm(Prisoners / Population ~ Year, 
+              data = subset(custody, Indigenous=="Yes"))
+fit_ind_log <- lm(log10(Prisoners / Population) ~ Year, 
+              data = subset(custody, Indigenous=="Yes"))
+fit_non <- lm(Prisoners / Population ~ Year, 
+              data = subset(custody, Indigenous=="No"))
+fit_non_log <- lm(log10(Prisoners / Population) ~ Year, 
+              data = subset(custody, Indigenous=="No"))
+```
+(d) Below shows the fitted line from the fitted models in (c). Which model matches up with which plot?
+```{r custody-plots, echo = TRUE}
+ggplot(custody, aes(Year, log10(Prisoners / Population))) + 
+  geom_point() + 
+  geom_smooth(method = "lm") + 
+  facet_wrap(~group, scales = "free_y") + 
+  labs(tag = "(A)") 
+
+ggplot(custody, aes(Year, Prisoners / Population)) + 
+  geom_point() + 
+  geom_smooth(method = "lm") + 
+  facet_wrap(~group, scales = "free_y") + 
+  scale_y_log10() + 
+  labs(tag = "(B)")
+
+ggplot(custody, aes(Year, Prisoners / Population)) + 
+  geom_point() + 
+  geom_smooth(method = "lm") + 
+  facet_wrap(~group, scales = "free_y") + 
+  labs(tag = "(C)")
+```
+
+(e) Another way to compare the proportion of incarceration across the groups is to look at the odds ratio over time.  Draw the graph below. What is the comparison in this case? 
+
+<img src="`r here::here("tutorials/images/tutorial09/custody-odds-plot-1.png")`">
+
+## Exercise 2: Insurance premium rates
+
+Age specific term life premium rates for a sum insured of $50,000 are given in the data `insure.txt`. The first column is the age of insured, the next two columns are the rates for male smokers and non-smokers, and the last two columns are the rates for female smokers and non-smokers. The data originally appeared in *National Roads and Motorists Association magazine* (Australia), The Open Road, June 1985, 14.
+
+
+(a) Read the data in and change the format of the data such that you will have 4 columns relating to the `premium`, `smoker`,  `gender` and `age`.
+(b) Plot `premium` against `age` for each combination of the smoking status and gender group as below.
+
+<img src="`r here::here("tutorials/images/tutorial09/insure-plot-1.png")`">
+
+(c) We can see from the plot in (b) that a polynomial regression of premium on age for each `smoker` and `gender` group combination seems appropriate. What would you choose the degree of a polynomial as? Plot these polynomial fits to the plot in (b). 
+(d) Perform diagnostics for the model fitted in (c).
+
+
+
+
+
+## Exercise 3: Survival on the Titanic
+
+RMS Titanic was a British passenger liner that sank in the North Atlantic Ocean in the early morning of 15 April 1912, after colliding with an iceberg during her maiden voyage from Southampton to New York City. Of the estimated 2,224 passengers and crew aboard, more than 1,500 died, making it one of the deadliest commercial peacetime maritime disasters in modern history.
+
+The data on the subset of passengers on the Titanic, found in `titanic.txt`, give their survival status, (`Survived`), together with their names (`Name`), age in years (`Age`), sex (`Sex`) and passenger class (`PClass`).
+
+(a) Read the data `titanic.txt` and perform some IDA. You can find out the passenger information using external sources such as https://www.encyclopedia-titanica.org. Do you notice anything unusual in the data? 
+(b) Extract the title from the `Name` and see its relation with `Sex` and `PClass`. 
+(c) How is the data in `titanic.txt` different to the data `Titanic` in `datasets` package? Note: `datasets` is loaded by default in R so you can see the data by typing `Titanic` in the console and pressing the Enter key. 
+(d) Remove duplicate entries and merge missing age data from `titanic-missing-age.csv` (which was painfully extracted from [this website](https://www.encyclopedia-titanica.org/)). Use this cleaned data for the next question.
+(e) Fit the following logistic regression model and compare the actual survival of the passengers with the expected probability of survival under this model. If this probability is greater than or equal to 0.5, consider that the passenger survived under this model prection. How well does the prediction match up with the observed data? Explore to see if there is any pattern of how good the prediction is based on age, sex or passenger class.
+```{r, eval = FALSE, echo = TRUE}
+fit <- glm(cbind(Survived, 1 - Survived) ~ Age + Sex + PClass, 
+           family="binomial", data=titanic)
+```
+
+
+# Exercise 4: High-density lipoprotein in human blood
+
+In a study of high-density lipoprotein (HDL, labelled $y$) in human blood a sample of size 42 was used. Measurements were taken on total cholesterol ($x_1$), total trigylceride ($x_2$) as well as noting whether a sticky component, sinking pre-beta (SPB, labelled $x_3$) was present (coded 1) or absent (coded 0). This data is stored in `HDLsamples.csv`. The basis for the analysis is the model 
+$$Y_i = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \epsilon_i,$$
+where $\epsilon_i \sim NID(0, \sigma^2).$
+
+(a) Fit the model above in R and perform some diagnostic checks, i.e. residual plot, boxplot of residuals and the QQ-plot of residuals.
+(b) Are there any high leverage points in this data set? What would you characterise as a high leverage point?
+(c) Are there any outliers in this data?
+(d) The function `sigma` on the linear model object in (a) will give an estimate of $\sigma$ which we denote as $\hat{\sigma}$. Generate about 19 sets of random variables drawn independently from $N(0, \hat{\sigma})$ of the same size as the data. Draw a QQ-plot for each sample (there should be 19 plots in total). Compare this to the QQ-plot of the residuals in (a). Can you distinguish the QQ-plot of the residuals and the other QQ-plots? Ask your fellow classmates as well. What do you think this means?

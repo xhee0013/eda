@@ -1,0 +1,824 @@
+---
+title: "ETC5521: Exploratory Data Analysis"
+subtitle: "Exploring data having a space and time context"
+author: "Di Cook"
+email: "ETC5521.Clayton-x@monash.edu"
+date: "Week 9 - Session 1"
+color_theme: "yellow"
+bgimg: "images/tsibble.png"
+output:
+  xaringan::moon_reader:
+    css:
+      - ninjutsu 
+      - "assets/animate.css"
+      - "assets/fira-code.css"
+      - "assets/boxes.css"
+      - "assets/styles.css"
+      - "assets/custom.css"
+      - "assets/monash-logo.css"
+      - "assets/monash-brand.css"
+      - "assets/monash-fonts.css"
+      - "assets/table.css"
+      - "assets/panelset.css"
+      - "assets/di3.css"
+    self_contained: false 
+    seal: false 
+    chakra: 'libs/remark-latest.min.js'
+    lib_dir: libs
+    includes:
+      in_header: "assets/custom.html"
+    mathjax: "assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    nature:
+      highlightStyle: github
+      highlightLanguage: r 
+      highlightLines: true
+      highlightSpans: false 
+      countIncrementalSlides: false
+      slideNumberFormat: '%current%/%total%'
+      navigation:
+        scroll: false 
+        touch: true
+        click: false
+      ratio: '16:9'
+---
+
+```{r, include = FALSE}
+current_file <- knitr::current_input()
+```
+```{r, include = FALSE, eval = F}
+input <- fs::path_ext_set(current_file, "html")
+pagedown::chrome_print(input = input, format = "pdf", wait = 20)
+```
+
+```{r setup, include = FALSE}
+options(width = 200)
+knitr::opts_chunk$set(
+  fig.path = "images/week9A/",
+  fig.width = 6,
+  fig.height = 6,
+  fig.align = "center",
+  dev.args = list(bg = 'transparent'),
+  out.width = "100%",
+  fig.retina = 3,
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  cache = FALSE,
+  cache.path = "cache/week9/"
+)
+```
+
+```{r libraries}
+library(tidyverse)
+library(tsibble)
+library(kableExtra)
+library(lubridate)
+library(sugrrants)
+library(brolgar)
+library(gghighlight)
+library(imputeTS)
+library(ochRe)
+library(lme4)
+library(modelr)
+library(here)
+library(gridExtra)
+library(ggthemes)
+```
+
+```{r settheme, eval=FALSE}
+theme_set(ggthemes::theme_gdocs(base_size = 18) +
+            theme(plot.background = element_rect(fill = 'transparent', colour = NA), 
+                  axis.line.x = element_line(color = "grey60", linetype = "solid", size = 1),
+                  axis.line.y = element_line(color = "grey60", linetype = "solid", size = 1),
+                  plot.title.position = "plot",
+                  plot.title = element_text(size = 24),
+                  panel.background  = element_rect(fill = 'transparent', colour = NA),
+                  legend.background = element_rect(fill = 'transparent', colour = NA),
+                  legend.key        = element_rect(fill = 'transparent', colour = NA)
+                  ) )
+```
+
+```{r titleslide, child="components/titleslide.Rmd"}
+```
+
+```{css, echo = FALSE}
+.gray80 {
+  color: #505050!important;
+  font-weight: 300;
+}
+.bg-gray80 {
+  background-color: #DCDCDC!important;
+}
+```
+
+---
+class: informative middle animated slideInLeft
+
+.pull-left[
+> Time series analysis is what you do after all the interesting stuff has been done!
+
+[Heike Hofmann, 2005](https://en.wikipedia.org/wiki/Heike_Hofmann)
+]
+.pull-right[
+<img src="images/week9A/heike-headshot.png" style="width: 400px; border-radius: 50%">
+]
+
+---
+# What is temporal data?
+
+`r emo::ji("clock")` Remember the pedestrian sensor data
+<br>
+
+```{r tsibble}
+pedestrian %>% top_n(50) %>% kable() %>%
+  column_spec(2, color = "white", background="#D93F00", italic=T) %>%
+  scroll_box(width = "100%", height = "500px")
+```
+---
+# What is temporal data?
+
+.left-column[
+```{r eval=FALSE}
+CO2.ptb <- read.table("https://scrippsco2.ucsd.edu/assets/data/atmospheric/stations/merged_in_situ_and_flask/monthly/monthly_merge_co2_ptb.csv", sep=",", skip=69)
+colnames(CO2.ptb) <- c("year", "month", "dateE", "date", "co2_ppm", "sa_co2", "fit", "sa_fit", "co2f", "sa_co2f")
+CO2.ptb$lat <- (-71.3)
+CO2.ptb$lon <- (-156.6)
+CO2.ptb$stn <- "ptb"
+CO2.ptb$co2_ppm <- na_if(CO2.ptb$co2_ppm, -99.99)
+  
+save(CO2.ptb, file=here::here("data/CO2_ptb.rda"))
+```
+
+```{r CO2}
+load(here::here("data/CO2_ptb.rda"))
+CO2.ptb <- CO2.ptb %>%
+  filter(year > 2015) 
+p1 <- ggplot(CO2.ptb, aes(x=date, y=co2_ppm)) + 
+  geom_line(size=2, colour="#D93F00") + xlab("") + ylab("CO2 (ppm)")
+p2 <- ggplot(CO2.ptb, aes(x=date, y=co2_ppm)) + 
+  geom_smooth(se=FALSE, colour="#D93F00", size=2) + 
+  xlab("") + ylab("CO2 (ppm)")
+grid.arrange(p1, p2, ncol=1)
+```
+
+]
+
+.right-column[
+- Temporal data has  date/time/ordering index variable, call it .monash-orange2[time]. 
+- A time variable has special structure:
+    - it can have *cyclical* patterns, eg seasonality (summer, winter), an over in cricket
+    - the cyclical patterns can be *nested*, eg postcode within state, over within innings
+- Measurements are also .monash-orange2[NOT independent] - yesterday may influence today.
+- It still likely has .monash-orange2[non-cyclical patterns], trends and associations with other variables, eg temperature increasing over time, over is bowled by Elise Perry or Sophie Molineaux
+]
+
+---
+# .orange[Case study] .bg-orange.circle[1] Melbourne pedestrian traffic
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+<br>
+Pedestrian counts at Southern Cross in Feb 2016 
+
+<br>
+
+```{r sc_ts, fig.width=12, fig.height=3, out.width="100%"}
+p <- pedestrian %>% 
+  filter(Sensor == "Southern Cross Station",
+         year(Date) == 2016, 
+         month(Date) == 2) %>%
+  ggplot(aes(x=Date_Time, Count)) + 
+    geom_line(size=1.1) +
+      xlab("") +
+    theme_bw()
+p + annotate("rect", xmin=ymd_hms("2016-02-01 01:00:00"), 
+             xmax=ymd_hms("2016-02-01 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-02 01:00:00"), 
+             xmax=ymd_hms("2016-02-02 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-03 01:00:00"), 
+             xmax=ymd_hms("2016-02-03 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-04 01:00:00"), 
+             xmax=ymd_hms("2016-02-04 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-05 01:00:00"), 
+             xmax=ymd_hms("2016-02-05 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-06 01:00:00"), 
+             xmax=ymd_hms("2016-02-06 23:00:00"), 
+             ymin=0, ymax=3200, fill="#008A25", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-07 01:00:00"), 
+             xmax=ymd_hms("2016-02-07 23:00:00"), 
+             ymin=0, ymax=3200, fill="#008A25", alpha=0.2) 
+```
+
+<br>
+
+`r anicon::nia("This is interesting!", animate = "bounce", anitype = "hover", colour = "#D93F00")`
+
+]
+.panel[.panel-name[learn]
+
+<br> <br> <br>
+
+- There are similar patterns for 5 days, and then a different pattern.
+- In the 5 day pattern, there are two big peaks and a smaller peak. 
+- This might be called multi-seasonality because there are two types of cyclical patterns.
+
+<br>
+
+`r anicon::nia("This is interesting!", animate = "bounce", anitype = "hover", colour = "#D93F00")`
+
+]
+.panel[.panel-name[R]
+```{r ref.label="sc_ts", echo=TRUE, eval=FALSE}
+```
+]
+]
+
+---
+# .orange[Case study] .bg-orange.circle[1] Melbourne pedestrian traffic
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+<br>
+Pedestrian counts at Birrarung Marr in Feb 2016 
+
+<br>
+
+```{r bm_ts, fig.width=12, fig.height=3, out.width="100%"}
+pedestrian %>% 
+  filter(Sensor == "Birrarung Marr",
+         year(Date) == 2016, 
+         month(Date) == 2) %>%
+  ggplot(aes(x=Date_Time, Count)) + 
+    geom_line(size=1.1) +
+    xlab("") +
+    theme_bw()
+```
+
+<br>
+
+`r anicon::nia("This is interesting!", animate = "bounce", anitype = "hover", colour = "#D93F00")`
+
+]
+.panel[.panel-name[learn]
+
+<br> <br> <br>
+
+- There are irregular patterns. 
+- There may be some small (almost) regular patterns. 
+
+<br>
+
+`r anicon::nia("This is interesting!", animate = "bounce", anitype = "hover", colour = "#D93F00")`
+
+]
+.panel[.panel-name[R]
+```{r ref.label="bm_ts", echo=TRUE, eval=FALSE}
+```
+]
+]
+
+---
+# .orange[Case study] .bg-orange.circle[1] Melbourne pedestrian traffic
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+<br>
+What does Heike mean? 
+
+<br>
+
+```{r arima, fig.width=12, fig.height=3, out.width="100%"}
+pedestrian %>% 
+    filter(Sensor == "Birrarung Marr",
+         year(Date) == 2016, 
+         month(Date) == 2) %>%
+  mutate(arima = arima.sim(n=696, 
+                           list(ar = c(0.8897, -0.4858),
+                                ma = c(-0.2279, 0.2488)),
+                           sd = sqrt(0.1796))) %>%
+  ggplot(aes(x=Date_Time, arima)) + 
+    geom_line(size=1.1) +
+    xlab("") +
+    theme_bw()
+```
+
+<br>
+
+`r anicon::nia("This is a little bit boring!", animate = "bounce", anitype = "hover", colour = "#D93F00")` It is important for fitting a model that accounts for dependencies between measurements, though.
+
+Exploratory analysis of temporal data is interested in extracting the trend and general patterns.
+
+]
+.panel[.panel-name[learn]
+
+<br> <br> <br>
+
+There is no apparent structure in this data. 
+
+When you read time series analysis, expect to see a focus on modeling this non-structure, usally called a stochastic process. There is some dependence in the measurements from one to another, and modeling this process forms the core of most of what is called time series analysis. 
+
+<br>
+
+`r anicon::nia("This is a little bit boring!", animate = "bounce", anitype = "hover", colour = "#D93F00")` It is important for fitting a model that accounts for dependencies between measurements, though. 
+
+Exploratory analysis of temporal data is interested inn extracting the trend and general patterns.
+
+]
+.panel[.panel-name[R]
+```{r ref.label="arima", echo=TRUE, eval=FALSE}
+```
+]
+]
+
+---
+class: informative 
+# What is exploratory analysis of time series?
+
+<br>
+
+.info-box[Exploratory analysis of time series investigates trends, patterns, cyclical, nested cyclical, temporal outliers, and temporal dependence.] 
+
+<br>
+
+For the pedestrian sensor data this is:
+
+- work day vs holiday pattern
+- daily patterns
+- weather and season related changes
+- event related patterns
+
+---
+# Regular vs irregular
+
+
+The Melbourne pedestrian sensor data has a .monash-orange2[regular] period. Counts are provided for every hour, at numerous locations.
+
+In contrast, the US flights data, below, is .monash-orange2[irregular]. 
+
+```{r nycflights, highlight.output=1}
+library(nycflights13)
+flights_ts <- flights %>% 
+  mutate(dt = ymd_hm(paste(paste(year, month, day, sep="-"), paste(hour, minute, sep=":")))) %>%
+  as_tsibble(index = dt, key = c(origin, dest, carrier, tailnum), regular = FALSE)
+flights_ts
+```
+
+---
+class: motivator middle
+
+.panelset[
+.panel[.panel-name[question]
+<br>
+<br>
+
+## Is pedestrian traffic regular, really?
+]
+
+.panel[.panel-name[discussion]
+<br>
+<br>
+
+*No, its event data: one pedestrian, arbitrary time. Its aggregated into a regular time period.*
+
+]
+]
+
+---
+class: transition middle animated slideInLeft
+
+## Let's make some plots
+
+---
+# Plotting temporal data
+
+- .monash-orange2[lines]: connecting sequential time points indicates the temporal dependence is important 
+- .monash-orange2[aspect ratio]: wide or tall? [Cleveland, McGill, McGill (1988) ](https://eagereyes.org/basics/banking-45-degrees) argue the average line slope in a line chart should be 45 degrees, which is called banking to 45 degrees. But this is refuted in Talbot, Gerth, Hanrahan (2012) that the conclusion was based on a flawed study. Nevertheless, aspect ratio is an inescapable skill for designing effective plots. For time series, typically a wide aspect ratio is good. 
+- .monash-orange2[conventions]: 
+    - time on the horizontal axis, 
+    - ordering of elements like week day, month. 
+
+---
+# Aspect ratio
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+```{r CO2_ratio, fig.width=12, fig.height=7}
+load(here::here("data/CO2_ptb.rda"))
+CO2.ptb <- CO2.ptb %>% filter(year > 1980)
+p <- ggplot(CO2.ptb, aes(x=date, y=co2_ppm)) + 
+  geom_line(size=1) + xlab("") + ylab("CO2 (ppm)")
+p1 <- p + theme(aspect.ratio = 1) + ggtitle("1 to 1 (may be useless)")
+p3 <- p + theme(aspect.ratio = 2) + ggtitle("tall & skinny:  trend")
+p2 <- ggplot(CO2.ptb, aes(x=date, y=co2_ppm)) + 
+  annotate("text", x=2000, y=375, label="CO2 at \n Point Barrow,\n Alaska", size=8) + theme_solid()
+p4 <- p + 
+  scale_x_continuous("", breaks = seq(1980, 2020, 5)) + 
+  theme(aspect.ratio = 0.2) + ggtitle("short & wide: seasonality")
+grid.arrange(p1, p2, p3, p4, layout_matrix= matrix(c(1,2,3,4,4,4), nrow=2, byrow=T))
+```
+]
+.panel[.panel-name[learn]
+
+<br>
+<br>
+
+- Is the trend linear or non-linear? 
+    - Yes, slightly non-linear. We could fit a linear regression model, and examine the residuals to better assess non-linear trend.
+- Is there a cyclical pattern?
+    - Yes, there is a yearly trend. 
+<br>
+<br>
+<br>
+
+*This type of data is easy to model, and forecast.*
+
+]
+
+.panel[.panel-name[R]
+
+```{r ref.label="CO2_ratio", echo=TRUE, eval=FALSE}
+```
+
+]
+
+]
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 1/7]
+
+.grid[
+<div class="item50 border-right" style="font-size:20pt">
+
+.item[
+
+```{r echo=TRUE}
+library(nycflights13)
+```
+
+]
+
+.item[
+What is a useful time element 
+to use, in order to study traffic 
+over time? 
+
+.monash-orange2[Hour, 15 minutes, 
+day, month?]
+]
+
+
+.item[
+
+<br>
+<br>
+
+Possibly, all of these.
+]
+
+
+.item[
+<br>
+<br>
+
+Let's start with .monash-orange2[hourly]. 
+]
+
+]
+
+
+.item[
+
+```{r flights_hourly, echo=TRUE, highlight.output=1}
+flights_hourly <- flights %>%
+  group_by(time_hour, origin) %>% #<<
+  summarise(count = n(), #<<
+    dep_delay = mean(dep_delay, #<<
+                     na.rm = TRUE)) %>% #<<
+  ungroup() %>%
+  as_tsibble(index = time_hour, 
+             key = origin)
+flights_hourly
+```
+
+</div>
+]
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 2/7]
+
+Pick one airport, and examine the hourly number of flights.
+
+<br>
+
+```{r flights_time, fig.width=15, fig.height=3, out.width="100%", echo=TRUE}
+flights_hourly %>%
+  filter(origin == "JFK") %>%
+  ggplot(aes(x=time_hour, y=count)) + 
+  geom_line() +
+  xlab("") + ylab("number of flights")
+```
+
+No, that's too much information, too much time. There's no overall trend. Not an interesting plot.
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 3/7]
+
+Reduce the time frame to check for periodicities
+
+```{r flights_time_month, fig.width=15, fig.height=3, out.width="100%", echo=TRUE}
+flights_hourly %>%
+  filter(origin == "JFK", 
+         time_hour < ymd("2013-01-08")) %>%
+  ggplot(aes(x=time_hour, y=count)) + 
+    geom_line(size=1.1) +
+    scale_x_datetime("", 
+                     date_breaks = "1 day", 
+                     date_labels = "%y-%m-%d %H",
+                     date_minor_breaks = "6 hours") + 
+    ylim(c(0, 32)) +
+    xlab("") + ylab("number of flights")
+```
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 4/7]
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+```{r calendar, fig.width=10, fig.height=6}
+calendar_df <- flights_hourly %>% 
+  filter(origin == "JFK") %>%
+  mutate(hour = hour(time_hour), 
+         date = as.Date(time_hour)) %>%
+  filter(year(date) < 2014) %>%
+  frame_calendar(x=hour, y=count, date=date, nrow=3) #<<
+p1 <- calendar_df %>%
+  ggplot(aes(x = .hour, y = .count, group = date)) +
+  geom_line()
+prettify(p1, size = 3, label.padding = unit(0.15, "lines"))
+```
+]
+.panel[.panel-name[learn]
+
+- a calendar plot is a wonderful way to get a lot of data into a page
+- it makes it easy to examine daily patterns, weekly, monthly patterns
+
+<br>
+<br>
+
+- The daily pattern at JFK is very regular. 
+- It is similar for every day of the week, and for every month
+- There is a peak in early flights, a drop around lunchtime and then the number of flights pick up again.
+
+]
+.panel[.panel-name[R]
+
+```{r ref.label="calendar", eval=FALSE, echo=TRUE}
+```
+
+]
+]
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 5/7]
+
+.grid[
+.item[
+```{r flights_daily, fig.width=15, fig.height=3, out.width="100%", echo=TRUE, eval=FALSE}
+flights_hourly %>%
+  filter(origin == "JFK") %>%
+  mutate(month = month(time_hour),
+         hour = hour(time_hour),
+         date = as.Date(time_hour)) %>%
+  ggplot(aes(x=hour, y=count)) + 
+    geom_line(aes(group=date), alpha = 0.1) +
+    geom_smooth(se = FALSE) +
+    xlab("hour") + ylab("number of flights")
+```
+
+<br> <br>
+Its very regular. Does this make sense?
+
+]
+.item[
+```{r ref.label="flights_daily", eval=TRUE, echo=FALSE}
+```
+]
+]
+
+---
+class: transition middle animated slideInLeft
+
+## Examine departure delays
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 6/7]
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+```{r calendar_delay, fig.width=10, fig.height=6}
+calendar_df <- flights_hourly %>% 
+  filter(origin == "JFK") %>%
+  mutate(hour = hour(time_hour), 
+         date = as.Date(time_hour)) %>%
+  filter(year(date) < 2014) %>%
+  frame_calendar(x=hour, y=dep_delay, date=date, nrow=3) 
+p2 <- calendar_df %>%
+  ggplot(aes(x = .hour, y = .dep_delay, group = date)) +
+  geom_line()
+prettify(p2, size = 3, label.padding = unit(0.15, "lines"))
+```
+
+]
+.panel[.panel-name[learn]
+
+## Delays are much more interesting to examine
+
+- Most of the time there are few delays
+- Jun and July have consistently more delays
+- Sporadic days have big delays
+
+.monash-orange2[Can you find a reason for one of the days with a big delay?]
+
+`r countdown::countdown(5, 0, font_size = "2em", color = "salmon")`
+
+]
+.panel[.panel-name[R]
+
+```{r ref.label="calendar_delay", eval=FALSE, echo=TRUE}
+```
+
+]
+]
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 7/7]
+
+.grid[
+.item[
+```{r flights_daily_delay, fig.width=15, fig.height=3, out.width="100%", echo=TRUE, eval=FALSE}
+flights_hourly %>%
+  filter(origin == "JFK") %>%
+  mutate(month = month(time_hour),
+         hour = hour(time_hour),
+         date = as.Date(time_hour)) %>%
+  ggplot(aes(x=hour, y=dep_delay)) + 
+    geom_hline(yintercept=0, colour="white", size=2) +
+    geom_line(aes(group=date), alpha = 0.1) +
+    geom_smooth(se=FALSE) +
+    xlab("hour") + ylab("number of flights")
+```
+
+- Delays tend to pile up as the day goes on.
+- Also notice a lot of flights depart a few minutes early.
+- This data is harder to model and forecast.
+
+]
+.item[
+```{r ref.label="flights_daily_delay", eval=TRUE, echo=FALSE}
+```
+]
+]
+
+---
+# Summary: Melting time
+
+- The structure of the airlines data is very useful. Date-time has already been broken out into: `year`, `month`, `day`, `hour`, `minute`.
+- There are also several possible key variables: `origin`, `carrier`, `tailnum`.
+
+`r countdown::countdown(1, 0, font_size = "2em")`
+
+.monash-orange2[Why isn't `dest` considered a key variable? Why not have `air_time` as a key variable?]
+
+- Aggregate by temporal components, in different ways to explore different patterns of variables in relation to elements of time.
+
+---
+class: transition middle
+
+## Interactive exploration with tsibbletalk
+
+---
+class: center
+
+`r anicon::faa("wrench", size=1, animate="wrench", speed="slow", colour="#D93F00", anitype="hover")` Your turn, .monash-blue[cut and paste the code] into your R console. Click on the tree, click on a point, line, ...
+
+.scroll-500[
+```{r tsibbletalk, eval=FALSE, echo=TRUE}
+library(tsibble)
+library(tsibbletalk)
+tourism_shared <- tourism %>%
+  as_shared_tsibble(spec = (State / Region) * Purpose)
+p0 <- plotly_key_tree(tourism_shared, height = 900, width = 600)
+
+library(feasts)
+tourism_feat <- tourism_shared %>%
+  features(Trips, feat_stl)
+
+p1 <- tourism_shared %>%
+  ggplot(aes(x = Quarter, y = Trips)) +
+  geom_line(aes(group = Region), alpha = 0.5) +
+  facet_wrap(~ Purpose, scales = "free_y")
+p2 <- tourism_feat %>%
+  ggplot(aes(x = trend_strength, y = seasonal_strength_year)) +
+  geom_point(aes(group = Region))
+
+library(plotly)
+subplot(p0,
+  subplot(
+    ggplotly(p1, tooltip = "Region", width = 900),
+    ggplotly(p2, tooltip = "Region", width = 900),
+    nrows = 2),
+  widths = c(.4, .6)) %>%
+  highlight(dynamic = TRUE)
+```
+]
+
+
+---
+class: center
+
+`r anicon::faa("wrench", size=1, animate="wrench", speed="slow", colour="#D93F00", anitype="hover")` Your turn, .monash-blue[cut and paste the code] into your R console. Drag the scroll bar to wrap the series on itself.
+
+.font_medium[
+```{r tsibbletalk2, eval=FALSE, echo=TRUE}
+p <- fill_gaps(pedestrian) %>%
+  filter_index(~ "2015") %>% 
+  ggplot(aes(x = Date_Time, y = Count, colour = Sensor)) +
+  geom_line(size = .2) +
+  facet_wrap(~ Sensor, scales = "free_y") +
+  theme(legend.position = "none")
+
+library(shiny)
+ui <- fluidPage(tsibbleWrapUI("tswrap"))
+server <- function(input, output, session) {
+  tsibbleWrapServer("tswrap", p, period = "1 day")
+}
+shinyApp(ui, server)
+```
+]
+
+---
+# A step back in time, classic almost periodic data
+
+.monash-orange2[See if you can get the peaks to match up with wrapping.]
+
+.pull-left[
+Annual numbers of lynx trappings for 1821–1934 in Canada. Almost 10 year cycle. 
+
+```{r tsibbletalk3, eval=FALSE, echo=TRUE}
+lynx_tsb <- as_tsibble(lynx) %>%
+  rename(count = value)
+pl <- ggplot(lynx_tsb, aes(x = index, y = count)) +
+  geom_line(size = .2) 
+
+ui <- fluidPage(tsibbleWrapUI("tswrap"))
+server <- function(input, output, session) {
+  tsibbleWrapServer("tswrap", pl, period = "10 year")
+}
+shinyApp(ui, server)
+
+```
+]
+
+.pull-right[
+
+Monthly mean relative sunspot numbers from 1749 to 1983. Almost 10 year cycle.
+
+```{r tsibbletalk4, eval=FALSE, echo=TRUE}
+sunspots_tsb <- as_tsibble(sunspots) %>%
+  rename(count = value)
+pl <- ggplot(sunspots_tsb, aes(x = index, y = count)) +
+  geom_line(size = .2) 
+
+ui <- fluidPage(tsibbleWrapUI("tswrap"))
+server <- function(input, output, session) {
+  tsibbleWrapServer("tswrap", pl, period = "10 year")
+}
+shinyApp(ui, server)
+
+```
+]
+---
+
+# Resources and Acknowledgement
+
+
+- The temporal data object [tsibble](https://tsibble.tidyverts.org/index.html)
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+- In Semester 3's ETC5580 expect to learn more about regular time series, which will include some exploration and some modeling
+
+---
+
+```{r endslide, child="components/endslide.Rmd"}
+```

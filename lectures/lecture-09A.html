@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Di Cook" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <script src="assets/panelset-modified.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/panelset.css" type="text/css" />
+    <link rel="stylesheet" href="assets/di3.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/tsibble.png)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Exploring data having a space and time context&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Di Cook*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 9 - Session 1
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;style type="text/css"&gt;
+.gray80 {
+  color: #505050!important;
+  font-weight: 300;
+}
+.bg-gray80 {
+  background-color: #DCDCDC!important;
+}
+&lt;/style&gt;
+
+---
+class: informative middle animated slideInLeft
+
+.pull-left[
+&gt; Time series analysis is what you do after all the interesting stuff has been done!
+
+[Heike Hofmann, 2005](https://en.wikipedia.org/wiki/Heike_Hofmann)
+]
+.pull-right[
+&lt;img src="images/week9A/heike-headshot.png" style="width: 400px; border-radius: 50%"&gt;
+]
+
+---
+# What is temporal data?
+
+🕘 Remember the pedestrian sensor data
+&lt;br&gt;
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:100%; "&gt;&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Sensor &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Date_Time &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; Time &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; Count &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-02-14 22:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-02-14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7081 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-02-21 21:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-02-21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8363 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-02-21 22:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-02-21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9658 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-02-21 23:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-02-21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10121 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-02-22 00:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-02-22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8441 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-07 20:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7144 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-07 21:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7238 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 13:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7092 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 14:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7031 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 15:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6951 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 16:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7167 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 17:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7246 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 18:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7122 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 19:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7565 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 20:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8121 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-08 21:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7330 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-09 13:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7413 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-09 14:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7665 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-09 15:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6954 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-29 13:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8919 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-03-29 22:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-03-29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9858 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-04-25 17:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-04-25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7293 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-06-17 22:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-06-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7556 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-07-18 21:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-07-18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9318 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-07-24 18:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-07-24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7426 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-07-24 22:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-07-24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11224 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-07-26 09:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-07-26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6949 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-07-26 10:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-07-26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8263 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-07-26 11:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-07-26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7124 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-09-12 22:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-09-12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7757 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-10-03 12:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-10-03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6974 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2015-10-03 18:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2015-10-03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7085 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-02-20 21:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-02-20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9579 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-02-20 22:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-02-20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11121 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-02-20 23:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-02-20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11273 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-02-21 00:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-02-21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9201 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-02-21 01:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-02-21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7678 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-03-12 20:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-03-12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6957 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-03-12 21:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-03-12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7179 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-03-13 13:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-03-13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7112 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-03-13 16:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-03-13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7049 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-03-13 20:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-03-13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8033 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-03-13 21:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-03-13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7901 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-03-14 14:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-03-14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7286 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-07-24 10:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-07-24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7158 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-09-16 18:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-09-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7993 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-10-01 11:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-10-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7038 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-10-01 12:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-10-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8591 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-10-01 18:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-10-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9716 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Birrarung Marr &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: white !important;background-color: #D93F00 !important;"&gt; 2016-10-16 08:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2016-10-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7218 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+---
+# What is temporal data?
+
+.left-column[
+
+
+&lt;img src="images/week9A/CO2-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+.right-column[
+- Temporal data has  date/time/ordering index variable, call it .monash-orange2[time]. 
+- A time variable has special structure:
+    - it can have *cyclical* patterns, eg seasonality (summer, winter), an over in cricket
+    - the cyclical patterns can be *nested*, eg postcode within state, over within innings
+- Measurements are also .monash-orange2[NOT independent] - yesterday may influence today.
+- It still likely has .monash-orange2[non-cyclical patterns], trends and associations with other variables, eg temperature increasing over time, over is bowled by Elise Perry or Sophie Molineaux
+]
+
+---
+# .orange[Case study] .bg-orange.circle[1] Melbourne pedestrian traffic
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+&lt;br&gt;
+Pedestrian counts at Southern Cross in Feb 2016 
+
+&lt;br&gt;
+
+&lt;img src="images/week9A/sc_ts-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+&lt;br&gt;
+
+<span class=" faa-bounce animated-hover " style=" color:#D93F00; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">This is interesting!</span>
+
+]
+.panel[.panel-name[learn]
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+- There are similar patterns for 5 days, and then a different pattern.
+- In the 5 day pattern, there are two big peaks and a smaller peak. 
+- This might be called multi-seasonality because there are two types of cyclical patterns.
+
+&lt;br&gt;
+
+<span class=" faa-bounce animated-hover " style=" color:#D93F00; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">This is interesting!</span>
+
+]
+.panel[.panel-name[R]
+
+```r
+p &lt;- pedestrian %&gt;% 
+  filter(Sensor == "Southern Cross Station",
+         year(Date) == 2016, 
+         month(Date) == 2) %&gt;%
+  ggplot(aes(x=Date_Time, Count)) + 
+    geom_line(size=1.1) +
+      xlab("") +
+    theme_bw()
+p + annotate("rect", xmin=ymd_hms("2016-02-01 01:00:00"), 
+             xmax=ymd_hms("2016-02-01 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-02 01:00:00"), 
+             xmax=ymd_hms("2016-02-02 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-03 01:00:00"), 
+             xmax=ymd_hms("2016-02-03 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-04 01:00:00"), 
+             xmax=ymd_hms("2016-02-04 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-05 01:00:00"), 
+             xmax=ymd_hms("2016-02-05 23:00:00"), 
+             ymin=0, ymax=3200, fill="#D93F00", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-06 01:00:00"), 
+             xmax=ymd_hms("2016-02-06 23:00:00"), 
+             ymin=0, ymax=3200, fill="#008A25", alpha=0.2) +
+    annotate("rect", xmin=ymd_hms("2016-02-07 01:00:00"), 
+             xmax=ymd_hms("2016-02-07 23:00:00"), 
+             ymin=0, ymax=3200, fill="#008A25", alpha=0.2) 
+```
+]
+]
+
+---
+# .orange[Case study] .bg-orange.circle[1] Melbourne pedestrian traffic
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+&lt;br&gt;
+Pedestrian counts at Birrarung Marr in Feb 2016 
+
+&lt;br&gt;
+
+&lt;img src="images/week9A/bm_ts-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+&lt;br&gt;
+
+<span class=" faa-bounce animated-hover " style=" color:#D93F00; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">This is interesting!</span>
+
+]
+.panel[.panel-name[learn]
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+- There are irregular patterns. 
+- There may be some small (almost) regular patterns. 
+
+&lt;br&gt;
+
+<span class=" faa-bounce animated-hover " style=" color:#D93F00; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">This is interesting!</span>
+
+]
+.panel[.panel-name[R]
+
+```r
+pedestrian %&gt;% 
+  filter(Sensor == "Birrarung Marr",
+         year(Date) == 2016, 
+         month(Date) == 2) %&gt;%
+  ggplot(aes(x=Date_Time, Count)) + 
+    geom_line(size=1.1) +
+    xlab("") +
+    theme_bw()
+```
+]
+]
+
+---
+# .orange[Case study] .bg-orange.circle[1] Melbourne pedestrian traffic
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+&lt;br&gt;
+What does Heike mean? 
+
+&lt;br&gt;
+
+&lt;img src="images/week9A/arima-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+&lt;br&gt;
+
+<span class=" faa-bounce animated-hover " style=" color:#D93F00; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">This is a little bit boring!</span> It is important for fitting a model that accounts for dependencies between measurements, though.
+
+Exploratory analysis of temporal data is interested in extracting the trend and general patterns.
+
+]
+.panel[.panel-name[learn]
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+There is no apparent structure in this data. 
+
+When you read time series analysis, expect to see a focus on modeling this non-structure, usally called a stochastic process. There is some dependence in the measurements from one to another, and modeling this process forms the core of most of what is called time series analysis. 
+
+&lt;br&gt;
+
+<span class=" faa-bounce animated-hover " style=" color:#D93F00; display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">This is a little bit boring!</span> It is important for fitting a model that accounts for dependencies between measurements, though. 
+
+Exploratory analysis of temporal data is interested inn extracting the trend and general patterns.
+
+]
+.panel[.panel-name[R]
+
+```r
+pedestrian %&gt;% 
+    filter(Sensor == "Birrarung Marr",
+         year(Date) == 2016, 
+         month(Date) == 2) %&gt;%
+  mutate(arima = arima.sim(n=696, 
+                           list(ar = c(0.8897, -0.4858),
+                                ma = c(-0.2279, 0.2488)),
+                           sd = sqrt(0.1796))) %&gt;%
+  ggplot(aes(x=Date_Time, arima)) + 
+    geom_line(size=1.1) +
+    xlab("") +
+    theme_bw()
+```
+]
+]
+
+---
+class: informative 
+# What is exploratory analysis of time series?
+
+&lt;br&gt;
+
+.info-box[Exploratory analysis of time series investigates trends, patterns, cyclical, nested cyclical, temporal outliers, and temporal dependence.] 
+
+&lt;br&gt;
+
+For the pedestrian sensor data this is:
+
+- work day vs holiday pattern
+- daily patterns
+- weather and season related changes
+- event related patterns
+
+---
+# Regular vs irregular
+
+
+The Melbourne pedestrian sensor data has a .monash-orange2[regular] period. Counts are provided for every hour, at numerous locations.
+
+In contrast, the US flights data, below, is .monash-orange2[irregular]. 
+
+
+```
+*## # A tsibble: 336,776 x 20 [!] &lt;UTC&gt;
+## # Key:       origin, dest, carrier, tailnum [52,807]
+##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time arr_delay carrier flight tailnum origin dest  air_time distance  hour minute time_hour           dt                 
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt; &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dttm&gt;              &lt;dttm&gt;             
+##  1  2013     1    30     2224           2000       144     2316           2101       135 EV        4309 N10575  EWR    ALB         31      143    20      0 2013-01-30 20:00:00 2013-01-30 20:00:00
+##  2  2013     2    17     2012           2010         2     2120           2114         6 EV        4162 N10575  EWR    ALB         33      143    20     10 2013-02-17 20:00:00 2013-02-17 20:10:00
+##  3  2013     2    26     2356           2000       236       41           2104       217 EV        4162 N10575  EWR    ALB         24      143    20      0 2013-02-26 20:00:00 2013-02-26 20:00:00
+##  4  2013     3    13     1958           2005        -7     2056           2109       -13 EV        4566 N10575  EWR    ALB         32      143    20      5 2013-03-13 20:00:00 2013-03-13 20:05:00
+##  5  2013     5    16     2214           2000       134     2307           2112       115 EV        4117 N10575  EWR    ALB         30      143    20      0 2013-05-16 20:00:00 2013-05-16 20:00:00
+##  6  2013     5    30     2045           2000        45     2141           2112        29 EV        4117 N10575  EWR    ALB         29      143    20      0 2013-05-30 20:00:00 2013-05-30 20:00:00
+##  7  2013     9    11     2254           2159        55     2336           2303        33 EV        6043 N10575  EWR    ALB         27      143    21     59 2013-09-11 21:00:00 2013-09-11 21:59:00
+##  8  2013     9    12       NA           2159        NA       NA           2303        NA EV        6043 N10575  EWR    ALB         NA      143    21     59 2013-09-12 21:00:00 2013-09-12 21:59:00
+##  9  2013     9     8     2156           2159        -3     2250           2303       -13 EV        4264 N11113  EWR    ALB         29      143    21     59 2013-09-08 21:00:00 2013-09-08 21:59:00
+## 10  2013     1    26     1614           1620        -6     1706           1724       -18 EV        4271 N11119  EWR    ALB         34      143    16     20 2013-01-26 16:00:00 2013-01-26 16:20:00
+## # … with 336,766 more rows
+```
+
+---
+class: motivator middle
+
+.panelset[
+.panel[.panel-name[question]
+&lt;br&gt;
+&lt;br&gt;
+
+## Is pedestrian traffic regular, really?
+]
+
+.panel[.panel-name[discussion]
+&lt;br&gt;
+&lt;br&gt;
+
+*No, its event data: one pedestrian, arbitrary time. Its aggregated into a regular time period.*
+
+]
+]
+
+---
+class: transition middle animated slideInLeft
+
+## Let's make some plots
+
+---
+# Plotting temporal data
+
+- .monash-orange2[lines]: connecting sequential time points indicates the temporal dependence is important 
+- .monash-orange2[aspect ratio]: wide or tall? [Cleveland, McGill, McGill (1988) ](https://eagereyes.org/basics/banking-45-degrees) argue the average line slope in a line chart should be 45 degrees, which is called banking to 45 degrees. But this is refuted in Talbot, Gerth, Hanrahan (2012) that the conclusion was based on a flawed study. Nevertheless, aspect ratio is an inescapable skill for designing effective plots. For time series, typically a wide aspect ratio is good. 
+- .monash-orange2[conventions]: 
+    - time on the horizontal axis, 
+    - ordering of elements like week day, month. 
+
+---
+# Aspect ratio
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+&lt;img src="images/week9A/CO2_ratio-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[learn]
+
+&lt;br&gt;
+&lt;br&gt;
+
+- Is the trend linear or non-linear? 
+    - Yes, slightly non-linear. We could fit a linear regression model, and examine the residuals to better assess non-linear trend.
+- Is there a cyclical pattern?
+    - Yes, there is a yearly trend. 
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+
+*This type of data is easy to model, and forecast.*
+
+]
+
+.panel[.panel-name[R]
+
+
+```r
+load(here::here("data/CO2_ptb.rda"))
+CO2.ptb &lt;- CO2.ptb %&gt;% filter(year &gt; 1980)
+p &lt;- ggplot(CO2.ptb, aes(x=date, y=co2_ppm)) + 
+  geom_line(size=1) + xlab("") + ylab("CO2 (ppm)")
+p1 &lt;- p + theme(aspect.ratio = 1) + ggtitle("1 to 1 (may be useless)")
+p3 &lt;- p + theme(aspect.ratio = 2) + ggtitle("tall &amp; skinny:  trend")
+p2 &lt;- ggplot(CO2.ptb, aes(x=date, y=co2_ppm)) + 
+  annotate("text", x=2000, y=375, label="CO2 at \n Point Barrow,\n Alaska", size=8) + theme_solid()
+p4 &lt;- p + 
+  scale_x_continuous("", breaks = seq(1980, 2020, 5)) + 
+  theme(aspect.ratio = 0.2) + ggtitle("short &amp; wide: seasonality")
+grid.arrange(p1, p2, p3, p4, layout_matrix= matrix(c(1,2,3,4,4,4), nrow=2, byrow=T))
+```
+
+]
+
+]
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 1/7]
+
+.grid[
+&lt;div class="item50 border-right" style="font-size:20pt"&gt;
+
+.item[
+
+
+```r
+library(nycflights13)
+```
+
+]
+
+.item[
+What is a useful time element 
+to use, in order to study traffic 
+over time? 
+
+.monash-orange2[Hour, 15 minutes, 
+day, month?]
+]
+
+
+.item[
+
+&lt;br&gt;
+&lt;br&gt;
+
+Possibly, all of these.
+]
+
+
+.item[
+&lt;br&gt;
+&lt;br&gt;
+
+Let's start with .monash-orange2[hourly]. 
+]
+
+]
+
+
+.item[
+
+
+```r
+flights_hourly &lt;- flights %&gt;%
+* group_by(time_hour, origin) %&gt;%
+* summarise(count = n(),
+*   dep_delay = mean(dep_delay,
+*                    na.rm = TRUE)) %&gt;%
+  ungroup() %&gt;%
+  as_tsibble(index = time_hour, 
+             key = origin)
+flights_hourly
+```
+
+```
+*## # A tsibble: 19,486 x 4 [1h] &lt;America/New_York&gt;
+## # Key:       origin [3]
+##    time_hour           origin count dep_delay
+##    &lt;dttm&gt;              &lt;chr&gt;  &lt;int&gt;     &lt;dbl&gt;
+##  1 2013-01-01 05:00:00 EWR        2     -1   
+##  2 2013-01-01 06:00:00 EWR       18      3.06
+##  3 2013-01-01 07:00:00 EWR       12     14.2 
+##  4 2013-01-01 08:00:00 EWR       20      0.75
+##  5 2013-01-01 09:00:00 EWR       19      9.05
+##  6 2013-01-01 10:00:00 EWR       18      2.06
+##  7 2013-01-01 11:00:00 EWR       11      0   
+##  8 2013-01-01 12:00:00 EWR       22      6.73
+##  9 2013-01-01 13:00:00 EWR       28     28.7 
+## 10 2013-01-01 14:00:00 EWR       18     33.7 
+## # … with 19,476 more rows
+```
+
+&lt;/div&gt;
+]
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 2/7]
+
+Pick one airport, and examine the hourly number of flights.
+
+&lt;br&gt;
+
+
+```r
+flights_hourly %&gt;%
+  filter(origin == "JFK") %&gt;%
+  ggplot(aes(x=time_hour, y=count)) + 
+  geom_line() +
+  xlab("") + ylab("number of flights")
+```
+
+&lt;img src="images/week9A/flights_time-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+No, that's too much information, too much time. There's no overall trend. Not an interesting plot.
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 3/7]
+
+Reduce the time frame to check for periodicities
+
+
+```r
+flights_hourly %&gt;%
+  filter(origin == "JFK", 
+         time_hour &lt; ymd("2013-01-08")) %&gt;%
+  ggplot(aes(x=time_hour, y=count)) + 
+    geom_line(size=1.1) +
+    scale_x_datetime("", 
+                     date_breaks = "1 day", 
+                     date_labels = "%y-%m-%d %H",
+                     date_minor_breaks = "6 hours") + 
+    ylim(c(0, 32)) +
+    xlab("") + ylab("number of flights")
+```
+
+&lt;img src="images/week9A/flights_time_month-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 4/7]
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+&lt;img src="images/week9A/calendar-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[learn]
+
+- a calendar plot is a wonderful way to get a lot of data into a page
+- it makes it easy to examine daily patterns, weekly, monthly patterns
+
+&lt;br&gt;
+&lt;br&gt;
+
+- The daily pattern at JFK is very regular. 
+- It is similar for every day of the week, and for every month
+- There is a peak in early flights, a drop around lunchtime and then the number of flights pick up again.
+
+]
+.panel[.panel-name[R]
+
+
+```r
+calendar_df &lt;- flights_hourly %&gt;% 
+  filter(origin == "JFK") %&gt;%
+  mutate(hour = hour(time_hour), 
+         date = as.Date(time_hour)) %&gt;%
+  filter(year(date) &lt; 2014) %&gt;%
+* frame_calendar(x=hour, y=count, date=date, nrow=3)
+p1 &lt;- calendar_df %&gt;%
+  ggplot(aes(x = .hour, y = .count, group = date)) +
+  geom_line()
+prettify(p1, size = 3, label.padding = unit(0.15, "lines"))
+```
+
+]
+]
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 5/7]
+
+.grid[
+.item[
+
+```r
+flights_hourly %&gt;%
+  filter(origin == "JFK") %&gt;%
+  mutate(month = month(time_hour),
+         hour = hour(time_hour),
+         date = as.Date(time_hour)) %&gt;%
+  ggplot(aes(x=hour, y=count)) + 
+    geom_line(aes(group=date), alpha = 0.1) +
+    geom_smooth(se = FALSE) +
+    xlab("hour") + ylab("number of flights")
+```
+
+&lt;br&gt; &lt;br&gt;
+Its very regular. Does this make sense?
+
+]
+.item[
+&lt;img src="images/week9A/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+class: transition middle animated slideInLeft
+
+## Examine departure delays
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 6/7]
+
+.panelset[
+.panel[.panel-name[🖼️]
+
+&lt;img src="images/week9A/calendar_delay-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+.panel[.panel-name[learn]
+
+## Delays are much more interesting to examine
+
+- Most of the time there are few delays
+- Jun and July have consistently more delays
+- Sporadic days have big delays
+
+.monash-orange2[Can you find a reason for one of the days with a big delay?]
+
+<div class="countdown" id="timer_5f83dc82" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+]
+.panel[.panel-name[R]
+
+
+```r
+calendar_df &lt;- flights_hourly %&gt;% 
+  filter(origin == "JFK") %&gt;%
+  mutate(hour = hour(time_hour), 
+         date = as.Date(time_hour)) %&gt;%
+  filter(year(date) &lt; 2014) %&gt;%
+  frame_calendar(x=hour, y=dep_delay, date=date, nrow=3) 
+p2 &lt;- calendar_df %&gt;%
+  ggplot(aes(x = .hour, y = .dep_delay, group = date)) +
+  geom_line()
+prettify(p2, size = 3, label.padding = unit(0.15, "lines"))
+```
+
+]
+]
+
+---
+# .orange[Case study] .bg-orange.circle[2] nycflights13 .font_small[Part 7/7]
+
+.grid[
+.item[
+
+```r
+flights_hourly %&gt;%
+  filter(origin == "JFK") %&gt;%
+  mutate(month = month(time_hour),
+         hour = hour(time_hour),
+         date = as.Date(time_hour)) %&gt;%
+  ggplot(aes(x=hour, y=dep_delay)) + 
+    geom_hline(yintercept=0, colour="white", size=2) +
+    geom_line(aes(group=date), alpha = 0.1) +
+    geom_smooth(se=FALSE) +
+    xlab("hour") + ylab("number of flights")
+```
+
+- Delays tend to pile up as the day goes on.
+- Also notice a lot of flights depart a few minutes early.
+- This data is harder to model and forecast.
+
+]
+.item[
+&lt;img src="images/week9A/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+]
+
+---
+# Summary: Melting time
+
+- The structure of the airlines data is very useful. Date-time has already been broken out into: `year`, `month`, `day`, `hour`, `minute`.
+- There are also several possible key variables: `origin`, `carrier`, `tailnum`.
+
+<div class="countdown" id="timer_5f83da19" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+.monash-orange2[Why isn't `dest` considered a key variable? Why not have `air_time` as a key variable?]
+
+- Aggregate by temporal components, in different ways to explore different patterns of variables in relation to elements of time.
+
+---
+class: transition middle
+
+## Interactive exploration with tsibbletalk
+
+---
+class: center
+
+<span>&lt;i class="fas  fa-wrench faa-wrench animated-hover faa-slow " style=" color:#D93F00;"&gt;&lt;/i&gt;</span> Your turn, .monash-blue[cut and paste the code] into your R console. Click on the tree, click on a point, line, ...
+
+.scroll-500[
+
+```r
+library(tsibble)
+library(tsibbletalk)
+tourism_shared &lt;- tourism %&gt;%
+  as_shared_tsibble(spec = (State / Region) * Purpose)
+p0 &lt;- plotly_key_tree(tourism_shared, height = 900, width = 600)
+
+library(feasts)
+tourism_feat &lt;- tourism_shared %&gt;%
+  features(Trips, feat_stl)
+
+p1 &lt;- tourism_shared %&gt;%
+  ggplot(aes(x = Quarter, y = Trips)) +
+  geom_line(aes(group = Region), alpha = 0.5) +
+  facet_wrap(~ Purpose, scales = "free_y")
+p2 &lt;- tourism_feat %&gt;%
+  ggplot(aes(x = trend_strength, y = seasonal_strength_year)) +
+  geom_point(aes(group = Region))
+
+library(plotly)
+subplot(p0,
+  subplot(
+    ggplotly(p1, tooltip = "Region", width = 900),
+    ggplotly(p2, tooltip = "Region", width = 900),
+    nrows = 2),
+  widths = c(.4, .6)) %&gt;%
+  highlight(dynamic = TRUE)
+```
+]
+
+
+---
+class: center
+
+<span>&lt;i class="fas  fa-wrench faa-wrench animated-hover faa-slow " style=" color:#D93F00;"&gt;&lt;/i&gt;</span> Your turn, .monash-blue[cut and paste the code] into your R console. Drag the scroll bar to wrap the series on itself.
+
+.font_medium[
+
+```r
+p &lt;- fill_gaps(pedestrian) %&gt;%
+  filter_index(~ "2015") %&gt;% 
+  ggplot(aes(x = Date_Time, y = Count, colour = Sensor)) +
+  geom_line(size = .2) +
+  facet_wrap(~ Sensor, scales = "free_y") +
+  theme(legend.position = "none")
+
+library(shiny)
+ui &lt;- fluidPage(tsibbleWrapUI("tswrap"))
+server &lt;- function(input, output, session) {
+  tsibbleWrapServer("tswrap", p, period = "1 day")
+}
+shinyApp(ui, server)
+```
+]
+
+---
+# A step back in time, classic almost periodic data
+
+.monash-orange2[See if you can get the peaks to match up with wrapping.]
+
+.pull-left[
+Annual numbers of lynx trappings for 1821–1934 in Canada. Almost 10 year cycle. 
+
+
+```r
+lynx_tsb &lt;- as_tsibble(lynx) %&gt;%
+  rename(count = value)
+pl &lt;- ggplot(lynx_tsb, aes(x = index, y = count)) +
+  geom_line(size = .2) 
+
+ui &lt;- fluidPage(tsibbleWrapUI("tswrap"))
+server &lt;- function(input, output, session) {
+  tsibbleWrapServer("tswrap", pl, period = "10 year")
+}
+shinyApp(ui, server)
+```
+]
+
+.pull-right[
+
+Monthly mean relative sunspot numbers from 1749 to 1983. Almost 10 year cycle.
+
+
+```r
+sunspots_tsb &lt;- as_tsibble(sunspots) %&gt;%
+  rename(count = value)
+pl &lt;- ggplot(sunspots_tsb, aes(x = index, y = count)) +
+  geom_line(size = .2) 
+
+ui &lt;- fluidPage(tsibbleWrapUI("tswrap"))
+server &lt;- function(input, output, session) {
+  tsibbleWrapServer("tswrap", pl, period = "10 year")
+}
+shinyApp(ui, server)
+```
+]
+---
+
+# Resources and Acknowledgement
+
+
+- The temporal data object [tsibble](https://tsibble.tidyverts.org/index.html)
+- Data coding using [`tidyverse` suite of R packages](https://www.tidyverse.org) 
+- Slides constructed with [`xaringan`](https://github.com/yihui/xaringan), [remark.js](https://remarkjs.com), [`knitr`](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+- In Semester 3's ETC5580 expect to learn more about regular time series, which will include some exploration and some modeling
+
+---
+
+
+background-image: url(images/tsibble.png)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Di Cook
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

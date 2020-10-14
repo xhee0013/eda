@@ -45,6 +45,7 @@ schedule:
     topic: Exploring data having a space and time context
   - week: 10
     lecturer: Di/Guest
+    readings: "[Healy (2018) Data Visualization, Chap 7, Draw maps](https://socviz.co/maps.html#maps); [Perpinan Lamigueiro (2018) Displaying Time Series, Spatial and Space-Time Data with R](https://oscarperpinan.github.io/bookvis/)"
     topic: Exploring data having a space and time context
   - week: 11
     lecturer: Emi

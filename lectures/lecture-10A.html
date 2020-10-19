@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ETC5521: Exploratory Data Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Di Cook" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <script src="libs/fabric-3.6.3/fabric.min.js"></script>
+    <script src="libs/FileSaver-2.0.2/FileSaver.min.js"></script>
+    <script src="libs/jQuery-3.5.1/jquery-3.5.1.min.js"></script>
+    <script src="assets/panelset-modified.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-logo.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="assets/table.css" type="text/css" />
+    <link rel="stylesheet" href="assets/panelset.css" type="text/css" />
+    <link rel="stylesheet" href="assets/di3.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+
+
+
+
+background-color: #006DAE
+class: middle center hide-slide-number
+
+
+&lt;div class="shade_black"  style="width:60%;right:0;bottom:0;padding:10px;border: dashed 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See &lt;a href=/&gt;here for PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Press the **right arrow** to progress to the next slide!]
+
+---
+
+
+background-image: url(images/wk10.png)
+background-size: cover
+class: hide-slide-number split-70 title-slide
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;
+
+# .monash-blue.outline-text[ETC5521: Exploratory Data Analysis]
+
+&lt;h2 class="monash-blue2 outline-text" style="font-size: 30pt!important;"&gt;&lt;/h2&gt;
+
+&lt;br&gt;
+
+&lt;h2 style="font-weight:900!important;"&gt;Exploring data having a space and time context&lt;/h2&gt;
+
+.bottom_abs.width100[
+
+Lecturer: *Di Cook*
+
+Department of Econometrics and Business Statistics
+
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+Week 10 - Session 1
+
+&lt;br&gt;
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;style type="text/css"&gt;
+.gray80 {
+  color: #505050!important;
+  font-weight: 300;
+}
+.bg-gray80 {
+  background-color: #DCDCDC!important;
+}
+&lt;/style&gt;
+
+---
+background-image: \url(https://bjork.com/images/Floral-B-Logo-300.png)
+background-position: 20% 80%
+
+.pull-left[
+&gt; You show me continents, I see the islands, You count the centuries, I blink my eyes
+
+[Björk](https://www.bjork.com)
+
+]
+--
+
+.pull-right[
+# Outline
+
+- Breaking up data by time, and by space
+- Maps of space over time
+- Exploring time over space glyph maps
+- Bending the choropleth map 
+- A flash back to the 1970s: Tukey's median polish 
+]
+
+---
+# .orange[Case study] .bg-orange.circle[1] Temperature change in Americas
+
+.panelset[
+.panel[.panel-name[data]
+6 years of monthly measurements of a 24x24 spatial grid from Central America collated by Paul Murrell, U. Auckland.
+
+.scroll-box-16[
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#kijzkfiqxp .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#kijzkfiqxp .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#kijzkfiqxp .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#kijzkfiqxp .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#kijzkfiqxp .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#kijzkfiqxp .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#kijzkfiqxp .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#kijzkfiqxp .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kijzkfiqxp .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kijzkfiqxp .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#kijzkfiqxp .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#kijzkfiqxp .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#kijzkfiqxp .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#kijzkfiqxp .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#kijzkfiqxp .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kijzkfiqxp .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kijzkfiqxp .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#kijzkfiqxp .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kijzkfiqxp .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#kijzkfiqxp .gt_left {
+  text-align: left;
+}
+
+#kijzkfiqxp .gt_center {
+  text-align: center;
+}
+
+#kijzkfiqxp .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#kijzkfiqxp .gt_font_normal {
+  font-weight: normal;
+}
+
+#kijzkfiqxp .gt_font_bold {
+  font-weight: bold;
+}
+
+#kijzkfiqxp .gt_font_italic {
+  font-style: italic;
+}
+
+#kijzkfiqxp .gt_super {
+  font-size: 65%;
+}
+
+#kijzkfiqxp .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="kijzkfiqxp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">time</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">y</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">x</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">lat</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">long</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">date</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">cloudhigh</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">cloudlow</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">cloudmid</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">ozone</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">pressure</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">surftemp</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">temperature</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">id</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">day</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">month</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">year</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-113.80000</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">0.5</td>
+      <td class="gt_row gt_right">31.0</td>
+      <td class="gt_row gt_right">2.0</td>
+      <td class="gt_row gt_center">260</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">297.4</td>
+      <td class="gt_row gt_right">296.9</td>
+      <td class="gt_row gt_left">1-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">2</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-111.29565</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.5</td>
+      <td class="gt_row gt_right">31.5</td>
+      <td class="gt_row gt_right">2.5</td>
+      <td class="gt_row gt_center">260</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">297.4</td>
+      <td class="gt_row gt_right">296.5</td>
+      <td class="gt_row gt_left">2-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">3</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-108.79130</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.5</td>
+      <td class="gt_row gt_right">32.5</td>
+      <td class="gt_row gt_right">3.5</td>
+      <td class="gt_row gt_center">260</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">297.4</td>
+      <td class="gt_row gt_right">296.0</td>
+      <td class="gt_row gt_left">3-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">4</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-106.28696</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.0</td>
+      <td class="gt_row gt_right">39.0</td>
+      <td class="gt_row gt_right">4.0</td>
+      <td class="gt_row gt_center">258</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">296.9</td>
+      <td class="gt_row gt_right">296.5</td>
+      <td class="gt_row gt_left">4-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">5</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-103.78261</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">0.5</td>
+      <td class="gt_row gt_right">48.0</td>
+      <td class="gt_row gt_right">4.5</td>
+      <td class="gt_row gt_center">258</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">296.5</td>
+      <td class="gt_row gt_right">295.5</td>
+      <td class="gt_row gt_left">5-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">6</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-101.27826</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">0.0</td>
+      <td class="gt_row gt_right">50.0</td>
+      <td class="gt_row gt_right">2.5</td>
+      <td class="gt_row gt_center">258</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">296.5</td>
+      <td class="gt_row gt_right">295.0</td>
+      <td class="gt_row gt_left">6-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">7</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-98.77391</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">0.0</td>
+      <td class="gt_row gt_right">51.0</td>
+      <td class="gt_row gt_right">4.5</td>
+      <td class="gt_row gt_center">256</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">295.5</td>
+      <td class="gt_row gt_right">295.5</td>
+      <td class="gt_row gt_left">7-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">8</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-96.26957</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">0.0</td>
+      <td class="gt_row gt_right">52.5</td>
+      <td class="gt_row gt_right">5.0</td>
+      <td class="gt_row gt_center">258</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">295.5</td>
+      <td class="gt_row gt_right">295.0</td>
+      <td class="gt_row gt_left">8-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">9</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-93.76522</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">0.5</td>
+      <td class="gt_row gt_right">54.0</td>
+      <td class="gt_row gt_right">8.5</td>
+      <td class="gt_row gt_center">256</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">295.0</td>
+      <td class="gt_row gt_right">295.0</td>
+      <td class="gt_row gt_left">9-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">10</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-91.26087</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.0</td>
+      <td class="gt_row gt_right">56.0</td>
+      <td class="gt_row gt_right">11.5</td>
+      <td class="gt_row gt_center">258</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_left">10-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">11</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-88.75652</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.0</td>
+      <td class="gt_row gt_right">56.0</td>
+      <td class="gt_row gt_right">11.5</td>
+      <td class="gt_row gt_center">258</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_left">11-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">12</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-86.25217</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.0</td>
+      <td class="gt_row gt_right">60.5</td>
+      <td class="gt_row gt_right">12.5</td>
+      <td class="gt_row gt_center">254</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">294.1</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_left">12-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">13</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-83.74783</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.5</td>
+      <td class="gt_row gt_right">57.0</td>
+      <td class="gt_row gt_right">19.5</td>
+      <td class="gt_row gt_center">254</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">293.2</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_left">13-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">14</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-81.24348</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">2.5</td>
+      <td class="gt_row gt_right">57.0</td>
+      <td class="gt_row gt_right">20.0</td>
+      <td class="gt_row gt_center">252</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">293.2</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_left">14-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">15</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-78.73913</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.5</td>
+      <td class="gt_row gt_right">53.5</td>
+      <td class="gt_row gt_right">22.0</td>
+      <td class="gt_row gt_center">254</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">293.2</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_left">15-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">16</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-76.23478</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.0</td>
+      <td class="gt_row gt_right">51.5</td>
+      <td class="gt_row gt_right">24.5</td>
+      <td class="gt_row gt_center">254</td>
+      <td class="gt_row gt_center">995</td>
+      <td class="gt_row gt_right">293.6</td>
+      <td class="gt_row gt_right">295.5</td>
+      <td class="gt_row gt_left">16-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">17</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-73.73043</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.0</td>
+      <td class="gt_row gt_right">52.0</td>
+      <td class="gt_row gt_right">16.5</td>
+      <td class="gt_row gt_center">256</td>
+      <td class="gt_row gt_center">1000</td>
+      <td class="gt_row gt_right">295.0</td>
+      <td class="gt_row gt_right">296.0</td>
+      <td class="gt_row gt_left">17-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">18</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-71.22609</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">1.5</td>
+      <td class="gt_row gt_right">37.5</td>
+      <td class="gt_row gt_right">8.0</td>
+      <td class="gt_row gt_center">256</td>
+      <td class="gt_row gt_center">995</td>
+      <td class="gt_row gt_right">296.9</td>
+      <td class="gt_row gt_right">296.9</td>
+      <td class="gt_row gt_left">18-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">19</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-68.72174</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">14.0</td>
+      <td class="gt_row gt_right">12.5</td>
+      <td class="gt_row gt_right">22.5</td>
+      <td class="gt_row gt_center">258</td>
+      <td class="gt_row gt_center">690</td>
+      <td class="gt_row gt_right">294.6</td>
+      <td class="gt_row gt_right">288.3</td>
+      <td class="gt_row gt_left">19-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_center">20</td>
+      <td class="gt_row gt_right">-21.2</td>
+      <td class="gt_row gt_right">-66.21739</td>
+      <td class="gt_row gt_left">1995-01-01</td>
+      <td class="gt_row gt_right">29.5</td>
+      <td class="gt_row gt_right">7.0</td>
+      <td class="gt_row gt_right">30.0</td>
+      <td class="gt_row gt_center">256</td>
+      <td class="gt_row gt_center">680</td>
+      <td class="gt_row gt_right">292.7</td>
+      <td class="gt_row gt_right">288.8</td>
+      <td class="gt_row gt_left">20-1</td>
+      <td class="gt_row gt_right">0</td>
+      <td class="gt_row gt_right">1</td>
+      <td class="gt_row gt_right">1995</td>
+    </tr>
+  </tbody>
+  
+  
+</table></div>
+]
+]
+.panel[.panel-name[R]
+
+
+```r
+data(nasa)
+nasa %&gt;% slice_head(n=20) %&gt;% gt()
+```
+
+]
+]
+---
+# .orange[Case study] .bg-orange.circle[1] Temperature change in Americas
+
+.pull-left[
+.panelset[
+.panel[.panel-name[plot]
+&lt;img src="images/week10A/spatial-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[R]
+
+```r
+ggplot(filter(nasa, time == 1), aes(x=long, y=lat)) + 
+  geom_point() +
+  geom_point(data=filter(nasa, time==1, x==5, y==20),
+             colour="orange", size=4) +
+  geom_point(data=filter(nasa, time==1, x==20, y==2),
+             colour="turquoise", size=4)
+```
+]
+]
+
+]
+
+.pull-right[
+.panelset[
+.panel[.panel-name[plot]
+&lt;img src="images/week10A/temporal-1.png" width="120%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[R]
+
+```r
+ggplot(nasa, aes(x=date, y=surftemp, group=id)) + 
+    geom_line(alpha=0.2) +
+    geom_line(data=filter(nasa, x == 5, y == 20),
+             colour="orange", size=2) +
+    geom_line(data=filter(nasa, x == 20, y == 2),
+             colour="turquoise", size=2)
+```
+]
+]
+]
+
+---
+class: informative middle nostripheader
+# Pre-processing of time and space
+
+.info-box[Think of .monash-orange2[time and space as a categorical variables]. You may need to create the categories of time. Spatial variable might need to be discretised, or gridded.]
+
+---
+# Slice in time and create a spatial map
+
+.panelset[
+.panel[.panel-name[plot]
+
+&lt;img src="images/week10A/raster-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[learn]
+
+&lt;br&gt; &lt;br&gt;
+
+In January 2005, temperatures are
+
+- cool over land in the north 
+- cool over the Andes in south america
+- warm on the equator, and along the coastline
+
+There are 12*6=72 maps to make!!
+
+]
+.panel[.panel-name[R]
+
+```r
+sth_america &lt;- map_data("world") %&gt;%
+  filter(between(long, -115, -57), between(lat, -21.5, 36.5))
+ggplot() + 
+  geom_tile(data = filter(nasa, time == 1), 
+            aes(x=long, y=lat, fill=surftemp)) +
+  geom_path(data=sth_america, 
+            aes(x=long, y=lat, group=group), 
+            colour="white", size=1) +
+  scale_fill_viridis_c("", option = "magma") +
+  theme_map() +
+  theme(legend.position = "bottom") +
+  ggtitle("January 1995")
+```
+]
+]
+
+---
+# Expand using facets in time
+
+.panelset[
+.panel[.panel-name[plot]
+&lt;img src="images/week10A/space_time-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[learn]
+
+This approach is exploring spatial trend over time.
+
+Can you see El Nino in 1997? Can you see the summer vs winter in the different hemispheres?
+
+]
+.panel[.panel-name[R]
+
+```r
+ggplot(nasa, aes(x=long, y=lat, fill=surftemp)) + 
+  geom_tile() +
+  facet_grid(year~month) +
+  scale_fill_viridis_c("surface temperature",
+                       option = "magma") +
+  theme_map() +
+  theme(legend.position="bottom")
+```
+]
+
+]
+---
+# Expand time across space
+
+.pull-left[
+.panelset[
+.panel[.panel-name[plot]
+
+This is called a glyph map. Small time series are plotted at each spatial location. 
+
+&lt;img src="images/week10A/time_space-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[R]
+
+
+```r
+temp.gly &lt;- glyphs(nasa, "long", "day", "lat",
+                   "surftemp", height=2.5)
+ggplot(temp.gly, ggplot2::aes(gx, gy, group = gid)) +
+  add_ref_lines(temp.gly, color = "grey90") +
+  add_ref_boxes(temp.gly, color = "grey90") +
+  geom_path() +
+  labs(x = "", y = "") +
+  coord_map() + theme_map()     
+```
+
+]
+]
+
+]
+.pull-right[
+.panelset[
+.panel[.panel-name[plot]
+
+This is for exploring temporal trends over space. Here the time series are represented in polar coordinates. 
+
+&lt;img src="images/week10A/time_space2-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[R]
+
+
+```r
+temp.gly &lt;- glyphs(nasa, "long", "day", "lat",
+                   "surftemp", height=2.5, 
+                   y_scale = range01, polar = TRUE)
+ggplot(temp.gly, ggplot2::aes(gx, gy, group = gid)) +
+  add_ref_lines(temp.gly, color = "grey90") +
+  add_ref_boxes(temp.gly, color = "grey90") +
+  geom_path() +
+  labs(x = "", y = "") +
+  coord_map() +
+  theme_map()  
+```
+
+]
+]
+
+]
+
+---
+# .orange[Case study] .bg-orange.circle[1] Temperature change in Americas
+
+## Detecting El Nino
+
+Slice space, and show the time series, and the pattern is very clear: The seasonal water temperature decrease doesn't happen in 1997, and water in this area stays unseasonably warm.
+
+&lt;img src="images/week10A/over_time-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+<span>&lt;i class="fas  fa-wrench faa-wrench animated-hover faa-slow " style=" color:#D93F00;"&gt;&lt;/i&gt;</span> Your turn using tsibbletalk
+
+
+```r
+library(tsibble)
+library(tsibbletalk)
+library(lubridate)
+nasa_shared &lt;- nasa %&gt;% 
+  mutate(date = ymd(date)) %&gt;%
+  select(long, lat, date, surftemp, id) %&gt;%
+  as_tsibble(index=date, key=id) %&gt;%
+  as_shared_tsibble()
+p1 &lt;- nasa_shared %&gt;%
+  ggplot(aes(x = long, y = lat)) +
+  geom_point(aes(group = id)) 
+p2 &lt;- nasa_shared %&gt;%
+  ggplot(aes(x = date, y = surftemp)) +
+  geom_line(aes(group = id), alpha = 0.5) 
+library(plotly)
+subplot(
+    ggplotly(p1, tooltip = "Region", width = 100),
+    ggplotly(p2, tooltip = "Region", width = 900),
+    nrows = 1, widths=c(0.4, 0.6)) %&gt;%
+  highlight(dynamic = TRUE)
+```
+
+---
+class: transition middle
+
+## A flash back to the 1970s: Tukey's median polish
+
+This is a useful data scratching technique, particularly for spatial data, to remove complicated trends.
+
+---
+# Median polish technique
+
+.pull-left[
+
+<input id = erasetwoway type = 'checkbox' title='Check it to erase !'>
+
+<input id = twowaydrawing-color type = 'color' value = '#005E7A' style = 'width:30px;'>
+
+<input id = exporttwoway type = 'button' style = 'width:55px;' value = 'Export'>
+
+<canvas id="twoway" width="500" height="500"></canvas>
+<script>
+const twoway = new fabric.Canvas('twoway', {
+    backgroundColor: 'whitesmoke',
+    isDrawingMode: true
+
+    });
+
+
+twoway.freeDrawingBrush.width  = 3;
+
+
+twowaydrawingColorEl = document.getElementById('twowaydrawing-color');
+
+twoway.freeDrawingBrush.color = twowaydrawingColorEl.value;
+
+twowaydrawingColorEl.onchange = function() {
+    twoway.freeDrawingBrush.color = twowaydrawingColorEl.value;
+  };
+
+
+ $('#erasetwoway').click(function(){
+
+    if (this.checked) {
+
+      twoway.freeDrawingBrush.color  = 'whitesmoke';
+
+    } else {
+
+      twoway.freeDrawingBrush.color = twowaydrawingColorEl.value;
+
+    }
+
+
+
+});
+
+
+
+
+
+ $('#erasetwoway').click(function(){
+
+    if (this.checked) {
+
+      twoway.freeDrawingBrush.width   = 10;
+
+    } else {
+
+      twoway.freeDrawingBrush.width  = 3;
+
+    }
+
+
+});
+
+
+$('#exporttwoway').click(function(){
+
+  $('#twoway').get(0).toBlob(function(blob){
+
+    saveAs(blob, 'twoway-IMG.png');
+
+
+  });
+
+
+});
+
+
+
+
+
+
+</script><script>
+
+  var txt1 = new fabric.Text(" 10  8  6  4  2 ", {
+
+  left: 10,
+  top: 10,
+  fontFamily: 'Courier',
+  fontSize: 18,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
+
+});
+
+  twoway.add(txt1);
+</script><script>
+
+  var txt2 = new fabric.Text("  8  6  4  2  4", {
+
+  left: 10,
+  top: 40,
+  fontFamily: 'Courier',
+  fontSize: 18,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
+
+});
+
+  twoway.add(txt2);
+</script><script>
+
+  var txt3 = new fabric.Text("  6  4  2  4  6", {
+
+  left: 10,
+  top: 70,
+  fontFamily: 'Courier',
+  fontSize: 18,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
+
+});
+
+  twoway.add(txt3);
+</script><script>
+
+  var txt3 = new fabric.Text("  4  2  6  8  8", {
+
+  left: 10,
+  top: 100,
+  fontFamily: 'Courier',
+  fontSize: 18,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
+
+});
+
+  twoway.add(txt3);
+</script><script>
+
+  var txt3 = new fabric.Text("  2  4  6  8  10", {
+
+  left: 10,
+  top: 130,
+  fontFamily: 'Courier',
+  fontSize: 18,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  underline: false,
+  linethrough: false,
+  overline: false,
+  fill: '#2F3941',
+  angle: 0,
+  opacity: 1,
+  stroke: '#282A36',
+  strokeWidth: 1,
+  textAlign: 'center',
+  lineHeight: 1,
+  
+  selectable: true,
+  
+
+});
+
+  twoway.add(txt3);
+</script>
+]
+.pull-right[
+.font_medium[
+1. Compute row medians, and the median of the row medians,  called **row overall effect**.
+2. Subtract each element in a row by its row median.
+3. Subtract the row overall effect from each row median.
+4. Do the same columns. Add the column overall effect to row overall effect.
+5. Repeat 1-4 until negligible change occur with row or column medians.
+]
+]
+
+---
+# Median polish technique
+
+.pull-left[
+
+&lt;img src="images/week10A/twoway-medpolish.png" width="100%"&gt;
+
+]
+
+.pull-right[
+
+.scroll-box-16[
+
+```
+## 1: 42
+```
+
+```
+## 
+## Median Polish Results (Dataset: "x")
+## 
+## Overall: 4
+## 
+## Row Effects:
+## [1] 2 0 0 0 2
+## 
+## Column Effects:
+## [1] 2 0 0 0 2
+## 
+## Residuals:
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    2    2    0   -2   -6
+## [2,]    2    2    0   -2   -2
+## [3,]    0    0   -2    0    0
+## [4,]   -2   -2    0    2    2
+## [5,]   -6   -2    0    2    2
+```
+]
+]
+
+---
+# Median polish technique
+
+.pull-left[
+
+.scroll-box-16[
+
+```
+## 1: 42
+## Final: 42
+```
+
+```
+## 
+## Median Polish Results (Dataset: "x")
+## 
+## Overall: 4
+## 
+## Row Effects:
+## [1] 2 0 0 0 2
+## 
+## Column Effects:
+## [1] 2 0 0 0 2
+## 
+## Residuals:
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    2    2    0   -2   -6
+## [2,]    2    2    0   -2   -2
+## [3,]    0    0   -2    0    0
+## [4,]   -2   -2    0    2    2
+## [5,]   -6   -2    0    2    2
+```
+]
+
+]
+
+.pull-right[
+
+Median polish is effectively fitting a model of this form:
+
+*overall effect + row effect + column effect*
+
+which can be written as:
+
+`$$y_{ij} = \mu + \alpha_i + \beta_j + \varepsilon_{ij}$$`
+&lt;br&gt;
+&lt;br&gt;
+
+Nice explanation by [Manny Gimond (2020)](https://mgimond.github.io/ES218/Week11a.html)
+
+]
+
+---
+
+# .orange[Case study] .bg-orange.circle[2] Soils
+
+.panelset[
+.panel[.panel-name[plot]
+
+
+&lt;img src="images/week10A/med_polish-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+This is the baker field data that we have seen before. The heatmap shows corn yield in a farm field in Iowa. High values are yellow and low values are dark blue. 
+
+The right-side heatmap shows the residuals from median polish, and the row and column marginal effects. After a median polish, the values should look randomly distributed.
+
+]
+
+.panel[.panel-name[R]
+
+.scroll-500[
+
+```r
+baker &lt;- read_csv("../data/baker.csv")
+p1 &lt;- ggplot(baker, aes(x=X, y=Y, fill=Corn97BU)) +
+  geom_tile() + 
+  scale_fill_viridis_c("") +
+  theme_map() +
+  theme(legend.position = "none") 
+baker_mat &lt;- baker %&gt;%
+  select(X, Y, Corn97BU) %&gt;%
+  pivot_wider(names_from = "Y", values_from = Corn97BU) 
+baker_mat &lt;- as.matrix(baker_mat)
+rownames(baker_mat) &lt;- baker_mat[,1]
+baker_mat &lt;- baker_mat[,-1]
+
+baker_mp &lt;- medpolish(baker_mat[,-1], na.rm=TRUE)
+baker_mp$residuals &lt;- cbind(as.numeric(rownames(baker_mp$residuals)), baker_mp$residuals)
+colnames(baker_mp$residuals)[1] &lt;- "X"
+baker_mp_res &lt;- baker_mp$residuals %&gt;%
+  as_tibble() %&gt;% 
+  pivot_longer(cols=`48`:`336`, names_to = "Y", 
+               values_to = "Corn97BU") %&gt;%
+  mutate(Y = as.numeric(Y))
+p2 &lt;- ggplot(baker_mp_res, aes(x=X, y=Y, fill=Corn97BU)) +
+  geom_tile() + 
+  scale_fill_viridis_c("", na.value="white") +
+  theme_map() +
+  theme(legend.position = "none") 
+
+col_marg &lt;- bind_rows(col=as.numeric(names(baker_mp$col)), 
+                      Corn97BU = as.numeric(baker_mp$col))
+row_marg &lt;- bind_rows(row=as.numeric(names(baker_mp$row)), 
+                      Corn97BU = as.numeric(baker_mp$row))
+p3 &lt;- ggplot(col_marg, aes(x = col, y = Corn97BU)) +
+        xlab("") + ylab("") +
+        geom_col() + theme_map() +
+        coord_flip()
+p4 &lt;- ggplot(row_marg, aes(x = row, y = Corn97BU)) +
+        geom_col() + theme_map() +
+        xlab("") + ylab("") 
+ 
+design &lt;- "
+##11#
+22334
+22334
+22334"
+p4 + p1 + p2 + p3 +
+  plot_layout(design = design)
+```
+]
+
+]
+]
+
+---
+class: transition middle
+
+## Choropleth maps and cartograms
+
+---
+# Choropleth maps 
+
+A choropleth map is used to show a measured variable associated with a political or geographic region. Polygons for the region are filled with colour. 
+
+.pull-left[
+&lt;img src="images/week10A/aus_liver_m.png" width="100%"&gt; 
+]
+.pull-right[
+
+Here's a map of liver cancer incidence for Australia, for local government regions. .monash-orange2[Orange] indicates .monash-orange2[high], and dark .monash-blue2[blue] represents .monash-blue2[low].
+
+&lt;br&gt;
+
+Where would you say is the highest incidence of liver cancer?
+
+]
+
+---
+# Choropleth maps 
+
+The problem with choropleth maps is that geographically large areas dominate the view and obscure the statistics of small regions. 
+
+.pull-left[
+&lt;img src="images/week10A/aus_liver_m_hex.png" width="100%"&gt; 
+]
+.pull-right[
+
+Here is a hexmap of liver cancer across Australia made with the [sugarbag](https://srkobakian.github.io/sugarbag/) package by Steff Kobakian. Each LGA is reprensented as a hexagon, roughly in its same geographic location. 
+
+&lt;br&gt;
+
+Would you change your previous answer?
+
+]
+
+
+---
+# Cartograms
+
+A [cartogram](https://www.r-graph-gallery.com/cartogram.html) transforms the geographic shape to match the value of a statistic. Its a useful exploratory technique for examining the spatial distribution of a measured variable. 
+
+.panelset[
+.panel[.panel-name[plot]
+
+&lt;img src="images/week10A/cartogram-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.panel[.panel-name[R]
+
+.scroll-box-16[
+
+```r
+data(wrld_simpl)
+afr &lt;- wrld_simpl[wrld_simpl$REGION==2,]
+afr &lt;- spTransform(afr, CRS("+init=epsg:3395"))
+# epsg:3395 means mercator projection
+
+afr_tb &lt;- tidy(afr)
+afr_tb &lt;- afr_tb %&gt;% 
+  left_join(. , afr@data, by=c("id"="ISO3")) 
+p1 &lt;- ggplot() +
+  geom_polygon(data = afr_tb, 
+               aes(fill = POP2005, x = long, y = lat, 
+                   group = group), size=0, alpha=0.9) +
+  scale_fill_viridis_c() +
+  theme_map() +
+  ggtitle("Choropleth map")
+
+afr_cartogram &lt;- cartogram_cont(afr, "POP2005", itermax=10)
+
+afr_c_tb &lt;- tidy(afr_cartogram)
+afr_c_tb &lt;- afr_c_tb %&gt;% 
+  left_join(. , afr_cartogram@data, by=c("id"="ISO3")) 
+p2 &lt;- ggplot() +
+  geom_polygon(data = afr_c_tb, 
+               aes(fill = POP2005, x = long, y = lat, 
+                   group = group), size=0, alpha=0.9) +
+  scale_fill_viridis_c() +
+  theme_map() +
+  ggtitle("Cartogram")
+
+afr_dorling &lt;- cartogram_dorling(afr, "POP2005")
+afr_d_tb &lt;- tidy(afr_dorling)
+afr_d_tb &lt;- afr_d_tb %&gt;% 
+  left_join(. , afr_dorling@data, by=c("id"="ISO3")) 
+p3 &lt;- ggplot() +
+  geom_polygon(data = afr_d_tb, 
+               aes(fill = POP2005, x = long, y = lat, 
+                   group = group) , size=0, alpha=0.9) +
+  scale_fill_viridis_c() +
+  theme_map() +
+  ggtitle("Dorling cartogram")
+lemon::grid_arrange_shared_legend(p1, p2, p3, ncol=3)
+```
+]
+
+]
+]
+
+---
+
+# Resources and Acknowledgement
+
+- [Healy (2018) Data Visualization](https://socviz.co/maps.html#maps)
+- [Perpinan Lamigueiro (2018) Displaying time series, spatial and space-time data with R](https://oscarperpinan.github.io/bookvis/)
+- Wikle, Zammit-Mangion, Cressie (2018) [Spatio-Temporal Statistics with R](https://spacetimewithr.org)
+- Tools for handling spatial objects,  [maptools](https://cran.r-project.org/web/packages/maptools/index.html)
+- Spatial features package [sf](https://r-spatial.github.io/sf/)
+- Hexmaps with [sugarbag](https://srkobakian.github.io/sugarbag/)
+- Making [cartograms](https://www.r-graph-gallery.com/cartogram.html) in R
+- Median polish on two way tables from Tukey, J. W. (1977). Exploratory Data Analysis, Reading Massachusetts: Addison-Wesley. (See [Manny Gimond (2020)](https://mgimond.github.io/ES218/Week11a.html))
+
+---
+
+
+background-image: url(images/wk10.png)
+background-size: cover
+class: hide-slide-number split-70
+count: false
+
+.column.shade_black[.content[
+
+&lt;br&gt;&lt;br&gt;
+
+# That's it, for this lecture!
+
+&lt;br&gt; 
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;&lt;img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /&gt;&lt;/a&gt;&lt;br /&gt;This work is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;.
+
+.bottom_abs.width100[
+
+Lecturer: Di Cook
+
+Department of Econometrics and Business Statistics&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  ETC5521.Clayton-x@monash.edu
+
+]
+
+
+]]
+
+
+
+&lt;div class="column transition monash-m-new delay-1s" style="clip-path:url(#swipe__clip-path);"&gt;
+&lt;div class="background-image" style="background-image:url('images/large.png');background-position: center;background-size:cover;margin-left:3px;"&gt;
+&lt;svg class="clip-svg absolute"&gt;
+&lt;defs&gt;
+&lt;clipPath id="swipe__clip-path" clipPathUnits="objectBoundingBox"&gt;
+&lt;polygon points="0.5745 0, 0.5 0.33, 0.42 0, 0 0, 0 1, 0.27 1, 0.27 0.59, 0.37 1, 0.634 1, 0.736 0.59, 0.736 1, 1 1, 1 0, 0.5745 0" /&gt;
+&lt;/clipPath&gt;
+&lt;/defs&gt;	
+&lt;/svg&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

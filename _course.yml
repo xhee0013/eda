@@ -49,6 +49,7 @@ schedule:
     topic: Exploring data having a space and time context
   - week: 11
     lecturer: Emi
+    readings: "[Wickham et al. (2010) Graphical inference for Infovis](https://vita.had.co.nz/papers/inference-infovis.pdf)"
     topic: Using computational tools to determine whether what is seen in the data can be assumed to apply more broadly
   - week: 12
     lecturer: Emi/Di

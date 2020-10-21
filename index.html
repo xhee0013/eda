@@ -24,6 +24,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -36,7 +38,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-      </style>
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -647,7 +649,7 @@ Di/Guest
 A: <a class="fa fa-link" href="lectures/lecture-10A.html" target="_blank"></a> <a class="fab fa-r-project" href="lectures/lecture-10A.Rmd" target="_blank"></a> <a class="fa fa-file-pdf" href="lectures/lecture-10A.pdf" target="_blank"></a>
 </td>
 <td style="text-align:center;width: 1cm; ">
-<a class="fa fa-tasks" href="tutorials/tutorial-10.html" target="_blank"></a> <a class="fa fa-wrench" href="tutorials/tutorial-10.Rmd" target="_blank"></a>
+<a class="fa fa-tasks" href="tutorials/tutorial-10.html" target="_blank"></a> <a class="fa fa-wrench" href="tutorials/tutorial-10.Rmd" target="_blank"></a> <a class="fa fa-lightbulb" href="tutorials/tutorial-10sol.html" target="_blank"></a> <a class="fa fa-laptop" href="tutorials/tutorial-10sol.Rmd" target="_blank"></a>
 </td>
 <td style="text-align:left;">
 Exploring data having a space and time context
@@ -718,7 +720,7 @@ Assignment 3 <strong>due Fri 6 Nov 11:55 PM</strong>
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

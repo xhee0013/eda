@@ -417,7 +417,7 @@ fabric_text_add(cid = "twoway", textId = "txt3",
                 left = 10, top = 70, 
                 fontFamily = "Courier", fontSize = 18)
 fabric_text_add(cid = "twoway", textId = "txt3",
-                text = "  4  2  6  8  8",
+                text = "  4  2  4  6  8",
                 left = 10, top = 100, 
                 fontFamily = "Courier", fontSize = 18)
 fabric_text_add(cid = "twoway", textId = "txt3",

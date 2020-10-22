@@ -43,8 +43,7 @@ This tutorial, including the chat, will be recorded, so that you can re-visit th
 
 ## `r emo::ji("target")` Objectives
 
-These exercise are to do some exploratory analysis with graphics and statistical models, focussing on logistic regression, LOESS and multiple linear regression.  
-
+These exercise are to do some exploratory analysis with graphics and statistical models, focussing on temporal data analysis.  
 
 ## `r emo::ji("wrench")` Preparation 
 

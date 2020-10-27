@@ -1,0 +1,475 @@
+---
+title: "ETC5521 Tutorial 11 Solution"
+subtitle: "Exploring spatiotemporal data and inference for exploratory methods"
+author: "Dr Emi Tanaka and Dr Di Cook"
+date: "Week 11"
+output:
+  bookdown::html_document2:
+    toc: true
+    number_sections: false
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, 
+  message = FALSE, 
+  warning = FALSE, 
+  cache = TRUE,
+  eval = TRUE,
+  cache.path = "cache/",
+  fig.path = "images/tutorial11/",
+  fig.align = "center"
+)
+```
+
+```{r libraries}
+library(tidyverse)
+library(lubridate)
+library(patchwork)
+library(forcats)
+library(ozmaps)
+library(sf)
+library(cartogram)
+library(ggthemes)
+library(broom)
+library(readxl)
+library(nullabor)
+library(plotly)
+library(sugarbag)
+```
+
+
+## Exercise 1: Melbourne COVID19 outbreak 
+
+In Melbourne we have been in a strict lockdown since July. Each week we get our hopes up that restrictions might be eased, and once again these hopes are dashed by the announcement Sunday Oct 25, keeping the restrictions a little longer because of another outbreak in the northwest of the city. The data we have collected here are the case counts by Victorian local government area (LGA) since the beginning of July. We will examine the spatiotemporal distribution of these counts. 
+
+Working with spatial data is always painful! It almost always requires some **ugly** code. Part of the reason for the difficulty is the use of special data objects, that describe maps. There are several different choices, and some packages and tools use one, and others use another, so not all tools work together. The `sf` package is a recent endeavour that helps enormously, but some tools still use other forms, and when you run into errors this might be the reason - it can be hard to tell. Another reason is that map objects can be very large, which makes sense for accurate mapping, but for data analysis and visualisation, we'd rather have smaller, even if slightly inaccurate, spatial objects. It can be helpful to thin out map data before doing further analysis - you need special tools for this, eg `mapshapr`. We don't need this for the exercises here. Another problem commonly encountered is that there are numerous coordinate systems, and types of projections of the 3D globe into a 2D canvas. We have become accustomed to lat/long but like time its an awkward scale to compute on because a translation from E/W and N/S to positive and negative values is needed. More commonly a Universal Transverse Mercator (UTM) is the standard but its far less intuitive to use.  
+
+The code for all the analysis is provided for you. We recommend that you run the code in steps to see what it is doing, why the mutating and text manipulations are necessary. Talk about the code with each other to help you understand it. 
+
+a. The file `melb_lga_covid.csv` contains the cases by LGA. Read the data in and inspect result. You should find that some variables are type `chr` because "null" has been used to code entries on some days. This needs fixing, and also missings should be converted to 0. Why does it make sense to substitute missings with 0, here?
+
+*NAs really have to be 0s. Its likely that the cells were left blank when numbers were recorded, left blank because there were no cases that day.*
+
+```{r}
+# Read the data
+# Replace null with 0, for three LGAs
+# Convert to long form to join with polygons
+# Make the date variables a proper date
+# Set NAs to 0, this is a reasonable assumption
+covid <- read_csv("https://raw.githubusercontent.com/numbats/eda/master/data/melb_lga_covid.csv") %>%
+  mutate(Buloke = as.numeric(ifelse(Buloke == "null", "0", Buloke))) %>%
+  mutate(Hindmarsh = as.numeric(ifelse(Hindmarsh == "null", "0", Hindmarsh))) %>%
+   mutate(Towong = as.numeric(ifelse(Towong == "null", "0", Towong))) %>%
+  pivot_longer(cols = Alpine:Yarriambiack, names_to="NAME", values_to="cases") %>%
+  mutate(Date = ydm(paste0("2020/",Date))) %>%
+  mutate(cases=replace_na(cases, 0))
+```
+
+b. Check the case counts to learn whether they are daily or cumulative. The best way to do this is select one suburb where there were substantial cases, and make a time series. If the counts are cumulative, calculate the daily counts, and re-check the temporal trend for your chosen LGA. Describe the temporal trend, and any visible artifacts. 
+
+*This is cumulative data. Once re-calculated as daily counts, and artifact that emerges is that ther are a few small negatives. this could occur if the previous days numbers have been adjusted as new information on cases or duplicates were found.* 
+
+```{r}
+# Check the case counts
+covid %>% filter(NAME == "Brimbank") %>%
+  ggplot(aes(x=Date, y=cases)) +
+    geom_point()
+
+# Case counts are cumulative, so take lags to get daily case counts
+covid <- covid %>%
+  group_by(NAME) %>%
+  mutate(new_cases = cases - dplyr::lag(cases))
+
+# Check the case counts
+covid %>% filter(NAME == "Brimbank") %>%
+  ggplot(aes(x=Date, y=new_cases)) +
+    geom_col() 
+```
+
+c. Now let's get polygon data of Victorian LGAs from the `ozmaps` package. We need to fix some names of LGAs because there are duplicated LGA names, and there is one mismatch in names from the COVID data and the ozmaps data (Colac Otway). If the COVID data had been provided with a unique LGA code it would have helped in merging with the polygon data.
+
+```{r}
+# Read the LGA data from ozmaps package. 
+# This has LGAs for all of Australia. 
+# Need to filter out Victoria LGAs, avoiding LGAs 
+# from other states with same name, and make the names
+# match covid data names. The regex equation is
+# removing () state and LGA type text strings
+# Good reference: https://r-spatial.github.io/sf/articles/sf1.html
+data("abs_lga")
+vic_lga <- abs_lga %>%
+  mutate(NAME = ifelse(NAME == "Latrobe (M) (Tas.)", "LatrobeM", NAME)) %>%
+  mutate(NAME = ifelse(NAME == "Kingston (DC) (SA)", "KingstonSA", NAME)) %>%
+  mutate(NAME = ifelse(NAME == "Bayside (A)", "BaysideA", NAME)) %>% 
+  mutate(NAME = str_replace(NAME, " \\(.+\\)", "")) %>%
+  mutate(NAME = ifelse(NAME == "Colac-Otway", "Colac Otway", NAME)) 
+vic_lga <- st_transform(vic_lga, 3395) 
+# 3395 is EPSG CRS, equiv to WGS84 mercator, 
+# see https://spatialreference.org/ref/epsg/?page=28
+# cartogram() needs this to be set
+```
+
+d. Select one day, merge the COVID data with the map polygons (LGA) and create a choropleth map. The LGA data is an `sf` object so the `geom_sf` will automatically grab the geometry from the object to make the spatial polygons.
+
+*The high count LGAs are all in Melbourne, mostly in the western suburbs.*
+
+```{r}
+# Select a day when cases were high
+covid_08_01 <- covid %>% 
+  filter(Date == ymd("2020-08-01")) 
+
+# Join covid data to polygon data, remove LGAs with 
+# missing values which should leave just Vic LGAs
+vic_lga_covid <- vic_lga %>%
+  left_join(covid_08_01, by="NAME") %>%
+  filter(!is.na(cases))
+
+# Make choropleth map, with appropriate colour palette
+ggplot(vic_lga_covid) + 
+  geom_sf(aes(fill = new_cases, label=NAME), colour="white") + 
+  scale_fill_distiller("Cases", palette = "YlOrRd",
+                       direction=1) + 
+  theme_map() +
+  theme(legend.position="bottom")
+# Make it interactive
+# plotly::ggplotly() 
+```
+
+e. To make a population-transformed polygon we need to get population data for each LGA. The file [`VIF2019_Population_Service_Ages_LGA_2036.xlsx`](https://github.com/numbats/eda/blob/master/data/VIF2019_Population_Service_Ages_LGA_2036.xlsx)  has been extracted from the [Vic Gov web site](https://www.planning.vic.gov.au/land-use-and-population-research/victoria-in-future/tab-pages/victoria-in-future-data-tables). It is a complicated `xlsx` file, with the data in sheet 3, and starting 13 rows down. The `readxl` package is handy here to extract the population data needed. You'll need to join the population counts to the map data to make a cartogram. Once you have the transformed polygon data, the same plotting code can be used, as created the choropleth map. 
+
+*Interestingly, the population of the LGAs is quite differnt, with densely populated LGAs in Melbourne. These get greatly enlarged by the algorithm, and LGA polygons from the rural areas are much smaller. It makes it easier to see the LGAs with high case counts, and also all of the LGAs in the city with low counts. (Note: the white inner city polygons are not actually LGAs, just unfortunate artifacts of the cartogram transformation.*
+
+```{r}
+# Incorporate population data to make cartogram
+# Population from https://www.planning.vic.gov.au/land-use-and-population-research/victoria-in-future/tab-pages/victoria-in-future-data-tables
+# Data can be downloaded from https://github.com/numbats/eda/blob/master/data/VIF2019_Population_Service_Ages_LGA_2036.xlsx
+pop <- read_xlsx(here::here("data/VIF2019_Population_Service_Ages_LGA_2036.xlsx"), sheet=3, skip=13, col_names = FALSE) %>%
+  rename(NAME = `...4`, pop=`...22`) %>%
+  filter(NAME != "Unincorporated Vic") %>% 
+  mutate(NAME = str_replace(NAME, " \\(.+\\)", "")) %>%
+  mutate(NAME = ifelse(NAME == "Colac-Otway", "Colac Otway", NAME)) 
+
+vic_lga_covid <- vic_lga_covid %>%
+  left_join(pop, by="NAME")
+
+# Compute additional statistics
+vic_lga_covid <- vic_lga_covid %>%
+  group_by(NAME) %>%
+  mutate(cases_per10k = max(new_cases/pop*10000, 0),
+         lnew_cases = log10(new_cases - min(new_cases) + 1)) %>%
+  ungroup()
+
+# Make a contiguous cartogram
+vic_lga_covid_carto <- cartogram_cont(vic_lga_covid, "pop")
+# This st_cast() is necessary to get plotly to work
+vic_lga_covid_carto <- st_cast(vic_lga_covid_carto, "MULTIPOLYGON") 
+
+ggplot(vic_lga_covid_carto) + 
+  geom_sf(aes(fill = cases, label=NAME), colour="white") + 
+  scale_fill_distiller("Cases", palette = "YlOrRd",
+                       direction=1) + 
+  theme_map() +
+  theme(legend.position="bottom") 
+# ggplotly()
+```
+
+f. The last step is to examine the spatiotemporal trend in covid cases by making faceted choropleth maps and cartograms. It's more manageable by aggregating to weekly counts, which can then be displayed using 16 maps for the 16 weeks of the data recording. Describe what you learn about case counts across Melbourne from the facetted maps.
+
+*The temporal trend is easier to read from the cartograms. The same LGAs are primarily affected throughout the time. It started in the northwest, in week 27, peaking in wekk 32. In week 29 it spread to a couple of eastern LGAs. Numbers have been low in all LGAs for the past four weeks. (Note: it could be interesting to use a log scale for counts, and also examine count for 10k people instead of raw counts. On the log scale Melbourne appears to be much more of a hotspot overall.)*
+
+```{r}
+# Aggregate counts to weekly, to examine temporal trend,
+# and re-compute cases per week
+covid_week <- covid %>% 
+  mutate(week = week(Date)) %>%
+  group_by(NAME, week) %>%
+  summarise(wk_cases = sum(new_cases, na.rm=TRUE)) %>%
+  ungroup() %>%
+  left_join(pop, by="NAME") %>% 
+  group_by(NAME, week) %>%
+  mutate(wk_cases_per10k = max(wk_cases/pop*10000, 0)) %>%
+  ungroup()
+
+# Need to join geometry on again  
+vic_lga_covid_week <- vic_lga %>%
+  left_join(covid_week, by="NAME") %>%
+  filter(!is.na(wk_cases))
+
+# Draw the faceted map
+ggplot(vic_lga_covid_week) + 
+  geom_sf(aes(fill = wk_cases), colour="white") + 
+  scale_fill_distiller("Cases", palette = "YlOrRd",
+                       direction=1) + 
+  facet_wrap(~week, ncol=4) +
+  theme_map() +
+  theme(legend.position="bottom")
+
+# Join to the cartogram
+vic_lga_covid_week_carto <-
+  vic_lga_covid_carto %>%
+  left_join(covid_week, by="NAME") 
+
+# Make the facetted cartogram
+ggplot(vic_lga_covid_week_carto) + 
+  geom_sf(aes(fill = wk_cases), colour="white") + 
+  scale_fill_distiller("Cases", palette = "YlOrRd",
+                       direction=1) + 
+  facet_wrap(~week, ncol=4) +
+  theme_map() +
+  theme(legend.position="bottom")
+```
+
+g. The code for standardising counts to cases per 10,000 people, is also provided. Re-make the cartograms with this statistic. Does the spatiotemporal pattern of COVID incidence change? Which is the better statistic to use, with the population re-shaped cartogram?
+
+*The spatiotemporal trend changes a little. A specific hotspot in one LGA is more visible in week 28, and several other hotspots appear, including Colac-Otway which had an outbreak in week 31 in a lamb processing facility. The cases per 10k is the better statistic to use, for all the plots, because it makes the values comparable and independent of the population differences between LGAs. *
+```{r}
+# Make the facetted cartogram
+ggplot(vic_lga_covid_week_carto) + 
+  geom_sf(aes(fill = wk_cases_per10k), colour="white") + 
+  scale_fill_distiller("Cases", palette = "YlOrRd",
+                       direction=1) + 
+  facet_wrap(~week, ncol=4) +
+  theme_map() +
+  theme(legend.position="bottom")
+```
+
+PURELY OUT OF INTEREST, EXTRA CODE TO MAKE A HEXMAP OF VICTORIA IS PROVIDED
+
+This code uses the `sugarbag` package, which is currently only available on GitHub. 
+
+```{r}
+# Spatial coordinates need to be in long/lat
+vlc_latlong <- st_transform(vic_lga_covid, crs = "+proj=longlat +datum=WGS84")
+
+# Placement of hexmaps depends on position relative to
+# Melbourne central
+data(capital_cities)
+vic_lga_hexmap <- create_hexmap(
+  shp = vlc_latlong,
+  sf_id = "NAME",
+  focal_points = capital_cities, verbose = TRUE)
+# This shows the centroids of the hexagons
+# ggplot(vic_lga_hexmap, aes(x=hex_long, y=hex_lat)) +
+#  geom_point()
+
+# Hexagons are made with the `fortify_hexagon` function
+vic_lga_covid_hexmap <- vic_lga_hexmap %>%
+  fortify_hexagon(sf_id = "NAME", hex_size = 0.1869) %>%
+  left_join(covid_08_01, by="NAME") %>%
+  filter(!is.na(cases))
+ggplot() +
+  geom_sf(data=vlc_latlong, 
+          fill = "grey90", colour = "white", size=0.1) +
+  geom_polygon(data=vic_lga_covid_hexmap, 
+               aes(x=long, y=lat, group=hex_id, 
+                   fill = new_cases, 
+                   colour = new_cases), size=0.2) +
+  scale_fill_distiller("Cases", palette = "YlOrRd",
+                       direction=1) +
+  scale_colour_distiller("Cases", palette = "YlOrRd",
+                       direction=1) +
+  theme_map() +
+  theme(legend.position="bottom")
+
+# Now join to the weekly data to make faceted hexmaps
+vic_lga_covid_week_hexmap <- vic_lga_hexmap %>%
+  fortify_hexagon(sf_id = "NAME", hex_size = 0.1869) %>%
+  full_join(covid_week, by="NAME")
+
+ggplot() +
+  geom_sf(data=vlc_latlong, 
+          fill = "grey90", colour = "white", size=0.1) +
+  geom_polygon(data=vic_lga_covid_week_hexmap,
+               aes(x=long, y=lat, group=hex_id, 
+                   fill = wk_cases, 
+                   colour = wk_cases), size=0.1) +
+  scale_fill_distiller("Cases", palette = "YlOrRd",
+                       direction=1) +
+  scale_colour_distiller("Cases", palette = "YlOrRd",
+                       direction=1) +
+  facet_wrap(~week, ncol=4) +
+  theme_map() +
+  theme(legend.position="bottom")
+```
+
+## Exercise 2: Skittles experiment
+
+```{r Q2-data}
+skittle <- read_csv("https://raw.githubusercontent.com/njtierney/skittles/master/data/skittles.csv")
+
+```
+
+(a) How many skittles did each person taste?  
+
+Each person tasted 10 skittles.
+
+```{r Q2a}
+skittle %>% 
+  with(table(person))
+```
+
+(b) A person with loss of taste is called *ageusia* and a person who has a loss of smell is called *anosmia*. The loss of taste and loss of smell will not allow you to distinguish flavours in food. What is the probability that a person with ageusia and anosmia will guess the skittle flavour correctly (out of the five flavours) for one skittle?
+
+If a person cannot distinguish flavours then they will randomly choose one of the five flavours. So the probability that they select the correct flavour is 1/5. 
+
+(c) What is the probability that a person with ageusia and anosmia will guess the skittle flavour correctly for 2 out of 10 skittles, assuming the order of taste does not matter?
+
+Suppose $X$ is the number of skittles that they correctly identified the flavour. Then assuming that the person cannot distinguish flavours and order of tasting the skittles does not matter, $X \sim B(10, 0.2)$. Then $P(X = 2) = {10 \choose 2} 0.2^5 0.8^5\approx 0.3$. So there's only about 30% chance such an event happens!
+
+```{r Q2c}
+dbinom(2, 10, 0.2)
+```
+
+
+(d) Test the hypothesis that people have the ability to distinguish skittle flavours correctly. Assume that the order of tasting does not matter and each person has the same ability to correctly identify the flavours. In conducting your test, define your null and alternate hypothesis, your assumptions, the test statistics and calculate the $p$-value. 
+
+Suppose $X$ is the number of skittles that a person identified the flavour correctly out of 30 skittles. Suppose each tasting is independent and has a equal probability of identifying the flavour correctly; we denote this probability as $p$. We test the hypotheses: $H_0: p = 0.2$ vs. $H_1: p > 0.2$. Under $H_0$, $X\sim B(30, 0.2)$ and therefore the $p$-value is $P(X \geq 15) \approx 0.0002$. The $p$-value is small so the data supports that people can correctly identify the flavour of a skittle!
+
+```{r Q2d}
+sum(skittle$correct)
+1 - pbinom(14, 30, 0.2)
+```
+
+
+
+(e) In part (d) we disregarded the order of the tasting and the possible variability in people's ability to correctly identify the flavour. If in fact these do matter, then how would you construct the test statistic? Is it easy?
+
+To construct a test statistic, we need to construct a summary statistic with some known distribution under the null hypothesis (if using a parametric approach) with large (or extreme) values indicating rejection of the null hypothesis. Suppose that $X_1$, $X_2$ and $X_3$ are the number of skittles out of 10 that person a, b and c, respectively, correctly identified. If each tasting is independent, then $X_1 \sim B(10, p_1)$, $X_2 \sim B(10, p_2)$ and $X_3 \sim B(10, p_3)$ where $p_i$ is the probability that the $i$-th person correctly identifies the flavour of a skittle. Now under $H_0$ you may assume that $p_1 = p_2 = p_3 = 0.2$ and assuming each person is independent, $X_1 + X_2 + X_3 \sim B(30, 0.2)$. Same as (d)! However, if we know remove the assumption that each tasting is independent (so the order of tasting does matter), then the distribution of the test statistic does not hold true any longer.
+
+
+
+(f) Consider the plot below that shows in each tile whether a person guessed correctly by order of their tasting. Suppose that under the null hypothesis, the order of tasting does not matter and people have no ability to distinguish the flavours. Generate a null plot under this null hypothesis.
+
+```{r skittle-tileplot}
+gtile <- skittle %>% 
+  ggplot(aes(factor(order), person, fill = factor(correct))) + 
+  geom_tile(color = "black", size = 2) +
+  coord_equal() + 
+  scale_fill_viridis_d() +
+  labs(x = "Order", y = "Person", fill = "Correct")
+gtile
+```
+
+The null plot is constructed as follows.
+
+```{r Q2e}
+set.seed(1)
+method <- null_dist("correct", "binom", list(size = 1, prob = 0.2))
+gtile %+% method(skittle)
+```
+
+(g) Based on (f), construct a lineup (using `nullabor` or otherwise) of 20 plots. Ask your peers, family or friends which plot looks different.
+
+
+```{r Q2g, fig.width=10, fig.height = 8, message = TRUE}
+lineup_df <- lineup(method, true = skittle)
+gtile %+% lineup_df +
+  facet_wrap(~.sample) +
+  guides(fill = FALSE) +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank())
+
+decrypt("bhMq KJPJ 62 sSQ6P6S2 7m")
+```
+
+
+(h) Suppose that you have a response from 100 people based on your lineup from (g) and 76 correctly identified the data plot. What is the p-value from this visual inference?
+
+We suppose that each person has the same ability to identify the data plot. If we let $X$ be the number of people who correctly identified the data plot in the lineup, then $X \sim B(100, p)$. The visual inference $p$-value is calculated from testing the hypotheses $H_0: p = 0.05$ vs $H_1: p \neq 0.05$, and so is $P(X\geq 76) \approx 0$. The visual inference $p$-value is very small so there is strong evidence to believe that the structure in the data deviates away from the null distribution!
+
+```{r Q2h}
+1 - pbinom(75, 100, 0.05)
+```
+
+
+(i) Now consider the plot below. Use the same null data in (g) to construct a lineup based on below visual statistic. Suppose we had 28 people out of 100 who correctly identified the data plot in this lineup. What is the difference in power of visual statistic in (f) and this one?
+
+```{r skittle-barplot}
+gbar <- skittle %>% 
+  mutate(person = fct_reorder(person, correct, sum)) %>% 
+  group_by(person) %>% 
+  summarise(correct = sum(correct)) %>% 
+  ggplot(aes(person, correct)) + 
+  geom_col() +
+  labs(x = "Person", y = "Correct") +
+  geom_hline(yintercept = 2, linetype = "dashed")
+gbar
+```
+
+```{r Q2i}
+gbar %+% lineup_df +
+  facet_wrap(~.sample) +
+  guides(fill = FALSE) +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank())
+
+decrypt("bhMq KJPJ 62 sSQ6P6S2 7m")
+```
+
+The estimated power of visual statistic in (f) is 76% and for the barplot is 26%. So the difference in power is 50%.
+
+
+## Exercise 3: Social media marketing
+
+```{r Q3-data}
+data(marketing, package = "datarium")
+```
+
+(a) Study the pairs plot. Which of the advertising medium do you think affects the sales?
+
+```{r Q3a}
+GGally::ggpairs(marketing)
+```
+
+The pairs plot suggest that advertising on youtube is highly correlated with the sales and advertising on facebook is moderately correlated with the sales. Newspaper advertisement does not appear to be correlated highly with the sales. 
+
+(b) Construct a coplot for sales vs advertising budget for facebook conditioned on advertising budget for youtube and newspaper. (You may like to make the intervals non-overlapping to make it easier to plot in `ggplot`). What do you see in the plot?
+
+```{r Q3b}
+marketing %>% 
+  ggplot(aes(facebook, sales)) +
+  geom_point() + 
+  facet_grid(cut_number(youtube, 4) ~ cut_number(newspaper, 4)) + 
+  geom_smooth(method = "lm")
+```
+
+The newspaper does not seem to have much affect on the sales however it is noticeable that sales is linearly related to advertisement budget for facebook conditioned on youtube
+
+(c) Now construct a coplot for sales vs advertising budget for facebook conditioned on advertising budget for youtube alone. Superimpose a linear model on each facet. Is there an interval where the linear model is not a good fit?
+
+```{r Q3c}
+marketing %>% 
+  ggplot(aes(facebook, sales)) +
+  geom_point() + 
+  facet_wrap(~cut_number(youtube, 4)) + 
+  geom_smooth(method = "lm")
+```
+
+There is a noticeably higher variability along the line in the above plot where advertisement budget for youtube is less than \$90,000. There appears to be a linear relationship between facebook and sales (conditioned on advertisement budget on youtube), however the fitted lines all appear to have different slopes.
+
+(d) Consider the following interaction model (which has the same symbolic model formulae as `sales ~ facebook*youtube`) for data where the advertising budget for youtube is at least \$90,000. Construct a QQ-plot of the residuals. Do you think the errors are normally distributed? Construct a lineup for the QQ-plot assuming that the null distribution is Normally distributed with mean zero and variance as estimated from the model fit.
+
+```{r Q3d, message = TRUE}
+fit <- lm(sales ~ facebook + youtube + facebook:youtube, data = filter(marketing, youtube > 90))
+
+gqq <- augment(fit) %>% 
+  ggplot(aes(sample = .resid)) +
+  stat_qq() +
+  stat_qq_line()
+gqq
+
+gqq %+% lineup(null_dist(".resid", "norm", list(mean = 0, sd = sigma(fit))),
+               true = augment(fit)) +
+  facet_wrap(~.sample) +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank(), 
+        aspect.ratio = 1)
+
+decrypt("bhMq KJPJ 62 sSQ6P6S2 uu")
+```
+
+
+
+
+
